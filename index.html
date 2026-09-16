@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#0F2A4D">
+<meta name="description" content="Lex Simulator — entrenamiento en litigación penal oral. Audiencias simuladas con el Código Procesal Penal de La Rioja.">
+<title>Lex Simulator — Entrenamiento en litigación penal oral</title>
+
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lex Simulator">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/estilo.css">
+</head>
+<body>
+
+<!-- ═══════════ PORTADA ═══════════ -->
+<div id="portada">
+  <header class="cabecera">
+    <img src="./icon-192.png" alt="">
+    <div class="marca">LEX SIMULATOR<small>Litigación penal oral</small></div>
+    <div class="relleno"></div>
+    <button class="plano" id="irBase">Base de conocimiento</button>
+    <button class="plano" id="irFalacias">Falacias</button>
+    <button class="plano" id="irAjustes">Ajustes</button>
+  </header>
+
+  <section class="heroe">
+    <img src="./emblema.png" alt="Lex Simulator">
+    <h1>Entrená la audiencia antes de la audiencia</h1>
+    <p>Casos riojanos con testigos que ocultan lo que no les preguntás bien. Objeciones resueltas
+       según el art. 203 del Código Procesal Penal de La Rioja, y una devolución que te corrige
+       pregunta por pregunta.</p>
+    <div class="botonera">
+      <button class="principal" id="empezar">Armar una audiencia</button>
+      <button class="secundario" id="irHistorial">Mis audiencias</button>
+      <button class="secundario oculto" id="instalar">Instalar en el teléfono</button>
+    </div>
+  </section>
+
+  <div class="rasgos">
+    <div class="rasgo">
+      <h3>Funciona sin conexión</h3>
+      <p>Veinte causas escritas a mano, con declaración previa y sobre cerrado. Una vez instalada,
+         no necesita internet ni cuenta de ningún tipo.</p>
+    </div>
+    <div class="rasgo">
+      <h3>Objeciones por regla</h3>
+      <p>Detecta sugestivas en el directo, compuestas, adjetivaciones, pedidos de opinión y
+         preguntas de más, y nombra la falacia que hay debajo de cada una.</p>
+    </div>
+    <div class="rasgo">
+      <h3>Testigo vivo, si querés</h3>
+      <p>Con tu propia clave de la API, el testigo improvisa, el caso se genera al momento y la
+         devolución te reescribe cada pregunta mal formulada.</p>
+    </div>
+  </div>
+
+  <footer class="pie">Material: CPP La Rioja (proyecto 2022) · Baytelman &amp; Duce · Rúa · Bacigalupo · Copi</footer>
+</div>
+
+<!-- ═══════════ ARMAR AUDIENCIA ═══════════ -->
+<section class="panel" id="setup"><div class="hoja">
+  <button class="plano" data-volver="portada">← Volver</button>
+  <h2>Armar una audiencia</h2>
+  <p>Elegí el tipo de audiencia y de qué lado litigás.</p>
+
+  <div class="campo"><span>Audiencia</span><div class="opciones" id="opModulo"></div></div>
+  <div class="campo"><span>Litigás como</span><div class="opciones" id="opRol"></div></div>
+  <div class="campo"><span>Caso</span><div class="opciones" id="opCaso"></div></div>
+
+  <div id="avisoIA" class="aviso oculto"></div>
+  <button class="principal" id="abrir">Abrir la audiencia</button>
+</div></section>
+
+<!-- ═══════════ SALA ═══════════ -->
+<section id="sala">
+  <header id="barra">
+    <button class="secundario" id="verLegajo">Legajo</button>
+    <div class="id"><b id="caratula">—</b><span id="subtitulo">—</span></div>
+    <div id="reloj">00:00</div>
+    <button class="secundario" id="levantar">Levantar audiencia</button>
+  </header>
+  <div id="cuerpo">
+    <aside id="legajo"><nav id="pestanas"></nav><div id="folios"></div></aside>
+    <div id="acta"><div class="hilo" id="hilo"></div></div>
+  </div>
+  <footer id="pie">
+    <div class="entrada">
+      <textarea id="pregunta" rows="1" placeholder="Formule su pregunta…"></textarea>
+      <button class="icono" id="microfono" aria-pressed="false" title="Dictar">
+        <svg viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 18v3"/></svg>
+      </button>
+      <button class="icono lleno" id="enviar" title="Formular">
+        <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+    <div class="pista"><span id="pistaIzq"></span><span id="pistaDer"></span></div>
+  </footer>
+</section>
+
+<!-- ═══════════ DEVOLUCIÓN ═══════════ -->
+<section class="panel" id="devolucion"><div class="hoja" id="hojaDev"></div></section>
+
+<!-- ═══════════ HISTORIAL ═══════════ -->
+<section class="panel" id="historial"><div class="hoja">
+  <button class="plano" data-volver="portada">← Volver</button>
+  <h2>Mis audiencias</h2>
+  <div id="listaHistorial"></div>
+</div></section>
+
+<!-- ═══════════ BASE DE CONOCIMIENTO ═══════════ -->
+<section class="panel" id="base"><div class="hoja">
+  <button class="plano" data-volver="portada">← Volver</button>
+  <h2>Base de conocimiento</h2>
+  <p>Lo que cargues acá se suma a lo que ya trae la app y se guarda en este dispositivo.
+     Cada piso viaja en un momento distinto, y por eso tienen presupuestos muy diferentes.</p>
+
+  <div class="tarjeta">
+    <h3>Reglas de audiencia</h3>
+    <p class="ayuda">Viaja en <b>cada pregunta</b> que formulás. Es el espacio más caro: poné acá solo
+      criterios que deban gobernar cada turno, como una regla de objeción propia de tu foro.</p>
+    <textarea id="kbReglas" placeholder="Ej.: En este foro los jueces exigen que la objeción se funde antes de resolver…"></textarea>
+    <div class="medidor" id="medReglas"><i></i></div>
+    <div class="ayuda" id="cntReglas"></div>
+  </div>
+
+  <div class="tarjeta">
+    <h3>Criterios de evaluación</h3>
+    <p class="ayuda">Viaja una sola vez, al levantar la audiencia. Hay lugar de sobra: rúbricas,
+      apuntes de capacitación, tus propios criterios sobre cómo se contraexamina.</p>
+    <textarea id="kbCriterios" placeholder="Ej.: Penalizar especialmente el uso de la declaración previa sin acreditar las condiciones de legitimidad…"></textarea>
+    <div class="medidor" id="medCriterios"><i></i></div>
+    <div class="ayuda" id="cntCriterios"></div>
+  </div>
+
+  <div class="tarjeta">
+    <h3>Ambientación y legajos</h3>
+    <p class="ayuda">Viaja una sola vez, al generar un caso nuevo con modelo. Acá van los legajos
+      reales anonimizados, cómo redacta un sumariante riojano, qué delitos llegan de verdad.</p>
+    <textarea id="kbAmbiente" placeholder="Pegá acá una IPP anonimizada, un acta, una declaración testimonial…"></textarea>
+    <div class="medidor" id="medAmbiente"><i></i></div>
+    <div class="ayuda" id="cntAmbiente"></div>
+  </div>
+
+  <div class="acciones">
+    <button class="principal" id="guardarKb">Guardar</button>
+    <button class="secundario" id="exportarKb">Exportar</button>
+    <button class="secundario" id="importarKb">Importar</button>
+    <input type="file" id="archivoKb" accept="application/json" class="oculto">
+  </div>
+</div></section>
+
+<!-- ═══════════ FALACIAS ═══════════ -->
+<section class="panel" id="falacias"><div class="hoja">
+  <button class="plano" data-volver="portada">← Volver</button>
+  <h2>Falacias y objeciones</h2>
+  <p>El art. 204 exige indicar el motivo de la objeción. Nombrar la falacia que hay debajo vuelve
+     el planteo mucho más difícil de rechazar. Esta es la tabla de correspondencias.</p>
+  <div id="listaFalacias"></div>
+</div></section>
+
+<!-- ═══════════ AJUSTES ═══════════ -->
+<section class="panel" id="ajustes"><div class="hoja">
+  <button class="plano" data-volver="portada">← Volver</button>
+  <h2>Ajustes</h2>
+
+  <div class="tarjeta">
+    <h3>Clave de la API de Anthropic</h3>
+    <p class="ayuda">Opcional. Sin clave, la app funciona con los veinte casos escritos y el motor de
+      objeciones por reglas. Con clave, el testigo improvisa y la devolución es del modelo.
+      La clave se guarda únicamente en este navegador y nunca sale de tu dispositivo, salvo hacia
+      la API de Anthropic. Cada audiencia consume crédito de tu cuenta.</p>
+    <input type="password" id="clave" placeholder="sk-ant-…" autocomplete="off" spellcheck="false">
+    <div class="ayuda">Se obtiene en console.anthropic.com. Nunca la pegues en el repositorio.</div>
+    <div class="acciones">
+      <button class="principal" id="guardarClave">Guardar clave</button>
+      <button class="secundario" id="probarClave">Probar</button>
+      <button class="secundario" id="borrarClave">Borrar</button>
+    </div>
+    <div id="estadoClave" class="ayuda"></div>
+  </div>
+
+  <div class="tarjeta">
+    <h3>Datos guardados</h3>
+    <p class="ayuda">El historial de audiencias y la base de conocimiento viven en este navegador.</p>
+    <div class="acciones"><button class="secundario" id="borrarTodo">Borrar todos mis datos</button></div>
+  </div>
+</div></section>
+
+<script src="./js/conocimiento.js"></script>
+<script src="./js/casos.js"></script>
+<script src="./js/motor.js"></script>
+<script src="./js/app.js"></script>
+</body>
+</html>

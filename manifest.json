@@ -1,0 +1,19 @@
+{
+  "name": "Lex Simulator — Entrenamiento en litigación penal oral",
+  "short_name": "Lex Simulator",
+  "description": "Audiencias penales simuladas con el Código Procesal Penal de La Rioja. Testigos, objeciones y devolución técnica.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F4F7FA",
+  "theme_color": "#0F2A4D",
+  "lang": "es-AR",
+  "dir": "ltr",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
