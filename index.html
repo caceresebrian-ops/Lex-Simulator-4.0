@@ -27,16 +27,18 @@
     <img src="./icon-192.png" alt="">
     <div class="marca">LEX SIMULATOR<small>Litigación penal oral</small></div>
     <div class="relleno"></div>
-    <button class="plano" id="irBase">Base de conocimiento</button>
-    <button class="plano" id="irFalacias">Falacias</button>
-    <button class="plano" id="irAjustes">Ajustes</button>
+    <nav class="menu">
+      <button class="plano" id="irBase">Base de conocimiento</button>
+      <button class="plano" id="irFalacias">Falacias</button>
+      <button class="plano" id="irAjustes">Ajustes</button>
+    </nav>
   </header>
 
   <section class="heroe">
     <img src="./emblema.png" alt="Lex Simulator">
     <h1>Entrená la audiencia antes de la audiencia</h1>
     <p>Casos riojanos con testigos que ocultan lo que no les preguntás bien. Objeciones resueltas
-       según el art. 209 del Código Procesal Penal de La Rioja (Ley 10.797), y una devolución que te corrige
+       según el art. 209 del Código Procesal Penal de La Rioja, y una devolución que te corrige
        pregunta por pregunta.</p>
     <div class="botonera">
       <button class="principal" id="empezar">Armar una audiencia</button>
@@ -45,23 +47,45 @@
     </div>
   </section>
 
-  <div class="rasgos">
-    <div class="rasgo">
-      <h3>Funciona sin conexión</h3>
-      <p>Veinte causas escritas a mano, con declaración previa y sobre cerrado. Una vez instalada,
-         no necesita internet ni cuenta de ningún tipo.</p>
+  <div class="vitrina">
+    <div class="rasgos" id="rasgos">
+      <div class="rasgo">
+        <span class="emblemita" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M5 12.5 9 16.5 19 7"/><circle cx="12" cy="12" r="10"/></svg>
+        </span>
+        <h3>Funciona sin conexión</h3>
+        <p>Veinte causas escritas a mano, con declaración previa y sobre cerrado. Una vez instalada,
+           no necesita internet ni cuenta de ningún tipo.</p>
+      </div>
+      <div class="rasgo">
+        <span class="emblemita" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M5 8h14"/><path d="M8 8 5 15h6z"/><path d="M16 8l-3 7h6z"/></svg>
+        </span>
+        <h3>Objeciones por regla</h3>
+        <p>Detecta sugestivas en el directo, compuestas, adjetivaciones, pedidos de opinión y
+           preguntas de más, y nombra la falacia que hay debajo de cada una.</p>
+      </div>
+      <div class="rasgo">
+        <span class="emblemita" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 18v3"/></svg>
+        </span>
+        <h3>Se litiga hablando</h3>
+        <p>El modo oral escucha tu pregunta, la envía cuando hacés una pausa y te contesta en voz
+           alta, con un timbre para el testigo, otro para el juez y otro para la contraparte.</p>
+      </div>
+      <div class="rasgo">
+        <span class="emblemita" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+        </span>
+        <h3>Testigo vivo, si querés</h3>
+        <p>Con tu propia clave de la API, el testigo improvisa, el caso se genera al momento y la
+           devolución te reescribe cada pregunta mal formulada.</p>
+      </div>
     </div>
-    <div class="rasgo">
-      <h3>Objeciones por regla</h3>
-      <p>Detecta sugestivas en el directo, compuestas, adjetivaciones, pedidos de opinión y
-         preguntas de más, y nombra la falacia que hay debajo de cada una.</p>
-    </div>
-    <div class="rasgo">
-      <h3>Testigo vivo, si querés</h3>
-      <p>Con tu propia clave de la API, el testigo improvisa, el caso se genera al momento y la
-         devolución te reescribe cada pregunta mal formulada.</p>
-    </div>
+    <div class="puntos" id="puntos" role="tablist" aria-label="Características"></div>
   </div>
+
+  <button class="detalles" id="verDetalles">Explorar más detalles</button>
 
   <footer class="pie">Material: Ley 10.797, CPP La Rioja · Baytelman &amp; Duce · Rúa · Bacigalupo · Copi</footer>
 </div>
@@ -95,6 +119,9 @@
   <footer id="pie">
     <div class="entrada">
       <textarea id="pregunta" rows="1" placeholder="Formule su pregunta…"></textarea>
+      <button class="icono" id="modoOral" aria-pressed="false" title="Modo oral: hablás y la sala te contesta en voz alta">
+        <svg viewBox="0 0 24 24"><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M21 15a2 2 0 0 1-2 2h-1v-5h1a2 2 0 0 1 2 2z"/><path d="M3 15a2 2 0 0 0 2 2h1v-5H5a2 2 0 0 0-2 2z"/><path d="M12 21h4"/></svg>
+      </button>
       <button class="icono" id="microfono" aria-pressed="false" title="Dictar">
         <svg viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 18v3"/></svg>
       </button>
@@ -193,6 +220,48 @@
     <p class="ayuda">El historial de audiencias y la base de conocimiento viven en este navegador.</p>
     <div class="acciones"><button class="secundario" id="borrarTodo">Borrar todos mis datos</button></div>
   </div>
+</div></section>
+
+<!-- ═══════════ DETALLES ═══════════ -->
+<section class="panel" id="detalles"><div class="hoja">
+  <button class="plano" data-volver="portada">← Volver</button>
+  <h2>Qué es Lex Simulator</h2>
+  <p>Una sala de audiencias que cabe en el teléfono, para practicar antes de pararse en una de verdad.</p>
+
+  <h3>Cinco audiencias</h3>
+  <div class="tarjeta">
+    <p><b>Examen directo.</b> Interrogás a tu propio testigo. No se admiten sugestivas, salvo las
+      introductorias, de transición o por la negación (art. 209).</p>
+    <p><b>Contraexamen.</b> Interrogás al testigo de la contraria con sugestivas de un solo punto y
+      lo confrontás con su declaración previa (art. 211).</p>
+    <p><b>Audiencia de cautelar.</b> Prisión preventiva o medida alternativa, ante el juez y contra
+      la contraparte, con los arts. 116, 127, 128 y 129.</p>
+    <p><b>Alegato de apertura.</b> Anunciás tu teoría del caso, sin argumentar todavía.</p>
+    <p><b>Alegato de clausura.</b> Cerrás con la prueba producida y pedís concretamente (art. 217).</p>
+  </div>
+
+  <h3>El sobre cerrado</h3>
+  <p>Cada testigo guarda dos o tres datos que no están en el legajo ni en su declaración previa.
+    Solo salen si la pregunta da justo en el punto. Si no los sacás, no aparecen, y recién al
+    levantar la audiencia vas a ver qué te perdiste y con qué línea de preguntas lo obtenías.</p>
+
+  <h3>Objeciones fundadas en lógica</h3>
+  <p>El motor analiza la forma de cada pregunta y detecta once defectos técnicos. Para cada uno
+    identifica la falacia que hay debajo, porque el art. 210 exige indicar el motivo de la objeción
+    y el planteo es más difícil de rechazar cuando se nombra el vicio lógico. La tabla completa está
+    en la sección Falacias.</p>
+
+  <h3>Tus datos no salen del teléfono</h3>
+  <p>El historial de audiencias y el material que cargues quedan guardados en este dispositivo. No
+    hay servidor ni cuenta. Si cargás una clave de la API, se guarda solo acá y únicamente viaja
+    hacia Anthropic cuando el testigo tiene que improvisar.</p>
+
+  <h3>Material de base</h3>
+  <p>Ley 10.797, Código Procesal Penal de La Rioja. Baytelman y Duce, <i>Litigación penal</i>. Rúa,
+    <i>Contraexamen</i> y <i>Examen directo de testigos</i>. Bacigalupo, <i>Técnica de resolución de
+    casos penales</i>. Copi, <i>Introducción a la lógica</i>.</p>
+
+  <div class="acciones"><button class="principal" id="detallesEmpezar">Armar una audiencia</button></div>
 </div></section>
 
 <script src="./js/conocimiento.js"></script>

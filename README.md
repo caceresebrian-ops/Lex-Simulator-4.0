@@ -50,8 +50,22 @@ Abrí la dirección publicada y:
 Queda con ícono propio y abre a pantalla completa. El *service worker* cachea todo, así que después
 de la primera visita funciona sin señal.
 
-El dictado por voz usa la API de reconocimiento del navegador y anda bien en Chrome sobre Android.
-En iOS el soporte es irregular: si el micrófono no aparece, escribí.
+### Litigar de manera oral
+
+Hay dos botones junto al campo de la pregunta.
+
+El **micrófono** dicta: hablás, el texto aparece en el campo y vos lo enviás cuando querés. Si la
+sala está hablando, tocarlo la corta en seco, que es lo que uno hace cuando el testigo se va por las
+ramas.
+
+El botón de **auriculares** enciende el modo oral, que cierra el circuito completo: escucha sin que
+tengas que sostener nada, envía la pregunta sola cuando hacés una pausa de un segundo y medio, la
+sala te contesta en voz alta con un timbre distinto para el testigo, el juez y la contraparte, y el
+micrófono se reabre solo. Así podés entrenar caminando, sin mirar la pantalla.
+
+El reconocimiento de voz anda bien en Chrome sobre Android y en Chrome de escritorio. En Safari
+sobre iPhone suele no estar disponible: en ese caso el modo oral se enciende igual, pero solo de
+salida, así que escuchás la audiencia y escribís tus preguntas.
 
 ## Estructura
 

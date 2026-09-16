@@ -51,6 +51,7 @@ const kb = () => guardado.leer('kb', { reglas:'', criterios:'', ambiente:'' });
 /* ─────────────── navegación ─────────────── */
 function ver(id){
   $('#portada').style.display = id === 'portada' ? 'flex' : 'none';
+  document.body.classList.toggle('solo-portada', id === 'portada');
   $('#sala').classList.toggle('activo', id === 'sala');
   $$('.panel').forEach(p => p.classList.toggle('activo', p.id === id));
   window.scrollTo(0,0);
@@ -61,6 +62,37 @@ $('#irHistorial').onclick= () => { pintarHistorial(); ver('historial'); };
 $('#irBase').onclick     = () => { pintarBase(); ver('base'); };
 $('#irFalacias').onclick = () => { pintarFalacias(); ver('falacias'); };
 $('#irAjustes').onclick  = () => { pintarAjustes(); ver('ajustes'); };
+$('#verDetalles').onclick = () => ver('detalles');
+$('#detallesEmpezar').onclick = () => { pintarSetup(); ver('setup'); };
+
+/* ─── carrusel de la portada: puntos sincronizados con el arrastre ─── */
+(function(){
+  const pista = $('#rasgos'), cont = $('#puntos');
+  if (!pista || !cont) return;
+  const tarjetas = [...pista.children];
+  tarjetas.forEach((_, i) => {
+    const b = document.createElement('button');
+    b.className = 'punto'; b.type = 'button'; b.role = 'tab';
+    b.setAttribute('aria-selected', i === 0);
+    b.setAttribute('aria-label', 'Característica ' + (i+1));
+    b.onclick = () => tarjetas[i].scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+    cont.appendChild(b);
+  });
+  let pendiente = null;
+  pista.addEventListener('scroll', () => {
+    if (pendiente) return;
+    pendiente = requestAnimationFrame(() => {
+      pendiente = null;
+      const centro = pista.scrollLeft + pista.clientWidth / 2;
+      let cerca = 0, dist = Infinity;
+      tarjetas.forEach((t, i) => {
+        const d = Math.abs((t.offsetLeft + t.offsetWidth/2) - centro);
+        if (d < dist){ dist = d; cerca = i; }
+      });
+      [...cont.children].forEach((p, i) => p.setAttribute('aria-selected', i === cerca));
+    });
+  }, { passive:true });
+})();
 
 /* ═══════════════ CAPA CON MODELO ═══════════════ */
 async function pedir(mensajes, opciones){
@@ -198,6 +230,85 @@ Respondé SOLO este JSON, sin texto alrededor:
   return await pedirJson(pide, { modelo: MODELO_FONDO, tope: 3000 });
 }
 
+
+/* ═══════════════ LA VOZ DE LA SALA ═══════════════
+   Cada rol habla con su propio timbre. La cola garantiza que las
+   intervenciones se escuchen en orden y avisa cuando terminó la última,
+   que es lo que permite reabrir el micrófono en el modo oral.        */
+const VOZ = {
+  soportada: typeof speechSynthesis !== 'undefined',
+  encendida: false, voces: [], cola: [], hablando: false, alVaciar: null,
+
+  cargarVoces(){
+    if (!this.soportada) return;
+    const todas = speechSynthesis.getVoices() || [];
+    this.voces = todas.filter(v => /^es/i.test(v.lang));
+    if (!this.voces.length) this.voces = todas.slice(0, 1);
+  },
+
+  /* Timbre por rol: el juez grave y pausado, la contraparte más rápida,
+     el testigo neutro. Si hay varias voces en español, se reparten.   */
+  perfil(quien){
+    const q = String(quien || '').toUpperCase();
+    const n = this.voces.length;
+    if (q.includes('JUEZ'))    return { v:this.voces[0 % n], rate:0.94, pitch:0.82 };
+    if (q.includes('FISCAL') || q.includes('DEFENSA'))
+                               return { v:this.voces[1 % n] || this.voces[0], rate:1.12, pitch:0.96 };
+    if (q.includes('SALA'))    return null;
+    return { v:this.voces[2 % n] || this.voces[0], rate:1.0, pitch:1.06 };
+  },
+
+  decir(quien, texto){
+    if (!this.soportada || !this.encendida || !texto) return;
+    const p = this.perfil(quien);
+    if (!p) return;
+    this.cola.push({ texto: String(texto).slice(0, 600), p });
+    if (!this.hablando) this._siguiente();
+  },
+
+  _siguiente(){
+    const item = this.cola.shift();
+    if (!item){
+      this.hablando = false;
+      const cb = this.alVaciar; this.alVaciar = null;
+      if (cb) setTimeout(cb, 120);
+      return;
+    }
+    this.hablando = true;
+    try {
+      const u = new SpeechSynthesisUtterance(item.texto);
+      u.lang = 'es-AR'; u.rate = item.p.rate; u.pitch = item.p.pitch;
+      if (item.p.v) u.voice = item.p.v;
+      u.onend = () => this._siguiente();
+      u.onerror = () => this._siguiente();
+      speechSynthesis.speak(u);
+    } catch { this._siguiente(); }
+  },
+
+  /* Cortar al testigo en seco, como se corta en una audiencia real */
+  callar(){
+    if (!this.soportada) return;
+    this.cola = [];
+    try { speechSynthesis.cancel(); } catch {}
+    this.hablando = false;
+    const cb = this.alVaciar; this.alVaciar = null;
+    if (cb) setTimeout(cb, 60);
+  },
+
+  /* iOS exige que la primera locución nazca de un gesto del usuario */
+  desbloquear(){
+    if (!this.soportada) return;
+    try {
+      const u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0; speechSynthesis.speak(u);
+    } catch {}
+  }
+};
+if (VOZ.soportada){
+  VOZ.cargarVoces();
+  speechSynthesis.onvoiceschanged = () => VOZ.cargarVoces();
+}
+
 /* ═══════════════ SALA ═══════════════ */
 function entrarSala(){
   const m = MODULOS[S.modulo], c = S.caso;
@@ -263,7 +374,9 @@ function turno(quien, texto, clase){
   const d = document.createElement('div');
   d.className = 'turno ' + (clase||'');
   d.innerHTML = '<div class="quien">'+esc(quien)+'</div><p class="dicho">'+esc(texto)+'</p>';
-  $('#hilo').appendChild(d); alFinal(); return d;
+  $('#hilo').appendChild(d); alFinal();
+  if (clase !== 'propio' && texto !== 'Pensando…') VOZ.decir(quien, texto);
+  return d;
 }
 const alFinal = () => { const a = $('#acta'); a.scrollTop = a.scrollHeight; };
 function aviso(t, malo){ const e = $('#pistaDer'); e.textContent = t||''; e.className = malo ? 'err' : (t ? 'ok' : ''); }
@@ -427,6 +540,8 @@ async function turnoConModelo(txt, fila){
 /* ═══════════════ DEVOLUCIÓN ═══════════════ */
 async function levantar(){
   if (!S.registro.length){ aviso('Todavía no hay nada que evaluar.', true); return; }
+  if (typeof ORAL !== 'undefined' && ORAL.activo) ORAL.apagar();
+  VOZ.callar();
   clearInterval(S.tick);
   const seg = Math.floor((Date.now()-S.t0)/1000);
   const m = MODULOS[S.modulo];
@@ -681,13 +796,115 @@ $('#enviar').onclick = formular;
 $('#verLegajo').onclick = () => $('#legajo').classList.toggle('abierto');
 $('#acta').addEventListener('click', () => $('#legajo').classList.remove('abierto'));
 
-/* dictado */
+/* ═══════════════ ENTRADA POR VOZ ═══════════════
+   Dos cosas distintas:
+   · el micrófono dicta la pregunta y vos la enviás;
+   · el modo oral cierra el circuito — escucha, envía sola cuando hacés
+     silencio, la sala contesta en voz alta y el micrófono se reabre.  */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+const ORAL = {
+  activo:false, rec:null, final:'', reloj:null, PAUSA:1700,
+
+  encender(){
+    if (!SR && !VOZ.soportada){
+      aviso('Este navegador no maneja voz. Podés litigar escribiendo.', true); return;
+    }
+    VOZ.encendida = true;
+    VOZ.desbloquear();                       // iOS exige el gesto inicial
+    $('#modoOral').setAttribute('aria-pressed','true');
+    if (!SR){
+      /* Safari en iPhone suele no reconocer voz, pero sí hablar.
+         Media capacidad es mejor que ninguna: la sala te contesta
+         en voz alta y vos escribís o dictás con el teclado.        */
+      this.activo = false;
+      $('#pistaIzq').textContent = 'La sala te contesta en voz alta. Escribí tu pregunta.';
+      aviso('Solo salida de audio en este navegador.');
+      return;
+    }
+    this.activo = true;
+    $('#pistaIzq').textContent = 'Modo oral: hablá y hacé una pausa para formular';
+    this.escuchar();
+  },
+
+  apagar(){
+    this.activo = false;
+    VOZ.encendida = false;
+    this.soloAudio = false;
+    VOZ.callar();
+    clearTimeout(this.reloj);
+    this.parar();
+    $('#modoOral').setAttribute('aria-pressed','false');
+    $('#modoOral').classList.remove('hablando');
+    $('#pistaIzq').textContent = 'Enter para enviar · Shift+Enter corta renglón';
+    aviso('');
+  },
+
+  parar(){ try { this.rec && this.rec.stop(); } catch {} this.rec = null; },
+
+  escuchar(){
+    if (!this.activo || this.rec) return;
+    try {
+      const r = new SR();
+      r.lang = 'es-AR'; r.continuous = true; r.interimResults = true;
+      this.final = '';
+      r.onresult = ev => {
+        let parcial = '';
+        for (let i = ev.resultIndex; i < ev.results.length; i++){
+          const t = ev.results[i][0].transcript;
+          if (ev.results[i].isFinal) this.final += t + ' ';
+          else parcial += t;
+        }
+        ta.value = (this.final + parcial).trim(); altoAuto();
+        clearTimeout(this.reloj);
+        if (ta.value) this.reloj = setTimeout(() => this.cerrarPregunta(), this.PAUSA);
+      };
+      r.onerror = ev => {
+        if (ev.error === 'not-allowed'){
+          aviso('El navegador no dio permiso al micrófono.', true);
+          this.apagar();
+        } else if (ev.error !== 'no-speech' && ev.error !== 'aborted'){
+          aviso('Se cortó el micrófono. Tocá el botón para retomar.', true);
+        }
+      };
+      r.onend = () => { this.rec = null; if (this.activo && !VOZ.hablando && !ta.value) this.escuchar(); };
+      r.start();
+      this.rec = r;
+      aviso('Escuchando…');
+    } catch { aviso('No se pudo abrir el micrófono.', true); this.apagar(); }
+  },
+
+  async cerrarPregunta(){
+    if (!this.activo) return;
+    const txt = ta.value.trim();
+    if (!txt) return;
+    clearTimeout(this.reloj);
+    this.parar();
+    aviso('');
+    $('#modoOral').classList.add('hablando');
+    await formular();
+    if (!this.activo) return;
+    if (VOZ.hablando) VOZ.alVaciar = () => this.retomar();
+    else this.retomar();
+  },
+
+  retomar(){
+    $('#modoOral').classList.remove('hablando');
+    if (this.activo) this.escuchar();
+  }
+};
+
+$('#modoOral').onclick = () => (ORAL.activo || VOZ.encendida) ? ORAL.apagar() : ORAL.encender();
+
+/* Micrófono: dicta. Y si la sala está hablando, la corta en seco,
+   que es lo que uno hace cuando el testigo se va por las ramas.     */
 (function(){
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const b = $('#microfono');
   if (!SR){ b.style.display = 'none'; return; }
   let rec = null, base = '';
   b.onclick = () => {
+    if (VOZ.hablando){ VOZ.callar(); aviso('Cortaste a la sala.'); return; }
+    if (ORAL.activo){ ORAL.apagar(); return; }
     if (rec){ rec.stop(); return; }
     try {
       rec = new SR(); rec.lang = 'es-AR'; rec.continuous = true; rec.interimResults = true;
