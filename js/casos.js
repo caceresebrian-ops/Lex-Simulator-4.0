@@ -1,5 +1,6 @@
 /* ══════════════════════════════════════════════════════════════════════════
    LEX SIMULATOR — Biblioteca de casos
+   Normativa citada: Ley 10.797, Código Procesal Penal de La Rioja.
    Cada caso trae legajo público, declaración previa y "sobre cerrado".
    El banco de respuestas permite que el testigo conteste sin conexión:
      claves    → palabras que activan el tema (separadas por espacios)
@@ -585,13 +586,15 @@ const CASOS = [
   ],
   imputado:{nombre:'Rubén Salvatierra', perfil:'41 años, empleado municipal, 12 años de antigüedad. Convive con la víctima y dos hijos menores. Sin antecedentes condenatorios. Tres denuncias en 14 meses.'},
   sobre:{
-    verdad:'No hay peligro de fuga: arraigo fuerte y empleo público. El peligro real es de entorpecimiento en su forma específica del art. 129 inc. 2: influir sobre la víctima para que se comporte de manera reticente, que es exactamente lo que pasó en los dos archivos anteriores. La medida adecuada no es la preventiva sino la del art. 116 inc. 7 combinada con el inc. 6 y el inc. 9.',
+    verdad:'No hay peligro de fuga: arraigo fuerte y empleo público. El riesgo real está en el art. 129, que la Ley 10.797 ya no titula solo como peligro de entorpecimiento sino como PELIGRO DE ENTORPECIMIENTO Y RIESGO DE LA VÍCTIMA, y que en su inciso 4 contempla expresamente los actos intimidatorios o amenazantes contra la víctima o su familia y la violación de las cautelares impuestas. La medida adecuada no es la preventiva sino la del art. 116 inc. 7 combinada con el inc. 6 y el inc. 9.',
     puntos:[
-      'El arraigo es fuerte: empleo público estable y domicilio. El peligro de fuga es débil (art. 128).',
-      'El patrón de archivos por falta de impulso de la víctima es un indicio concreto de influencia sobre ella (art. 129 inc. 2).',
-      'El art. 116 inc. 7 prevé específicamente el abandono inmediato del domicilio en casos de violencia doméstica.',
+      'El arraigo es fuerte: empleo público estable, doce años de antigüedad y domicilio. El peligro de fuga del art. 128 es débil y conviene concederlo de entrada.',
+      'El inc. 4 del art. 129 es el que rige este caso: contempla los actos intimidatorios contra la víctima como riesgo procesal autónomo, sin necesidad de forzar el inciso sobre influencia en testigos.',
+      'El patrón de dos archivos por falta de impulso de la víctima es el indicio concreto que exige el art. 129: no alcanza con invocar el riesgo en abstracto.',
+      'El informe de riesgo alto es el respaldo del peligro, pero hay que bajarlo a hechos: qué conducta concreta se teme y por qué.',
+      'El art. 116 inc. 7 prevé específicamente el abandono inmediato del domicilio cuando se trate de hechos de violencia doméstica y la víctima conviva con el imputado, que es exactamente este supuesto.',
       'La vivienda está a nombre de la víctima, lo que despeja el obstáculo habitual a la exclusión.',
-      'La prisión preventiva debe ser el último recurso: si el peligro se neutraliza con exclusión, prohibición de contacto y dispositivo de rastreo, el juez debe imponer esas (art. 116, último párrafo).'
+      'La prisión preventiva es el último recurso del art. 116: si el peligro se neutraliza con exclusión, prohibición de contacto y dispositivo de rastreo, el juez DEBE imponer esas, por un plazo predeterminado y en forma combinada (art. 116, último párrafo).'
     ],
     conducta:''}
 },
@@ -659,7 +662,7 @@ const CASOS = [
   ],
   imputado:{nombre:'Ramón Alberto Quiroga', perfil:'24 años. Niega el hecho. Sin condenas.'},
   sobre:{
-    verdad:'El caso se juega entero en la fiabilidad del reconocimiento. La fiscalía debe sostener la identificación pese a las condiciones de percepción; la defensa debe mostrar que un reconocimiento en esas condiciones no supera el estándar del art. 182.',
+    verdad:'El caso se juega entero en la fiabilidad del reconocimiento. La fiscalía debe sostener la identificación pese a las condiciones de percepción; la defensa debe mostrar que un reconocimiento en esas condiciones no supera el estándar del art. 187.',
     puntos:[
       'La identificación es el único elemento que vincula al imputado con el hecho.',
       'Las condiciones de percepción fueron adversas: segundos, de perfil, con capucha y sin iluminación.',
@@ -687,9 +690,9 @@ const CASOS = [
     puntos:[
       'Cuidado con la causa falsa: comprar combustible antes del incendio es antecedente temporal, no causa.',
       'Cuidado con la falacia de composición y de división al valorar el cuadro indiciario: ni la suma de indicios débiles es automáticamente fuerte, ni la fuerza del conjunto se transmite a cada indicio.',
-      'El art. 19 y el 212 mandan valoración integral según la sana crítica: hay que mostrar cómo se articulan los indicios, no enumerarlos.',
+      'Los arts. 19 y 218 mandan valoración integral según la sana crítica: hay que mostrar cómo se articulan los indicios, no enumerarlos.',
       'La hipótesis alternativa del cortocircuito debe ser descartada, no ignorada.',
-      'La petición debe ser concreta (art. 211), incluida la calificación y el monto de pena.'
+      'La petición debe ser concreta (art. 217), incluida la calificación y el monto de pena.'
     ],
     conducta:''}
 },

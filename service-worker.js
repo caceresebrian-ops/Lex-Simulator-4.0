@@ -2,7 +2,10 @@
    Cachea la app para que funcione sin conexión. Las llamadas a la API
    de Anthropic nunca se cachean: van siempre a la red.                */
 
-const VERSION = 'lex-v1';
+/* IMPORTANTE: subí este número en CADA actualización de los archivos.
+   Si no cambia, los navegadores que ya visitaron el sitio siguen sirviendo
+   la copia vieja desde el caché y no ven los cambios nunca.              */
+const VERSION = 'lex-v2';
 const NUCLEO = [
   './',
   './index.html',

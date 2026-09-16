@@ -70,6 +70,17 @@ apple-touch-icon.png
 emblema.png
 ```
 
+## Actualizar el sitio
+
+Para reemplazar archivos no hace falta borrar nada: subí los nuevos con el mismo nombre y GitHub
+los sobrescribe. Pero **cada vez que cambies un archivo, subí el número de `VERSION` en
+`service-worker.js`** (`lex-v2`, `lex-v3`, y así). Ese nombre identifica el caché: si no cambia, los
+navegadores que ya visitaron el sitio siguen mostrando la versión vieja aunque en GitHub estén los
+archivos nuevos.
+
+Si actualizaste y no ves los cambios, en la computadora hacé Ctrl+Shift+R, y en el teléfono cerrá la
+app instalada del todo y volvé a abrirla.
+
 ## Agregar casos
 
 Los casos viven en `js/casos.js`. Cada uno lleva legajo público, declaración previa, sobre cerrado y
@@ -90,7 +101,7 @@ más texto.
 
 ## Material de base
 
-- Proyecto de Código Procesal Penal de La Rioja (2022) — arts. 199 a 215 y 115 a 134
+- Ley 10.797 — Código Procesal Penal de La Rioja (sancionada) — arts. 205 a 218 y 115 a 132
 - Baytelman y Duce, *Litigación penal. Juicio oral y prueba*
 - Gonzalo Rúa, *Contraexamen de testigos* y *Examen directo de testigos* (Binder, dir.)
 - Bacigalupo, *Técnica de resolución de casos penales*

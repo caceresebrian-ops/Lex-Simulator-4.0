@@ -107,7 +107,7 @@ function analizar(texto, modulo, previas){
   const introductoria = previas.length < 2 || /\b(su nombre|se llama|a que se dedica|donde vive|es usted)\b/.test(plano);
   if (modulo === 'directo' && sugestiva && !introductoria)
     d.unshift({id:'sugestiva', nombre:'Pregunta sugestiva', falacia:null,
-               motivo:'en el examen directo la pregunta no puede contener la respuesta (art. 203)'});
+               motivo:'en el examen directo la pregunta no puede contener la respuesta (art. 209)'});
 
   /* — abierta en contraexamen: no es objetable, pero es un "NO" — */
   if (modulo === 'contra' && !sugestiva && !d.some(x => x.id==='explicacion') && palabras > 10)
@@ -132,7 +132,7 @@ function decidirObjecion(an, modulo, estado){
   const lista = OBJETABLES[modulo] || [];
   const grave = an.defectos.find(x => lista.includes(x.id));
   if (!grave) return null;
-  // El art. 204 manda que las objeciones no alteren la continuidad:
+  // El art. 210 manda que las objeciones no alteren la continuidad:
   // como mucho una cada tres preguntas, salvo defectos manifiestos.
   const manifiesto = ['sugestiva','coaccion','adhominem','compuesta'].includes(grave.id);
   if (!manifiesto && estado.desdeUltimaObjecion < 3) return null;

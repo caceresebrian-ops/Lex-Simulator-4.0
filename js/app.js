@@ -12,15 +12,15 @@ const { CPP, TECNICA, LOGICA, FALACIAS, CASOS,
 /* ─────────────── configuración ─────────────── */
 const MODULOS = {
   contra:  {nombre:'Contraexamen', pista:'al testigo de la contraria', tipo:'audiencia', testigo:true,
-            reglas:'El usuario contraexamina. Puede usar sugestivas de un solo punto y confrontar con la declaración previa (art. 203): las sugestivas NO son objetables. Sí lo son: compuesta, capciosa, que asume hechos no acreditados, que tergiversa la previa, argumentativa, repetitiva, ambigua o vaga por adjetivación, que pide opinión a un testigo lego, impertinente o coactiva.'},
+            reglas:'El usuario contraexamina. Puede usar sugestivas de un solo punto y confrontar con la declaración previa (art. 209): las sugestivas NO son objetables. Sí lo son: compuesta, capciosa, que asume hechos no acreditados, que tergiversa la previa, argumentativa, repetitiva, ambigua o vaga por adjetivación, que pide opinión a un testigo lego, impertinente o coactiva.'},
   directo: {nombre:'Examen directo', pista:'a tu propio testigo', tipo:'audiencia', testigo:true,
-            reglas:'El usuario hace el examen directo de su propio testigo. Son OBJETABLES las sugestivas o indicativas (art. 203), salvo introductorias, de transición o por la negación. También: compuesta, ambigua o vaga, capciosa, que asume hechos no acreditados, opinión de testigo lego, repetitiva, impertinente.'},
+            reglas:'El usuario hace el examen directo de su propio testigo. Son OBJETABLES las sugestivas o indicativas (art. 209), salvo introductorias, de transición o por la negación. También: compuesta, ambigua o vaga, capciosa, que asume hechos no acreditados, opinión de testigo lego, repetitiva, impertinente.'},
   cautelar:{nombre:'Audiencia de cautelar', pista:'prisión preventiva o medida alternativa', tipo:'audiencia', testigo:false,
-            reglas:'Audiencia del art. 130. No hay testigos: se litiga contra la contraparte ante el juez. El juez conduce y exige concreción, pero no interroga sobre los hechos (art. 203).'},
+            reglas:'Audiencia del art. 130. No hay testigos: se litiga contra la contraparte ante el juez. El juez conduce y exige concreción, pero no interroga sobre los hechos (art. 209).'},
   apertura:{nombre:'Alegato de apertura', pista:'anunciar la teoría del caso', tipo:'alegato', minutos:5,
-            reglas:'Exposición inicial del art. 199: se anuncia lo que la prueba va a demostrar, no se argumenta todavía, y no se leen memoriales (art. 211).'},
+            reglas:'Exposición inicial del art. 205: se anuncia lo que la prueba va a demostrar, no se argumenta todavía, y no se leen memoriales (art. 217).'},
   clausura:{nombre:'Alegato de clausura', pista:'cerrar con la prueba producida', tipo:'alegato', minutos:8,
-            reglas:'Alegato final del art. 211: se argumenta y se valora la prueba según la sana crítica, y se cierra con la petición concreta.'}
+            reglas:'Alegato final del art. 217: se argumenta y se valora la prueba según la sana crítica, y se cierra con la petición concreta.'}
 };
 const ROLES = { fiscal:'Fiscal', defensa:'Defensa' };
 const otroDe = r => r === 'fiscal' ? 'DEFENSA' : 'FISCAL';
@@ -353,7 +353,7 @@ PERSONAJES:
   de un solo punto contesta seco y se calla. Nunca ofrece lo que está en el sobre cerrado: si no se
   lo preguntan bien, esa información no aparece.
 • ${otro}: objeta cuando corresponde, diciendo "Objeción" y el motivo.
-• JUEZ: resuelve en una línea. NO interroga al testigo jamás (art. 203).`
+• JUEZ: resuelve en una línea. NO interroga al testigo jamás (art. 209).`
   : `
 PERSONAJES:
 • ${otro}: litiga en contra con argumentos concretos sobre los arts. 116, 127, 128 y 129.
@@ -384,7 +384,7 @@ Puntos: ${(c.sobre?.puntos||[]).join(' | ')}
 ${c.sobre?.conducta ? 'Conducta: '+c.sobre.conducta : ''}
 ${extra ? '\nREGLAS ADICIONALES DEL USUARIO:\n'+extra.slice(0,2500) : ''}
 
-CÓMO OBJETAR: solo con fundamento real, y como mucho una cada cuatro o cinco preguntas (art. 204).
+CÓMO OBJETAR: solo con fundamento real, y como mucho una cada cuatro o cinco preguntas (art. 210).
 Si la pregunta es correcta, no inventes motivo.
 
 Respondé SOLO este JSON:
@@ -494,8 +494,8 @@ function informeAlegatoOffline(seg){
   const m = MODULOS[S.modulo];
   const tiene = re => re.test(plano);
   const ejes = [
-    { eje:'Petición concreta (art. 211)', puntaje: tiene(/\b(solicito|pido|requiero|peticiono|absoluci|condena|pena de)\b/) ? 9 : 3,
-      comentario:'El art. 211 exige que las partes expresen sus peticiones de un modo concreto al finalizar.' },
+    { eje:'Petición concreta (art. 217)', puntaje: tiene(/\b(solicito|pido|requiero|peticiono|absoluci|condena|pena de)\b/) ? 9 : 3,
+      comentario:'El art. 217 exige que las partes expresen sus peticiones de un modo concreto al finalizar.' },
     { eje:'Proposiciones fácticas', puntaje: tiene(/\b(la prueba|el testigo|el perito|acredit|demostr|surge de)\b/) ? 8 : 4,
       comentario:'Se litiga con afirmaciones de hecho respaldadas en prueba, no con conclusiones jurídicas sueltas.' },
     { eje:'Extensión', puntaje: Math.max(0, Math.min(10, 10 - Math.abs(pal - m.minutos*130)/60)),
@@ -506,7 +506,7 @@ function informeAlegatoOffline(seg){
       comentario:'La apertura anuncia lo que la prueba va a demostrar; la valoración es materia de la clausura.' });
   else
     ejes.push({ eje:'Sana crítica', puntaje: tiene(/\b(sana critica|valoraci|integral|indicio|coherent|corrobor)\b/) ? 8 : 5,
-      comentario:'Los arts. 19 y 212 mandan valoración integral. Mostrá cómo se articula la prueba, no la enumeres.' });
+      comentario:'Los arts. 19 y 218 mandan valoración integral. Mostrá cómo se articula la prueba, no la enumeres.' });
   const global = Math.round((ejes.reduce((a,e)=>a+e.puntaje,0)/ejes.length)*10)/10;
   return { global, ejes, correcciones:[], aciertos:[],
     perdido:(S.caso.sobre?.puntos||[]).filter(p => !plano.includes(window.LEX.sinTildes(p).slice(0,25))),
