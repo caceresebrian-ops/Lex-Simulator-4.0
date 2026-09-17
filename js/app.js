@@ -388,6 +388,7 @@ function entrarSala(){
   const m = MODULOS[S.modulo], c = S.caso;
   S.registro = []; S.turnos = []; S.previas = [];
   S.estado = { desdeUltimaObjecion: 9, dichos: new Set() };
+  S.fundado = '';
   $('#hilo').innerHTML = '';
   $('#caratula').textContent = c.caratula || 'Causa sin carátula';
   $('#subtitulo').textContent = `${m.nombre} · ${ROLES[S.rol]}${hayIA() ? '' : ' · sin conexión'}`;
@@ -496,8 +497,10 @@ async function formular(){
   $('#pregunta').value = ''; altoAuto();
   turno('USTED — ' + ROLES[S.rol].toUpperCase(), txt, 'propio');
 
-  const an = m.tipo === 'audiencia' ? analizar(txt, S.modulo, S.previas) : null;
+  const esCautelar = S.modulo === 'cautelar';
+  const an = (m.tipo === 'audiencia' && !esCautelar) ? analizar(txt, S.modulo, S.previas) : null;
   if (an) S.previas.push(an.toks);
+  if (esCautelar) S.fundado = (S.fundado || '') + ' \n ' + txt;
   const fila = { quien:'LITIGANTE', texto:txt, analisis:an, objetada:false, revelo:null };
   S.registro.push(fila);
 
@@ -570,12 +573,14 @@ async function turnoOffline(an, fila){
 
   if (!m.testigo){
     const ind = pensando('SALA');
-    await demora(1400 + Math.random()*900);
+    await demora(1500 + Math.random()*900);
     ind.remove();
-    turno(otro, 'La contraparte se opone y solicita que se resuelva conforme a los arts. 127 a 129.', 'objecion');
-    await demora(900);
-    turno('JUEZ', 'Escuchada la parte, continúe fundando su petición. Recuerde precisar el plazo.', 'juez');
-    S.registro.push({ quien:'JUEZ', texto:'continúe' });
+    const { replica, interpela } = tribunalCautelar();
+    turno(otro, replica, 'objecion');
+    S.registro.push({ quien:otro, texto:replica });
+    await demora(1200 + Math.random()*600);
+    turno('JUEZ', interpela, 'juez');
+    S.registro.push({ quien:'JUEZ', texto:interpela });
     return;
   }
 
@@ -593,6 +598,58 @@ async function turnoOffline(an, fila){
   if (r.revelado) aviso('Sacaste un punto del sobre cerrado.');
   else if (r.aclara) aviso('El testigo no entendió la pregunta.', true);
   else if (an.defectos.length && !obj) aviso(an.defectos[0].nombre + ': ' + an.defectos[0].motivo, true);
+}
+
+/* El tribunal reacciona a lo que todavía no fundaste. Si no diste el
+   plazo, el juez te lo pide; si no descartaste las medidas del art. 116,
+   la contraparte se apoya justo ahí.                                   */
+function tribunalCautelar(){
+  const todo = window.LEX.sinTildes(S.fundado || '');
+  const faltan = EJES_CAUTELAR.filter(e => !e.re.test(todo));
+  const soyFiscal = S.rol === 'fiscal';
+
+  const REPLICAS = {
+    conviccion: soyFiscal
+      ? 'Su señoría, la fiscalía no ha acreditado elementos de convicción suficientes sobre la participación de mi asistido. El art. 127 inciso 1 es el punto de partida y todavía no se satisfizo.'
+      : 'La defensa pretende discutir el mérito, pero los elementos de convicción están acreditados y el art. 127 inciso 1 se encuentra satisfecho.',
+    arraigo: soyFiscal
+      ? 'Mi asistido tiene arraigo constatado: domicilio, familia a cargo y trabajo. El art. 128 inciso 1 juega en contra del pedido fiscal.'
+      : 'El arraigo invocado por la defensa no está respaldado en constancias del legajo.',
+    alternativa: soyFiscal
+      ? 'La fiscalía pide la medida más gravosa sin descartar ninguna de las diez anteriores del art. 116. El último párrafo es imperativo, su señoría.'
+      : 'Las medidas alternativas no resultan suficientes para neutralizar el peligro en este caso.',
+    entorpecimiento: soyFiscal
+      ? 'No se invocó ningún indicio concreto de entorpecimiento en los términos del art. 129.'
+      : 'El riesgo del art. 129 está presente y la defensa no se hace cargo de él.',
+    plazo: 'La contraparte no ha precisado el plazo de la medida, como exige el art. 127 inciso 3.',
+    limitaciones: soyFiscal
+      ? 'Además, el art. 124 bloquea la prisión preventiva en este caso, y la fiscalía lo omitió por completo.'
+      : 'El art. 124 no resulta aplicable a este supuesto.',
+    conducta: 'Nada se dijo sobre el comportamiento procesal previo, que es la segunda pauta del art. 128.',
+    peticion: 'La contraparte no ha formulado una petición concreta.',
+    contradiccion: 'La contraparte no se hace cargo de los argumentos que ya expusimos.'
+  };
+  const INTERPELA = {
+    conviccion: 'Doctor, concretamente: ¿con qué elementos del legajo acredita usted la participación?',
+    arraigo: '¿Qué dice el informe socioambiental sobre el domicilio y el trabajo? Sea concreto, por favor.',
+    conducta: '¿Hubo rebeldías o incomparecencias previas en esta causa?',
+    entorpecimiento: '¿Qué indicio concreto tiene usted de entorpecimiento? No me alcanza con la posibilidad abstracta.',
+    alternativa: 'Le voy a pedir que me explique por qué ninguna de las medidas del art. 116 alcanza para neutralizar el peligro que invoca.',
+    limitaciones: '¿Considera usted aplicable alguna de las limitaciones del art. 124?',
+    plazo: 'Doctor, no me ha dado el plazo. ¿Por cuánto tiempo pide la medida?',
+    peticion: 'Concretamente, ¿qué está pidiendo usted a este tribunal?',
+    contradiccion: '¿Qué responde al planteo de la contraparte?'
+  };
+  const OK = [
+    'Escuchada la parte. Continúe.',
+    'Tomo nota. ¿Algo más que quiera agregar antes de que resuelva?',
+    'Bien. La contraparte tendrá su oportunidad de responder.'
+  ];
+  const f = faltan[0];
+  return {
+    replica: (f && REPLICAS[f.id]) || 'Su señoría, la defensa se opone en los términos ya expuestos.',
+    interpela: (f && INTERPELA[f.id]) || OK[Math.floor(Math.random()*OK.length)]
+  };
 }
 
 /* ─── con modelo ─── */
@@ -696,14 +753,18 @@ async function levantar(){
   if (hayIA()){
     try { d = await devolucionConModelo(seg); }
     catch (e){
-      d = m.tipo === 'audiencia' ? informeOffline(S.caso, S.modulo, S.registro, seg) : null;
+      d = S.modulo === 'cautelar' ? informeCautelar(S.caso, S.rol, S.registro, seg)
+        : m.tipo === 'alegato'    ? informeAlegato(S.caso, S.modulo, S.rol, S.registro, seg, m.minutos)
+        : informeOffline(S.caso, S.modulo, S.registro, seg);
       if (d) d.veredicto = '[La devolución del modelo falló: ' + e.message + '] ' + d.veredicto;
       else { $('#hojaDev').innerHTML = '<h2>Devolución</h2><p>'+esc(e.message)+'</p>'; return; }
     }
-  } else if (m.tipo === 'audiencia'){
-    d = informeOffline(S.caso, S.modulo, S.registro, seg);
+  } else if (S.modulo === 'cautelar'){
+    d = informeCautelar(S.caso, S.rol, S.registro, seg);
+  } else if (m.tipo === 'alegato'){
+    d = informeAlegato(S.caso, S.modulo, S.rol, S.registro, seg, m.minutos);
   } else {
-    d = informeAlegatoOffline(seg);
+    d = informeOffline(S.caso, S.modulo, S.registro, seg);
   }
   pintarDevolucion(d, seg);
   archivar(d, seg);

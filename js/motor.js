@@ -578,3 +578,260 @@ if (typeof window !== 'undefined') {
     bancoUniversal, fichas, sinTildes
   });
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   5. AUDIENCIA DE MEDIDAS DE COERCIÓN (art. 130)
+   Acá no se interroga: se funda. Evaluar la forma de las preguntas no
+   tiene sentido. Lo que se mide es si el planteo cumple la checklist que
+   la propia ley impone a quien pide o resiste la medida.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+const EJES_CAUTELAR = [
+  { id:'conviccion', eje:'Elementos de convicción (art. 127.1)', peso:1,
+    re:/\b(elementos de conviccion|acta de|flagrancia|testimonio|declaracion de|pericia|informe|secuestr|filmacion|camara|acredit|surge de|constanci|prueba que)/,
+    falta:'No acreditaste los elementos de convicción sobre la existencia del hecho y la participación. Es el primer requisito del art. 127 y sin eso no se discute ningún peligro.',
+    bien:'Acreditaste el mérito sustantivo con elementos concretos del legajo.' },
+
+  { id:'arraigo', eje:'Arraigo (art. 128.1)', peso:1,
+    re:/\b(arraigo|domicilio|residencia|vive en|asiento de la familia|trabajo|empleo|ocupacion|hijos a cargo|familia|facilidades para|abandonar el pais|ocultarse|socioambiental)/,
+    falta:'No trabajaste el arraigo, que es la primera pauta del art. 128: domicilio, residencia habitual, asiento de la familia, negocios o trabajo, y facilidades para irse u ocultarse.',
+    bien:'Discutiste el arraigo con las pautas concretas del art. 128.1.' },
+
+  { id:'conducta', eje:'Comportamiento procesal (art. 128.2)', peso:1,
+    re:/\b(rebeldia|rebelde|no compareci|comparecio|se present|citacion|oculto|identidad falsa|domicilio falso|antecedent|condena anterior|condicional|incumpli|se fugo|se dio a la fuga|entrego voluntariamente)/,
+    falta:'No dijiste nada sobre el comportamiento durante el procedimiento, que es la segunda pauta del art. 128: si hubo rebeldía, ocultamiento de identidad o domicilio falso.',
+    bien:'Usaste el comportamiento procesal previo como pauta del peligro de fuga.' },
+
+  { id:'entorpecimiento', eje:'Entorpecimiento y riesgo de la víctima (art. 129)', peso:1,
+    re:/\b(entorpec|destru|modific|oculta|suprim|falsific|prueba|influ|testigos|perito|reticen|induc|intimidator|amenaz|contra la victima|su familia|violatorio|viole las medidas|incumplio la cautelar|acercamiento)/,
+    falta:'No planteaste el art. 129. Ojo que la Ley 10.797 lo amplió: ya no es solo entorpecimiento, el inciso 4 incorpora los actos intimidatorios contra la víctima o su familia y la violación de las cautelares impuestas.',
+    bien:'Trabajaste el art. 129, incluido el riesgo de la víctima.' },
+
+  { id:'alternativa', eje:'Proporcionalidad y medida alternativa (art. 116)', peso:1.3,
+    re:/\b(art(iculo)? 116|medida menos gravosa|alternativ|presentacion periodica|caucion|dispositivo|tobillera|rastreo|arresto domiciliario|prohibicion de|abandono del domicilio|no salir|ultimo recurso|proporcional|menos lesiva|combinad)/,
+    falta:'No discutiste las medidas del art. 116. Su último párrafo es imperativo: si el peligro puede evitarse razonablemente con una medida menos gravosa, el juez DEBE imponer esa. Litigar una preventiva sin descartar las diez alternativas anteriores es dejar el planteo a mitad de camino.',
+    bien:'Discutiste el catálogo del art. 116 y la proporcionalidad de la medida pedida.' },
+
+  { id:'limitaciones', eje:'Limitaciones del art. 124', peso:0.8,
+    re:/\b(art(iculo)? 124|condena condicional|condicional|ejecucion morigerada|24\.?660|setenta an?os|70 an?os|embarazo|lactancia|accion privada|libertad de expresion)/,
+    falta:'No mencionaste el art. 124, que bloquea la prisión preventiva de plano en varios supuestos, empezando por el más frecuente: que pudiera aplicarse condena condicional.',
+    bien:'Invocaste las limitaciones del art. 124.' },
+
+  { id:'plazo', eje:'Plazo de la medida (arts. 127.3 y 130)', peso:1,
+    re:/\b(plazo|meses|dias de|duracion|por el termino|tres meses|renovacion|vencimiento|hasta el)/,
+    falta:'No fijaste plazo. El art. 127 inc. 3 obliga a indicar el plazo de duración necesario, y el art. 130 exige que el fiscal especifique el de la medida y el de la investigación. Sin plazo, el pedido está incompleto.',
+    bien:'Precisaste el plazo, como exigen los arts. 127.3 y 130.' },
+
+  { id:'peticion', eje:'Petición concreta', peso:1,
+    re:/\b(solicito|pido|requiero|peticiono|solicitamos|vengo a solicitar|corresponde disponer|se disponga|se imponga|se rechace|se ordene|cese|libertad)/,
+    falta:'No cerraste con una petición concreta. El tribunal necesita saber exactamente qué le estás pidiendo y por cuánto tiempo.',
+    bien:'Cerraste con una petición concreta.' },
+
+  { id:'contradiccion', eje:'Respuesta a la contraparte', peso:0.8,
+    re:/\b(la (fiscalia|defensa|contraparte)|lo que dice|sostiene que|se invoca|alega|no es cierto que|contrariamente|sin embargo|frente a ello|el planteo de)/,
+    falta:'No te hiciste cargo de lo que argumentó la contraparte. La audiencia del art. 130 es contradictoria: lo que no se refuta, queda en pie.',
+    bien:'Te hiciste cargo de los argumentos de la contraparte.' }
+];
+
+/* Vicios típicos: fundar el peligro en la gravedad del delito o en fórmulas
+   sin datos del caso. Son los dos motivos más frecuentes de revocación.  */
+const VICIOS_CAUTELAR = [
+  { id:'gravedad', re:/\b(gravedad del (hecho|delito)|pena en expectativa|escala penal|delito grave|alarma social|repercusion (social|publica)|inseguridad)/,
+    aviso:'Fundaste el peligro procesal en la gravedad del delito o en la alarma social. La gravedad por sí sola no es un peligro procesal: los arts. 128 y 129 exigen pautas concretas referidas a esta persona. Es el vicio que más revocaciones genera.' },
+  { id:'formula', re:/\b(podria (eludir|entorpecer)|existe riesgo de que|no puede descartarse|es de presumir|presumible|razonablemente podria)/,
+    aviso:'Usaste fórmulas presuntivas ("podría", "no puede descartarse"). El art. 129 pide vehementes indicios que justifiquen la grave sospecha, no posibilidades abstractas.' },
+  { id:'oficio', re:/\b(de oficio|el tribunal deberia disponer por si)/,
+    aviso:'El art. 115 prohíbe imponer medidas de oficio: siempre hace falta pedido expreso de parte.' }
+];
+
+function analizarCautelar(texto){
+  const p = sinTildes(texto);
+  return {
+    texto, palabras: texto.split(/\s+/).filter(Boolean).length,
+    cubre: EJES_CAUTELAR.filter(e => e.re.test(p)).map(e => e.id),
+    vicios: VICIOS_CAUTELAR.filter(v => v.re.test(p)).map(v => v.id)
+  };
+}
+
+function informeCautelar(caso, rol, registro, segundos){
+  const mios = registro.filter(r => r.quien === 'LITIGANTE');
+  const todo = sinTildes(mios.map(r => r.texto).join(' \n '));
+  const n = mios.length || 1;
+  const r1 = x => Math.round(x*10)/10;
+
+  const ejes = [], faltantes = [], logrados = [];
+  let suma = 0, pesos = 0;
+  for (const e of EJES_CAUTELAR){
+    const ok = e.re.test(todo);
+    const pt = ok ? 9 : 2;
+    ejes.push({ eje:e.eje, puntaje:pt, comentario: ok ? e.bien : e.falta });
+    suma += pt * e.peso; pesos += e.peso;
+    (ok ? logrados : faltantes).push(e);
+  }
+
+  const vicios = VICIOS_CAUTELAR.filter(v => v.re.test(todo));
+  let global = r1(suma / pesos - vicios.length * 0.8);
+  global = Math.max(1, Math.min(10, global));
+
+  const correcciones = vicios.map(v => {
+    const frase = mios.map(m=>m.texto).find(t => v.re.test(sinTildes(t))) || '';
+    return { tuya: frase.slice(0, 220), problema: 'Vicio de fundamentación', mejor: v.aviso };
+  });
+  for (const e of faltantes.slice(0, 4))
+    correcciones.push({ tuya:'(no lo planteaste)', problema:e.eje, mejor:e.falta });
+
+  const perdido = [];
+  for (const p of (caso.sobre?.puntos || []))
+    if (!todo.includes(sinTildes(p).slice(0, 28))) perdido.push(p);
+
+  const partes = [];
+  partes.push(`Fundaste en ${n} intervención${n>1?'es':''}, durante ${Math.floor(segundos/60)} minutos.`);
+  partes.push(`Cubriste ${logrados.length} de los ${EJES_CAUTELAR.length} puntos que la ley exige en esta audiencia.`);
+  if (vicios.length) partes.push('Aparecen vicios de fundamentación que en una revisión ante el Tribunal de Impugnación se pagan caro.');
+  partes.push(rol === 'fiscal'
+    ? 'Como fiscal, la carga es tuya: tenés que acreditar el mérito, justificar el peligro con pautas concretas y fijar el plazo.'
+    : 'Como defensa, tu mejor terreno no es negar el hecho sino atacar el peligro procesal y ofrecer la medida menos gravosa que lo neutralice.');
+
+  return { global, ejes, correcciones, perdido,
+    aciertos: logrados.slice(0,3).map(e => e.bien),
+    veredicto: partes.join(' ') };
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   6. ALEGATOS
+   Se evalúa estructura, uso de la prueba, petición y solidez lógica.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+const EJES_APERTURA = [
+  { id:'teoria', eje:'Teoría del caso', peso:1.3,
+    re:/\b(este (es un )?caso (se trata|es)|lo que paso|la prueba va a demostrar|vamos a demostrar|van a escuchar|va a quedar acreditad|esta causa trata)/,
+    falta:'No enunciaste una teoría del caso. La apertura tiene que empezar con una frase que el tribunal pueda repetir: de qué se trata este juicio, en tus términos.',
+    bien:'Enunciaste una teoría del caso identificable.' },
+  { id:'promesa', eje:'Anuncio de la prueba', peso:1.2,
+    re:/\b(va a declarar|van a declarar|escucharan|van a escuchar|se va a incorporar|el perito|la prueba|los testigos|se va a acreditar|vamos a probar)/,
+    falta:'La apertura es una promesa: hay que anunciar qué prueba se va a producir y qué va a demostrar cada una. Sin eso, el tribunal no tiene con qué ordenar lo que va a escuchar.',
+    bien:'Anunciaste la prueba y lo que cada elemento va a demostrar.' },
+  { id:'protagonistas', eje:'Presentación de los protagonistas', peso:0.9,
+    re:/\b(mi (defendido|asistido)|el imputado|la victima|el senor|la senora|se llama|de \d{2} an?os|trabajaba|vivia)/,
+    falta:'No presentaste a las personas. Los jueces no conocen el caso: necesitan saber quién es quién antes de escuchar a nadie.',
+    bien:'Presentaste a los protagonistas del caso.' },
+  { id:'debilidad', eje:'Anticipación de las debilidades', peso:1,
+    re:/\b(es cierto que|va a escuchar tambien|no vamos a negar|reconocemos que|si bien|es verdad que|la defensa va a decir|la fiscalia va a decir)/,
+    falta:'No adelantaste ninguna debilidad. Si la contraria la va a exhibir igual, conviene que salga primero de tu boca: el golpe se amortigua y ganás credibilidad.',
+    bien:'Adelantaste las debilidades de tu caso, que es lo que hace creíble una apertura.' }
+];
+
+const EJES_CLAUSURA = [
+  { id:'promesa', eje:'Retoma de la promesa', peso:1.1,
+    re:/\b(como (dijimos|anticipamos|prometimos)|al comenzar|en la apertura|dijimos que|tal como adelant)/,
+    falta:'No retomaste lo que prometiste en la apertura. Cerrar el círculo es lo que convierte la clausura en el final de una historia y no en un resumen.',
+    bien:'Retomaste la promesa de la apertura y mostraste que se cumplió.' },
+  { id:'prueba', eje:'Proposiciones fácticas con su prueba', peso:1.4,
+    re:/\b(declaro que|dijo que|el testigo|el perito|surge de|conforme el acta|la pericia|quedo acreditado con|lo dicho por|segun el informe)/,
+    falta:'No anclaste tus afirmaciones en prueba concreta. Cada proposición fáctica tiene que decir de dónde sale: qué testigo, qué pericia, qué acta.',
+    bien:'Anclaste tus afirmaciones en prueba producida e identificada.' },
+  { id:'sana', eje:'Valoración integral (arts. 19 y 218)', peso:1.1,
+    re:/\b(sana critica|valoracion (conjunta|integral|armonica)|en conjunto|se corrobora|coincide con|converge|maximas de la experiencia|reglas de la logica)/,
+    falta:'Enumeraste prueba sin articularla. Los arts. 19 y 218 mandan formar convicción de la valoración conjunta y armónica: hay que mostrar cómo se sostienen unas pruebas con otras.',
+    bien:'Mostraste cómo se articula la prueba entre sí, y no solo la enumeraste.' },
+  { id:'refuta', eje:'Refutación de la contraria', peso:1.1,
+    re:/\b(la (fiscalia|defensa|querella) (dijo|sostiene|pretende|va a decir)|se dijo aca que|el argumento de|frente a ello|no es cierto que|se pretende hacer creer)/,
+    falta:'No refutaste la posición contraria. Lo que no se contesta, el tribunal lo puede dar por no discutido.',
+    bien:'Te hiciste cargo de los argumentos de la contraria.' },
+  { id:'adversa', eje:'Tratamiento de la prueba adversa', peso:1,
+    re:/\b(es cierto que|si bien|reconocemos|ese testigo|la contradiccion|declaro distinto|no recordaba|se contradijo|resulta inconsistente)/,
+    falta:'No trataste la prueba que juega en contra. Ignorarla no la hace desaparecer: la deja intacta para que la use el otro.',
+    bien:'Trataste la prueba adversa en lugar de ignorarla.' },
+  { id:'calificacion', eje:'Calificación legal', peso:1,
+    re:/\b(art(iculo)?\.? ?\d+|codigo penal|tipifica|calific|encuadra|subsun|autor|participe|tentativa|agravad|atenuad|legitima defensa)/,
+    falta:'No fundaste la calificación legal. Hay que mostrar cómo los hechos acreditados se subsumen en el tipo, elemento por elemento.',
+    bien:'Fundaste la calificación legal sobre los hechos acreditados.' },
+  { id:'peticion', eje:'Petición concreta (art. 217)', peso:1.3,
+    re:/\b(solicito|solicitamos|pido|pedimos|requiero|corresponde (condenar|absolver)|absolucion|condena de|pena de|an?os de prision|se absuelva|se condene)/,
+    falta:'No cerraste con una petición concreta. El art. 217 lo exige expresamente: al finalizar, las partes expresan sus peticiones de un modo concreto. Y en la práctica, un alegato sin pedido concreto deja al tribunal decidiendo solo.',
+    bien:'Cerraste con la petición concreta que exige el art. 217.' }
+];
+
+/* Falacias de Copi detectables en el texto de un alegato */
+const FALACIAS_ALEGATO = [
+  { id:'ad-ignorantiam', re:/\b(nadie (dijo|declaro|probo) lo contrario|no se probo que no|no hay prueba de que no|no fue desmentido)/,
+    aviso:'Argumento por la ignorancia: que no se haya probado lo contrario no acredita el hecho. Ojo con la asimetría: el art. 13 pone la carga en la acusación, así que la falta de prueba de cargo sí favorece al imputado, pero no alcanza para dar por cierto un hecho positivo propio.' },
+  { id:'causa-falsa', re:/\b(despues de (eso|ello) |acto seguido.*por lo tanto|primero.*luego.*entonces fue|si ocurrio antes)/,
+    aviso:'Causa falsa: estás tomando por causa lo que solo es antecedente temporal. La secuencia no acredita la causalidad.' },
+  { id:'composicion', re:/\b(cada (uno de los )?indicio.*(debil|aislad)|por separado no (prueban|acreditan))/,
+    aviso:'Falacia de composición o división: que cada indicio sea equívoco por separado no vuelve equívoco al conjunto, ni al revés. El art. 19 manda valoración conjunta y armónica.' },
+  { id:'ad-misericordiam', re:/\b(tiene (hijos|familia) (peque|a cargo|menores)|situacion de pobreza|padre de familia|da pena|sufrimiento de mi asistido)/,
+    aviso:'Apelación a la piedad: esas circunstancias son pertinentes en el juicio sobre la pena del art. 203, no para acreditar o descartar el hecho.' },
+  { id:'ad-populum', re:/\b(todos sabemos|es de publico conocimiento|la sociedad reclama|todo el barrio sabe|alarma social)/,
+    aviso:'Apelación a la multitud: el sentir general no es prueba. Además el art. 194 excluye la prueba que procura generar prejuicio.' },
+  { id:'ad-hominem', re:/\b(es un (delincuente|mentiroso|vago)|tiene antecedentes|no se puede creer a alguien asi)/,
+    aviso:'Ad hominem: impugnar al testigo es legítimo si mostrás su pauta de conducta o la inconsistencia de su testimonio; no lo es descalificarlo sin más, ni concluir que todo lo que dijo es falso.' },
+  { id:'peticion-principio', re:/\b(es evidente que|obviamente|no cabe duda|resulta indudable|claramente quedo probado)/,
+    aviso:'Petición de principio: afirmar con énfasis no es demostrar. Reemplazá el adjetivo por la prueba que lo sostiene.' }
+];
+
+function informeAlegato(caso, modulo, rol, registro, segundos, minutos){
+  const texto = registro.filter(r => r.quien === 'LITIGANTE').map(r => r.texto).join(' \n ');
+  const p = sinTildes(texto);
+  const palabras = texto.split(/\s+/).filter(Boolean).length;
+  const r1 = x => Math.round(x*10)/10;
+  const lista = modulo === 'apertura' ? EJES_APERTURA : EJES_CLAUSURA;
+
+  const ejes = [], faltan = [], logros = [];
+  let suma = 0, pesos = 0;
+  for (const e of lista){
+    const ok = e.re.test(p);
+    const pt = ok ? 9 : 2.5;
+    ejes.push({ eje:e.eje, puntaje:pt, comentario: ok ? e.bien : e.falta });
+    suma += pt*e.peso; pesos += e.peso;
+    (ok ? logros : faltan).push(e);
+  }
+
+  /* La apertura no argumenta: eso es de la clausura (arts. 205 y 217) */
+  const correcciones = [];
+  if (modulo === 'apertura'){
+    const argumenta = /\b(es evidente|no cabe duda|quedo (probado|acreditado)|resulta indudable|debe condenarse|debe absolverse|la prueba demuestra que)\b/.test(p);
+    ejes.push({ eje:'No argumentar todavía', puntaje: argumenta ? 3 : 9,
+      comentario: argumenta
+        ? 'Valoraste prueba que todavía no se produjo. La exposición inicial del art. 205 anuncia lo que la prueba va a demostrar; la valoración es materia del alegato del art. 217.'
+        : 'Mantuviste el registro del anuncio, sin adelantar valoración.' });
+    suma += (argumenta ? 3 : 9) * 1.2; pesos += 1.2;
+    if (argumenta) correcciones.push({ tuya:'(en tu apertura)', problema:'Argumentación anticipada',
+      mejor:'Cambiá "quedó probado que…" por "la prueba va a demostrar que…". Es la misma idea en el tiempo verbal correcto.' });
+  }
+
+  const fal = FALACIAS_ALEGATO.filter(f => f.re.test(p));
+  for (const f of fal){
+    const frase = texto.split(/(?<=[.;])\s+/).find(t => f.re.test(sinTildes(t))) || '(en tu alegato)';
+    correcciones.push({ tuya: frase.slice(0,200), problema: 'Defecto lógico: ' + f.id.replace(/-/g,' '), mejor: f.aviso });
+  }
+  for (const e of faltan.slice(0, 4))
+    correcciones.push({ tuya:'(no aparece en tu alegato)', problema:e.eje, mejor:e.falta });
+
+  const objetivo = (minutos || 6) * 130;
+  const ritmo = Math.max(0, Math.min(10, 10 - Math.abs(palabras - objetivo)/(objetivo*0.09)));
+  ejes.push({ eje:'Extensión y ritmo', puntaje:r1(ritmo),
+    comentario:`${palabras} palabras en ${Math.floor(segundos/60)} minutos. Para ${minutos||6} minutos hablados, la referencia ronda las ${objetivo}.` });
+  suma += ritmo*0.7; pesos += 0.7;
+
+  let global = r1(suma/pesos - fal.length*0.6);
+  global = Math.max(1, Math.min(10, global));
+
+  const v = [];
+  v.push(`${palabras} palabras, ${Math.floor(segundos/60)} minutos.`);
+  v.push(`Cubriste ${logros.length} de los ${lista.length} elementos que se esperan en ${modulo === 'apertura' ? 'una apertura' : 'una clausura'}.`);
+  if (fal.length) v.push(`Se detectaron ${fal.length} defecto${fal.length>1?'s':''} lógico${fal.length>1?'s':''} en la argumentación.`);
+  v.push(modulo === 'apertura'
+    ? 'La apertura se gana con una teoría del caso clara y una promesa que después puedas cumplir.'
+    : 'La clausura se gana mostrando cómo cada afirmación se apoya en prueba producida, y cerrando con una petición concreta.');
+
+  return { global, ejes, correcciones, aciertos: logros.slice(0,3).map(e=>e.bien),
+    perdido: (caso.sobre?.puntos||[]).filter(x => !p.includes(sinTildes(x).slice(0,26))),
+    veredicto: v.join(' ') };
+}
+
+if (typeof window !== 'undefined') {
+  window.LEX = Object.assign(window.LEX || {}, {
+    analizarCautelar, informeCautelar, informeAlegato, EJES_CAUTELAR
+  });
+}
