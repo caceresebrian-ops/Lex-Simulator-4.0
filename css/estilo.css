@@ -293,6 +293,17 @@ ul.limpia li{font-family:Spectral,Georgia,serif;font-size:15.5px;line-height:1.5
 .medidor{height:5px;background:var(--borde);border-radius:3px;overflow:hidden;margin-top:7px}
 .medidor i{display:block;height:100%;background:var(--azul-medio)}
 .medidor.alto i{background:var(--rojo)}
+.par{background:var(--blanco);border:1px solid var(--borde);border-radius:var(--radio);padding:16px 18px;margin-bottom:12px;box-shadow:var(--sombra)}
+.par h4{margin:0 0 10px;font-size:14px;color:var(--marino)}
+.par .mal,.par .bien{font-family:Spectral,Georgia,serif;font-size:15.5px;line-height:1.5;margin:0 0 8px;padding-left:13px;border-left:3px solid var(--rojo)}
+.par .bien{border-left-color:var(--verde)}
+.par .rot{display:block;font-family:Archivo,sans-serif;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.par .mal .rot{color:var(--rojo)}
+.par .bien .rot{color:var(--verde)}
+.par .porque{font-size:13.5px;color:var(--gris);margin:10px 0 0;line-height:1.5}
+.grupoEj{margin:28px 0 14px}
+.grupoEj h3{font-size:17px;color:var(--marino);margin:0 0 5px;font-family:Spectral,Georgia,serif;font-weight:600}
+.grupoEj p{font-size:13.5px;color:var(--gris);margin:0}
 .falacia{border-top:1px solid var(--borde);padding:15px 0}
 .falacia h4{margin:0 0 4px;font-size:14.5px}
 .falacia .obj{display:inline-block;background:var(--celeste-pal);color:var(--azul);border-radius:5px;padding:2px 8px;font-size:12px;margin-bottom:7px}

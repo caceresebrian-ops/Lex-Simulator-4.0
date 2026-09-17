@@ -90,12 +90,22 @@ function analizar(texto, modulo, previas){
      antes del verbo ("Usted estaba ahí…"), o por la coletilla final.
      Una interrogativa verbal ("¿Estaba acompañado?") es cerrada pero NO
      sugestiva: no contiene la respuesta.                              */
-  const limpio = plano.replace(/^[¿\s]+/,'');
-  const tieneColetilla = COLETILLA.test(plano.replace(/[¿?]/g,'').trim());
-  const ordenAfirmativo = /^(usted|ud\.?|vos|el|ella|ellos|ellas|su|sus|los|las|don|doña|dona|el imputado|la victima|el testigo|el acusado|mi defendido)\b/.test(limpio);
-  const arrancaInterrogativo = INTERROGATIVOS.test(limpio);
-  const sugestiva = tieneColetilla || (ordenAfirmativo && !arrancaInterrogativo) ||
-                    (!arrancaInterrogativo && !/\?/.test(crudo) && crudo.length > 12);
+  const limpio = plano.replace(/^[¿\s]+/,'').replace(/^(y|e|bien|bueno|ahora|entonces|ademas)\s+/,'');
+
+  /* Una pregunta es sugestiva cuando afirma el hecho y solo pide
+     confirmación. Señales: coletilla final, u orden sujeto-verbo sin
+     ninguna palabra interrogativa. NO alcanza con que falte el signo
+     de pregunta: quien dicta no los escribe.                        */
+  const tieneColetilla  = COLETILLA.test(plano.replace(/[¿?]/g,'').trim());
+  const hayInterrogativo = /\b(que|qué|quien|quienes|como|cuando|donde|adonde|cual|cuales|cuanto|cuanta|cuantos|cuantas|por que|para que)\b/.test(plano);
+  const ordenAfirmativo = /^(usted|ud\.?|vos|el|ella|ellos|ellas|su|sus|los|las|esos|esas|este|esta|estos|estas|ese|esa|don|doña|dona|el imputado|la victima|el testigo|el acusado|mi defendido)\b/.test(limpio);
+  const primeras = limpio.split(/\s+/).slice(0, 4).join(' ');
+  const verboInterrogativo = INTERROGATIVOS.test(primeras) ||
+    /\b(puede|podria|pudo|sabe|sabia|supo|recuerda|conoce|conocia|vio|escucho|oyo|estaba|estuvo|habia|tuvo|hizo|dijo|noto|observo|advirtio|logro|alcanzo)\b/.test(primeras);
+
+  const sugestiva = tieneColetilla
+    || (ordenAfirmativo && !hayInterrogativo)
+    || (!hayInterrogativo && !verboInterrogativo && crudo.length > 12);
 
   const dosSignos = (crudo.match(/\?/g)||[]).length > 1;
   const conector  = /\s(y|e)\s+(tambien|ademas|luego|despues|entonces|usted|ud)\b/.test(plano) || /\?.+\?/.test(crudo);
@@ -263,7 +273,7 @@ const ACLARACIONES = [
   '¿Se refiere a ese día o en general?',
   'Discúlpeme, ¿me lo puede preguntar de otra manera?'
 ];
-const TITUBEOS = ['Eh… ', 'Mire… ', 'Y… ', 'A ver… ', 'Mmm… '];
+const TITUBEOS = ['Eh… ', 'Mire… ', 'Y… ', 'A ver… ', 'Y bueno… '];
 const REMATES  = [' No sé si me explico.', ' Eso es lo que me acuerdo.', ' Así fue.', ''];
 
 function humanizar(texto, opts){
@@ -372,8 +382,17 @@ function limpiarColetilla(t){
           .trim().replace(/^usted\s+/i,'').replace(/\s+$/,'');
 }
 
-function reformular(d, texto){
+function reformular(d, texto, modulo){
   const plano = sinTildes(texto);
+  /* En el examen directo las sugestivas están prohibidas (art. 209), así
+     que jamás se puede sugerir una como corrección. En el contraexamen
+     son la herramienta principal.                                      */
+  const directo = modulo === 'directo';
+  const cerrar = f => directo ? abierta(f) : (f + ', ¿no es cierto?');
+  const abierta = f => {
+    for (const [re, sug] of ABIERTAS) if (re.test(sinTildes(f))) return sug;
+    return '¿Qué fue lo que pasó en ese momento?';
+  };
 
   if (d.id === 'compuesta'){
     let partes = texto.split(/\?\s*/).filter(x => x.trim().length > 4);
@@ -387,14 +406,15 @@ function reformular(d, texto){
     }
     const a = pulir(partes[0] || ''), b = pulir(partes.slice(1).join(' '));
     if (a && b)
-      return 'Partila en dos: «' + a + ', ¿no es cierto?» y recién después «' + b + ', ¿no es cierto?».';
+      return 'Partila en dos: «' + cerrar(a) + '» y recién después «' + cerrar(b) + '».';
     return 'Partila en dos preguntas: un hecho por pregunta.';
   }
 
   if (d.id === 'explicacion'){
     const m = texto.match(/por\s?qu[eé]\s+(.+?)[\?\.]?$/i);
-    if (m) return 'No le pidas que explique. Afirmá el hecho y que lo conceda: «' +
-                  pulir(m[1]) + ', ¿no es cierto?».';
+    if (m) return directo
+      ? 'En el directo no podés afirmarlo vos. Preguntá abierto y acotado: «' + abierta(m[1]) + '».'
+      : 'No le pidas que explique. Afirmá el hecho y que lo conceda: «' + pulir(m[1]) + ', ¿no es cierto?».';
     return 'Sacá el pedido de explicación y afirmá el hecho: «Usted [hecho], ¿no es cierto?».';
   }
 
@@ -402,9 +422,9 @@ function reformular(d, texto){
     return 'Cambiá "' + d.termino + '" por una medida: «' + MEDIDAS[d.termino] + '».';
 
   if (d.id === 'sugestiva'){
-    for (const [re, sug] of ABIERTAS) if (re.test(plano)) return 'En el directo va abierta: «' + sug + '».';
-    const nucleo = limpiarColetilla(texto);
-    return 'Sacale la respuesta de adentro. En vez de «' + pulir(nucleo) + '», preguntá «¿Qué pasó en ese momento?» y dejá que lo diga él.';
+    const nucleo = pulir(limpiarColetilla(texto));
+    return 'En el directo la pregunta no puede traer la respuesta puesta. En vez de «' + nucleo +
+           '», preguntá «' + abierta(texto) + '» y que lo diga él.';
   }
 
   if (d.id === 'opinion'){
@@ -416,19 +436,19 @@ function reformular(d, texto){
   if (d.id === 'conclusion'){
     const nucleo = texto.replace(/\b(entonces|o sea que|es decir que|quiere decir que|en conclusi[oó]n|por lo tanto|de manera que|con lo cual)\b/gi,'').replace(/^[\s,¿]+/,'').trim();
     return 'Sacá la conclusión y guardala para la clausura. Quedate con el hecho: «' +
-           pulir(nucleo) + ', ¿no es cierto?».';
+           cerrar(pulir(nucleo)) + '».';
   }
 
   if (d.id === 'asume'){
     const m = texto.match(/\b(cuando|luego de que|despu[eé]s de que|una vez que|mientras)\s+(.+?)[,\?]/i);
-    if (m) return 'Primero acreditá el presupuesto: «' + pulir(m[2]) +
-                  ', ¿no es cierto?». Recién cuando lo conceda, preguntá por el resto.';
+    if (m) return 'Primero acreditá el presupuesto: «' + cerrar(pulir(m[2])) +
+                  '». Recién cuando lo tengas, preguntá por el resto.';
     return 'Acreditá primero el hecho que la subordinada da por cierto, y después preguntá.';
   }
 
   if (d.id === 'larga'){
     const corte = texto.split(/[,;]/)[0];
-    return 'Cortala en la primera coma: «' + pulir(corte) + ', ¿no es cierto?». El resto va en preguntas siguientes.';
+    return 'Cortala en la primera coma: «' + cerrar(pulir(corte)) + '». El resto va en preguntas siguientes.';
   }
 
   if (d.id === 'abierta'){
@@ -439,7 +459,7 @@ function reformular(d, texto){
   }
 
   if (d.id === 'coaccion')
-    return 'Sacá la advertencia. La sugestiva ya presiona lo suficiente: «' + pulir(limpiarColetilla(texto)) + ', ¿no es cierto?».';
+    return 'Sacá la advertencia: «' + cerrar(pulir(limpiarColetilla(texto))) + '».';
 
   if (d.id === 'adhominem')
     return 'No lo califiques: mostralo con su propia declaración previa. Fijá el punto, acreditá la declaración anterior y recién ahí confrontá.';
@@ -517,7 +537,7 @@ function informeOffline(caso, modulo, registro, segundos){
     correcciones.push({
       tuya: p.texto,
       problema: d.nombre + ': ' + d.motivo + (d.falacia ? ' Falacia subyacente: ' + d.falacia.replace(/-/g,' ') + '.' : ''),
-      mejor: reformular(d, p.texto)
+      mejor: reformular(d, p.texto, modulo)
     });
   }
 

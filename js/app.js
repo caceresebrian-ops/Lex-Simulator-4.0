@@ -6,7 +6,7 @@
 (function(){
 "use strict";
 
-const { CPP, TECNICA, LOGICA, FALACIAS, CASOS,
+const { CPP, TECNICA, LOGICA, FALACIAS, EJEMPLOS, CASOS,
         analizar, decidirObjecion, responderOffline, informeOffline, fichas } = window.LEX;
 
 /* ─────────────── configuración ─────────────── */
@@ -61,6 +61,7 @@ $('#empezar').onclick    = () => { pintarSetup(); ver('setup'); };
 $('#irHistorial').onclick= () => { pintarHistorial(); ver('historial'); };
 $('#irBase').onclick     = () => { pintarBase(); ver('base'); };
 $('#irFalacias').onclick = () => { pintarFalacias(); ver('falacias'); };
+$('#irEjemplos').onclick = () => { pintarEjemplos(); ver('ejemplos'); };
 $('#irAjustes').onclick  = () => { pintarAjustes(); ver('ajustes'); };
 $('#verDetalles').onclick = () => ver('detalles');
 $('#detallesEmpezar').onclick = () => { pintarSetup(); ver('setup'); };
@@ -241,31 +242,77 @@ Respondé SOLO este JSON, sin texto alrededor:
 const VOZ = {
   soportada: typeof speechSynthesis !== 'undefined',
   encendida: false, voces: [], cola: [], hablando: false, alVaciar: null,
+  generos: { testigo:'m', juez:'m', contraparte:'f' },
+
+  /* Nombres de voces en castellano cuyo género se conoce. Sirve cuando el
+     sistema tiene varias instaladas; si no, se distingue por el tono.   */
+  MASC: /(pablo|jorge|diego|miguel|carlos|raul|raúl|alvaro|álvaro|enrique|andres|andrés|juan|luciano|mateo|tomas|tomás|arnau|felipe|gonzalo|sergio|dario|manuel|male|hombre|masculin)/i,
+  FEM:  /(helena|laura|sabina|monica|mónica|paulina|marisol|esperanza|elvira|lucia|lucía|conchita|penelope|penélope|camila|isabela|salome|salomé|sofia|sofía|ximena|valentina|elena|dalia|paloma|female|mujer|femenin)/i,
+  BUENA: /(natural|neural|online|google|premium|enhanced|wavenet)/i,
+  MALA:  /(espeak|compact|pico|robot)/i,
 
   cargarVoces(){
     if (!this.soportada) return;
     const todas = speechSynthesis.getVoices() || [];
-    this.voces = todas.filter(v => /^es/i.test(v.lang));
-    if (!this.voces.length) this.voces = todas.slice(0, 1);
+    let es = todas.filter(v => /^es/i.test(v.lang));
+    if (!es.length) es = todas.slice(0, 3);
+    /* Mejor primero: las naturales antes que las sintéticas viejas */
+    es.sort((a,b) => this.calidad(b) - this.calidad(a));
+    this.voces = es;
+  },
+  calidad(v){
+    let p = 0;
+    if (this.BUENA.test(v.name)) p += 3;
+    if (this.MALA.test(v.name))  p -= 4;
+    if (v.localService === false) p += 1;      // las de red suelen sonar mejor
+    if (/^es-(AR|419|MX|US|CL|UY)/i.test(v.lang)) p += 2;   // acento rioplatense o americano
+    return p;
+  },
+  /* Busca una voz del género pedido; si el sistema no las distingue,
+     devuelve la mejor y el tono se encarga de diferenciarlas.        */
+  vozDe(g){
+    const re = g === 'm' ? this.MASC : this.FEM;
+    const otra = g === 'm' ? this.FEM : this.MASC;
+    return this.voces.find(v => re.test(v.name))
+        || this.voces.find(v => !otra.test(v.name))
+        || this.voces[0] || null;
   },
 
-  /* Timbre por rol: el juez grave y pausado, la contraparte más rápida,
-     el testigo neutro. Si hay varias voces en español, se reparten.   */
   perfil(quien){
     const q = String(quien || '').toUpperCase();
-    const n = this.voces.length;
-    if (q.includes('JUEZ'))    return { v:this.voces[0 % n], rate:0.94, pitch:0.82 };
-    if (q.includes('FISCAL') || q.includes('DEFENSA'))
-                               return { v:this.voces[1 % n] || this.voces[0], rate:1.12, pitch:0.96 };
-    if (q.includes('SALA'))    return null;
-    return { v:this.voces[2 % n] || this.voces[0], rate:1.0, pitch:1.06 };
+    if (q.includes('SALA')) return null;
+    let rol = 'testigo';
+    if (q.includes('JUEZ')) rol = 'juez';
+    else if (q.includes('FISCAL') || q.includes('DEFENSA')) rol = 'contraparte';
+    const g = this.generos[rol] || 'm';
+    /* Tono base por género y ajuste por rol: el juez más grave y pausado,
+       la contraparte algo más rápida al objetar.                        */
+    let pitch = g === 'm' ? 0.80 : 1.14;
+    let rate  = 1.0;
+    if (rol === 'juez'){ pitch -= 0.06; rate = 0.93; }
+    if (rol === 'contraparte'){ rate = 1.08; }
+    return { v: this.vozDe(g), rate, pitch };
+  },
+
+  /* Los sonidos de duda se deletrean si se los manda tal cual:
+     "Mmm" sale como "eme eme eme". Se cambian por una pausa.   */
+  paraHablar(t){
+    return String(t)
+      .replace(/\b(m+h*m+|hm+|mmm+|ajá|aja|ehh+|uhm+)\b/gi, ',')
+      .replace(/…/g, ', ')
+      .replace(/\s*,\s*,+/g, ',')
+      .replace(/^\s*,\s*/, '')
+      .replace(/\s+/g, ' ')
+      .trim();
   },
 
   decir(quien, texto){
     if (!this.soportada || !this.encendida || !texto) return;
     const p = this.perfil(quien);
     if (!p) return;
-    this.cola.push({ texto: String(texto).slice(0, 600), p });
+    const limpio = this.paraHablar(texto).slice(0, 600);
+    if (!limpio) return;
+    this.cola.push({ texto: limpio, p });
     if (!this.hablando) this._siguiente();
   },
 
@@ -280,7 +327,8 @@ const VOZ = {
     this.hablando = true;
     try {
       const u = new SpeechSynthesisUtterance(item.texto);
-      u.lang = 'es-AR'; u.rate = item.p.rate; u.pitch = item.p.pitch;
+      u.lang = (item.p.v && item.p.v.lang) || 'es-AR';
+      u.rate = item.p.rate; u.pitch = item.p.pitch;
       if (item.p.v) u.voice = item.p.v;
       u.onend = () => this._siguiente();
       u.onerror = () => this._siguiente();
@@ -288,7 +336,6 @@ const VOZ = {
     } catch { this._siguiente(); }
   },
 
-  /* Cortar al testigo en seco, como se corta en una audiencia real */
   callar(){
     if (!this.soportada) return;
     this.cola = [];
@@ -298,7 +345,6 @@ const VOZ = {
     if (cb) setTimeout(cb, 60);
   },
 
-  /* iOS exige que la primera locución nazca de un gesto del usuario */
   desbloquear(){
     if (!this.soportada) return;
     try {
@@ -324,6 +370,14 @@ function entrarSala(){
   $('#levantar').textContent = 'Levantar audiencia';
   $('#levantar').onclick = levantar;
 
+  /* El testigo tiene el género que le fijó el caso; el juez y la
+     contraparte se sortean, para que no suenen siempre igual.     */
+  VOZ.generos = {
+    testigo: (c.testigo && c.testigo.genero) || 'm',
+    juez: Math.random() < 0.5 ? 'm' : 'f',
+    contraparte: Math.random() < 0.5 ? 'm' : 'f'
+  };
+  VOZ.cargarVoces();
   VOZ.encendida = guardado.leer('voz', true) !== false;
   $('#vozToggle').setAttribute('aria-pressed', VOZ.encendida);
 
@@ -793,6 +847,17 @@ function pintarFalacias(){
     '<p><b>Ejemplo.</b> '+esc(f.ejemplo)+'</p>'+
     '<p class="plan">'+esc(f.planteo)+'</p>'+
     '<p style="margin-top:8px"><b>Nota.</b> '+esc(f.remedio)+'</p></div>').join('');
+}
+
+function pintarEjemplos(){
+  $('#listaEjemplos').innerHTML = EJEMPLOS.map(g =>
+    '<div class="grupoEj"><h3>' + esc(g.grupo) + '</h3><p>' + esc(g.nota) + '</p></div>' +
+    g.items.map(i =>
+      '<div class="par"><h4>' + esc(i.tipo) + '</h4>' +
+      '<p class="mal"><span class="rot">Así no</span>' + esc(i.mal) + '</p>' +
+      '<p class="bien"><span class="rot">Así sí</span>' + esc(i.bien) + '</p>' +
+      '<p class="porque">' + esc(i.porque) + '</p></div>').join('')
+  ).join('');
 }
 
 /* ═══════════════ AJUSTES ═══════════════ */

@@ -366,6 +366,123 @@ const FALACIAS = [
   }
 ];
 
+
+/* ─────────────────────────── 4. EJEMPLOS DE ESTUDIO ─────────────────────────── */
+/* Pares de pregunta mal y bien formulada, para leer antes de entrar a la sala. */
+
+const EJEMPLOS = [
+{ grupo:'Examen directo', nota:'La regla del art. 209: la pregunta no puede contener la respuesta. El testigo es el que cuenta; vos solo abrís las puertas.',
+  items:[
+  { tipo:'Acreditación del testigo',
+    mal:'Usted es empleado municipal y vive en el barrio hace veinte años, ¿no es cierto?',
+    bien:'¿A qué se dedica? ¿Desde cuándo vive en el barrio?',
+    porque:'La acreditación sirve para que el tribunal crea en el testigo. Si la recitás vos, el testigo no se luce y la información no queda en su voz.' },
+  { tipo:'Instalar la escena',
+    mal:'¿Qué pasó esa noche?',
+    bien:'¿Dónde estaba usted a las diez y media? ¿Qué vio cuando dobló la esquina?',
+    porque:'La abierta enorme produce un relato vago. Hay que ir por tramos para que el juez pueda ver la película, que es lo que Baytelman llama CINE.' },
+  { tipo:'Sugestiva',
+    mal:'Usted vio al imputado salir corriendo con la mochila, ¿no es cierto?',
+    bien:'¿Qué fue lo que vio en ese momento?',
+    porque:'Objetable por el art. 209. Y aunque no te objeten, el dato vale mucho menos: lo afirmaste vos y él solo asintió.' },
+  { tipo:'Sugestiva permitida',
+    mal:'—',
+    bien:'Le voy a preguntar ahora sobre lo que pasó dentro del local. ¿Qué vio al entrar?',
+    porque:'El art. 209 admite las sugestivas introductorias y de transición. Sirven para ordenar el examen sin sugerir el contenido.' },
+  { tipo:'Adjetivación vaga',
+    mal:'¿Estaba cerca del lugar?',
+    bien:'¿A cuántos metros estaba?',
+    porque:'"Cerca" significa una cosa para el testigo y otra para el juez. La medida concreta es lo que después sirve en el alegato.' },
+  { tipo:'Pedido de opinión',
+    mal:'¿Le pareció que estaba borracho?',
+    bien:'¿Cómo caminaba? ¿Cómo le hablaba?',
+    porque:'El testigo lego declara sobre lo que percibió, no sobre lo que concluye. Además la conducta descrita convence más que la etiqueta.' },
+  { tipo:'Fórmula abstracta',
+    mal:'¿Él la amenazó?',
+    bien:'¿Qué palabras usó exactamente?',
+    porque:'"Amenazar" es una calificación jurídica. Lo que acredita el tipo penal son las palabras concretas.' },
+  { tipo:'Pregunta compuesta',
+    mal:'¿Dónde estaba usted y qué hora era cuando escuchó los gritos?',
+    bien:'¿Dónde estaba usted? … ¿Y qué hora era?',
+    porque:'Con dos hechos en una pregunta, el testigo contesta el que le conviene y el otro se pierde.' },
+  { tipo:'Adelantar la debilidad',
+    mal:'(callarse y esperar que no salga)',
+    bien:'¿Había consumido alcohol esa noche? ¿Cuánto?',
+    porque:'Si la debilidad va a salir en el contraexamen, conviene que salga primero de tu boca: el golpe se amortigua y el testigo parece honesto.' }
+]},
+
+{ grupo:'Contraexamen', nota:'Acá la sugestiva de un solo punto es la herramienta, no el vicio. Lo que se paga caro es perder el control.',
+  items:[
+  { tipo:'La sugestiva de un solo punto',
+    mal:'¿Cómo era la iluminación de la cuadra?',
+    bien:'Dos de las tres luminarias estaban apagadas, ¿no es cierto?',
+    porque:'La abierta le regala el control: puede decir "se veía bien igual". La sugestiva corta solo admite sí o no.' },
+  { tipo:'Preguntar por qué',
+    mal:'¿Por qué no llamó a la policía en el momento?',
+    bien:'Usted no llamó a la policía esa noche, ¿no es cierto?',
+    porque:'El "por qué" es una invitación a explicarse, y toda explicación en el contraexamen juega en contra tuyo.' },
+  { tipo:'La pregunta de más',
+    mal:'Entonces usted no puede estar seguro de haberlo reconocido, ¿no es cierto?',
+    bien:'(no preguntarla: se guarda para el alegato de clausura)',
+    porque:'Le estás pidiendo la conclusión al testigo, que va a decir que sí está seguro y te destruye la línea. La conclusión la sacás vos, después, ante el tribunal.' },
+  { tipo:'Pregunta de pesca',
+    mal:'¿Y qué más recuerda de esa noche?',
+    bien:'(no preguntar lo que no sabés cómo va a contestar)',
+    porque:'En contraexamen no se pregunta sin conocer la respuesta. Lo que no está en el legajo, no se pregunta.' },
+  { tipo:'Impugnación, paso 1: fijar',
+    mal:'En su declaración usted dijo otra cosa, ¿no?',
+    bien:'Usted acaba de decir que está seguro de haberlo reconocido, ¿no es cierto?',
+    porque:'Primero hay que cerrarle todas las salidas sobre lo que dijo hoy, para que después no diga que lo interpretaron mal.' },
+  { tipo:'Impugnación, paso 2: acreditar la previa',
+    mal:'(saltar directo a la contradicción)',
+    bien:'Usted declaró esa misma noche en la comisaría, ¿no es cierto? A pocas horas del hecho. Con los recuerdos más frescos, ¿verdad?',
+    porque:'Hay que rodear la declaración anterior de sus condiciones de legitimidad antes de usarla. Si salteás este paso, el testigo dice "estaba nervioso" y se te cae todo.' },
+  { tipo:'Impugnación, paso 3: confrontar',
+    mal:'Usted mintió, ¿no es cierto?',
+    bien:'En esa declaración usted dijo que no le vio bien la cara por la capucha. ¿Es así?',
+    porque:'Se confronta con el texto, no con la acusación de mentir. Copi es expreso: impugnar mostrando la inconsistencia es legítimo; afirmar que miente sin mostrarlo es un ad hominem falaz.' },
+  { tipo:'Pregunta larga',
+    mal:'Usted dijo que estaba en el kiosco y que escuchó gritos y que cuando miró ya estaba todo pasando y que no llegó a ver bien, ¿es así?',
+    bien:'Usted estaba en el kiosco. … Escuchó gritos. … Cuando miró, ya había pasado. …',
+    porque:'Si anotada ocupa más de un renglón, hay que partirla. Cada hecho concedido por separado es un ladrillo que después no se puede sacar.' },
+  { tipo:'Adjetivación',
+    mal:'Todo pasó muy rápido, ¿no?',
+    bien:'Usted lo vio durante dos o tres segundos, ¿no es cierto?',
+    porque:'"Rápido" no dice nada. "Dos o tres segundos" es lo que después le decís al juez en la clausura.' }
+]},
+
+{ grupo:'Objeciones: cómo se plantean', nota:'El art. 210 exige indicar el motivo. Decir solo "objeción" no basta, y nombrar la falacia que hay debajo lo vuelve difícil de rechazar.',
+  items:[
+  { tipo:'Sugestiva (solo en el directo)', mal:'¡Objeción!',
+    bien:'Objeto: la pregunta es sugestiva, contiene la respuesta que se busca. Art. 209.',
+    porque:'Hay que decir el motivo para que el tribunal pueda resolver de inmediato.' },
+  { tipo:'Capciosa o que asume hechos', mal:'Objeción, es capciosa.',
+    bien:'Objeto: la pregunta presupone un hecho que no está acreditado en esta audiencia. Solicito que se divida.',
+    porque:'Es la falacia de pregunta compleja. Señalar el presupuesto oculto es lo que obliga a dividirla.' },
+  { tipo:'Compuesta', mal:'Objeción.',
+    bien:'Objeto por compuesta: contiene dos hechos distintos y la respuesta va a ser ambigua.',
+    porque:'Una sola respuesta para dos hechos no sirve como prueba de ninguno de los dos.' },
+  { tipo:'Opinión de testigo lego', mal:'Objeción, no es perito.',
+    bien:'Objeto: se le pide una conclusión que excede lo que percibió por sus sentidos.',
+    porque:'La excepción son las opiniones de sentido común basadas en percepción directa, así que conviene precisar el exceso.' },
+  { tipo:'Preguntada y respondida', mal:'Ya la contestó.',
+    bien:'Objeto: la pregunta ya fue formulada y respondida. Art. 209.',
+    porque:'El art. 209 prohíbe expresamente las repetitivas, más allá de la pérdida de tiempo.' },
+  { tipo:'Tergiversa la prueba', mal:'Eso no dijo.',
+    bien:'Objeto: la pregunta le atribuye al testigo algo que no declaró. Pido que se lea el pasaje completo.',
+    porque:'Es la falacia de acento: el recorte cambia el sentido. Pedir la lectura completa es el remedio.' },
+  { tipo:'Coacción ilegítima', mal:'Está presionando al testigo.',
+    bien:'Objeto: la pregunta contiene una advertencia dirigida a condicionar la respuesta. Art. 209.',
+    porque:'Hay que distinguirla de la coacción legítima que toda sugestiva supone: lo objetable es la amenaza personal.' },
+  { tipo:'Impertinente', mal:'No viene al caso.',
+    bien:'Objeto por impertinente: la respuesta no hace más ni menos probable ninguna de las teorías del caso en discusión.',
+    porque:'El test es lógico, no de mérito. Formulado así, el tribunal tiene el criterio para resolver.' },
+  { tipo:'Cuándo NO objetar', mal:'(objetar todo lo objetable)',
+    bien:'(dejar pasar la pregunta si la respuesta no te perjudica)',
+    porque:'La objeción le avisa al tribunal que algo te incomoda e interrumpe tu propio ritmo. Es una decisión estratégica, no un reflejo.' }
+]}
+];
+
 /* Resumen compacto para inyectar en los prompts del modelo */
 const LOGICA = `
 LÓGICA ARGUMENTATIVA APLICADA A LA OBJECIÓN (Copi, cap. 3):
@@ -379,5 +496,5 @@ limita a afirmar que miente, o si de la impugnación se concluye que todo lo que
 `;
 
 if (typeof window !== 'undefined') {
-  window.LEX = Object.assign(window.LEX || {}, { CPP, TECNICA, LOGICA, FALACIAS });
+  window.LEX = Object.assign(window.LEX || {}, { CPP, TECNICA, LOGICA, FALACIAS, EJEMPLOS });
 }

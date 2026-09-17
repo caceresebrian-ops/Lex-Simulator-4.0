@@ -26,7 +26,7 @@ const CASOS = [
     {tipo:'Informe de la Dirección de Alumbrado', detalle:'Dos de las tres luminarias de esa esquina estaban fuera de servicio desde febrero.'},
     {tipo:'Acta de secuestro del teléfono', detalle:'Del 25/3, en poder de Julio Sosa, quien dice haberlo comprado en la feria.'}
   ],
-  testigo:{nombre:'Gustavo Nieva', calidad:'víctima y único testigo presencial',
+  testigo:{genero:'m', nombre:'Gustavo Nieva', calidad:'víctima y único testigo presencial',
     perfil:'38 años, empleado municipal, secundario completo. Está convencido de lo que vio y se ofende si se le sugiere que puede equivocarse. Habla rápido cuando se pone nervioso.'},
   previa:'Que el día de la fecha, siendo aproximadamente las 22:40 horas, el declarante se encontraba caminando por calle Benjamín de la Vega en dirección al sur, cuando a la altura de la intersección con calle Catamarca fue abordado por un sujeto de sexo masculino, de contextura delgada, de aproximadamente un metro setenta y cinco de estatura, quien vestía campera oscura con capucha colocada. Que dicho sujeto le exhibió lo que parecía ser un arma de fuego a la altura de la cintura y le exigió la entrega del teléfono celular y del dinero que llevara consigo. Que el declarante entregó un aparato marca Samsung y la suma de nueve mil pesos aproximadamente. Que todo sucedió muy rápido, en cuestión de segundos, y que la iluminación del lugar era escasa. Que el sujeto se retiró corriendo en dirección al este. Que el declarante cree que podría reconocerlo si lo viera nuevamente, aunque no le vio bien la cara por la capucha.',
   contexto:{
@@ -85,7 +85,7 @@ const CASOS = [
     {tipo:'Acta de allanamiento', detalle:'Se secuestra una amoladora en el domicilio de Agüero.'},
     {tipo:'Informe pericial', detalle:'La amoladora no conserva numeración legible.'}
   ],
-  testigo:{nombre:'Aldo Páez', calidad:'testigo presencial, comerciante lindero',
+  testigo:{genero:'m', nombre:'Aldo Páez', calidad:'testigo presencial, comerciante lindero',
     perfil:'57 años, dueño de una rotisería. Servicial, quiere ayudar, y por querer ayudar afirma más de lo que sabe. Se pone incómodo si lo corrigen.'},
   previa:'Que siendo aproximadamente las cuatro de la madrugada el declarante se encontraba en el interior de su comercio realizando tareas de limpieza, cuando escuchó ruidos provenientes del fondo del local lindero. Que se asomó por la puerta y alcanzó a ver a dos personas jóvenes, de sexo masculino, que cargaban bultos en una motocicleta de color oscuro. Que no pudo observar sus rostros ni la patente del rodado. Que uno de ellos le resultó conocido de vista del barrio. Que los mismos se retiraron por calle 19 de Febrero en dirección al norte.',
   contexto:{
@@ -141,7 +141,7 @@ const CASOS = [
     {tipo:'Actuaciones policiales', detalle:'Constatan tumulto de aproximadamente cuarenta personas a la salida.'},
     {tipo:'Historia clínica', detalle:'Ingreso a las 5:20. Se consigna aliento etílico en el paciente.'}
   ],
-  testigo:{nombre:'Franco Luna', calidad:'testigo presencial, amigo de la víctima',
+  testigo:{genero:'m', nombre:'Franco Luna', calidad:'testigo presencial, amigo de la víctima',
     perfil:'23 años, changarín. Leal a su amigo hasta la exageración. Había tomado esa noche. Responde con bronca si siente que se defiende al agresor.'},
   previa:'Que el declarante se encontraba junto a Marcelo Britos a la salida del local bailable La Cava, cuando se acercó Cristian Vera, a quien conoce del pueblo, y sin mediar palabra le propinó un golpe de puño en el rostro a Britos, quien cayó al suelo. Que luego de ello se generó una pelea generalizada entre varias personas. Que el declarante intervino para separar. Que había mucha gente en el lugar. Que ambos habían consumido bebidas alcohólicas durante la noche.',
   contexto:{
@@ -197,7 +197,7 @@ const CASOS = [
     {tipo:'Declaración de Elsa Ponce', detalle:'Vecina. Escuchó gritos, no vio el episodio.'},
     {tipo:'Expediente civil', detalle:'Causa por medianera entre las mismas partes, en trámite desde hace tres años.'}
   ],
-  testigo:{nombre:'Raúl Cáceres', calidad:'víctima y denunciante',
+  testigo:{genero:'m', nombre:'Raúl Cáceres', calidad:'víctima y denunciante',
     perfil:'61 años, jubilado. Meticuloso, trae fechas anotadas. Le cuesta separar este episodio del conflicto general con el vecino y se va todo el tiempo al tema de la medianera.'},
   previa:'Que el día 3 de mayo, siendo alrededor de las 19 horas, el declarante se encontraba regando el frente de su domicilio cuando se aproximó su vecino Sergio Olmos, con quien mantiene un litigio civil, y en tono agresivo le manifestó que debía retirar la denuncia por ruidos molestos que había efectuado en la Municipalidad. Que en un momento el nombrado se levantó la remera dejando ver lo que el declarante interpretó como la culata de un arma de fuego en la cintura. Que no puede precisar el tipo ni el color del arma. Que el declarante ingresó a su domicilio y cerró la puerta. Que decidió efectuar la denuncia al día siguiente luego de consultarlo con su hija.',
   contexto:{
@@ -254,7 +254,7 @@ const CASOS = [
     {tipo:'Segunda declaración de Yamila Torres', detalle:'Del 22/3 en fiscalía. Se retracta y atribuye las lesiones a una caída.'},
     {tipo:'Registro de llamada al 911', detalle:'Del 20/1 a las 23:14. Audio disponible.'}
   ],
-  testigo:{nombre:'Yamila Torres', calidad:'víctima, testigo que se retracta',
+  testigo:{genero:'f', nombre:'Yamila Torres', calidad:'víctima, testigo que se retracta',
     perfil:'29 años, dos hijos con el imputado, sin trabajo formal. Hoy sostiene la retractación. Está incómoda, responde corto y mira al piso. Es el caso clásico de impugnación con declaración previa, pero también de una víctima que puede estar bajo presión.'},
   previa:'Que el día de la fecha, siendo las 23 horas aproximadamente, se hizo presente en el domicilio de la declarante su ex pareja, Diego Morales, pese a tener prohibido el acercamiento. Que el nombrado ingresó por el patio, comenzó a increparla por cuestiones vinculadas a los hijos y, ante la negativa de la declarante a entregarle las llaves del vehículo, la tomó del brazo izquierdo y le propinó un golpe de puño en el rostro. Que la declarante logró comunicarse con el 911. Que el nombrado se retiró antes del arribo del personal policial.',
   contexto:{
@@ -312,7 +312,7 @@ const CASOS = [
     {tipo:'Informe meteorológico', detalle:'Visibilidad reducida por niebla entre las 5 y las 8 del 12/8.'},
     {tipo:'Autopsia', detalle:'Politraumatismo. Muerte inmediata.'}
   ],
-  testigo:{nombre:'Cabo Emanuel Ramírez', calidad:'preventor, confeccionó el croquis',
+  testigo:{genero:'m', nombre:'Cabo Emanuel Ramírez', calidad:'preventor, confeccionó el croquis',
     perfil:'31 años, ocho años en la fuerza, sin capacitación específica en accidentología. Contesta con seguridad institucional y tiende a presentar como constatado lo que en realidad dedujo.'},
   previa:'Que el declarante se constituyó en el lugar del hecho siendo aproximadamente las 7:20 horas, por orden de la superioridad. Que al arribar se encontraba presente personal de bomberos y una ambulancia. Que procedió a confeccionar el croquis ilustrativo del lugar, consignando la posición final de los rodados y los rastros visibles sobre la calzada. Que del análisis del lugar surge que el impacto se habría producido sobre el carril de circulación sur-norte. Que las condiciones de visibilidad al momento de su arribo eran regulares por presencia de niebla.',
   contexto:{
@@ -367,7 +367,7 @@ const CASOS = [
     {tipo:'Informe pericial químico', detalle:'Clorhidrato de cocaína, pureza del 31%.'},
     {tipo:'Croquis del inmueble', detalle:'El tapial del fondo linda con un pasillo de uso común de tres viviendas.'}
   ],
-  testigo:{nombre:'Sargento Lucía Agüero', calidad:'preventora a cargo del procedimiento',
+  testigo:{genero:'f', nombre:'Sargento Lucía Agüero', calidad:'preventora a cargo del procedimiento',
     perfil:'35 años, División Drogas. Profesional y precisa, pero acostumbrada a que no la contraexaminen. Si la pregunta es exacta, contesta exacto; si es vaga, se refugia en el acta.'},
   previa:'Que la declarante se desempeñó como jefa del procedimiento llevado a cabo en el domicilio sito en Manzana 14, Casa 7 del barrio Antártida, en virtud de orden emanada del juzgado interviniente. Que se ingresó al inmueble siendo las 6:15 horas, encontrándose en el lugar el imputado, su progenitora y dos menores de edad. Que durante el registro se procedió al secuestro de cuarenta y tres envoltorios de material vegetal compactado, una balanza de precisión y dinero en efectivo. Que los envoltorios fueron hallados en el sector posterior del inmueble. Que se labró la correspondiente acta con intervención de testigos hábiles.',
   contexto:{
@@ -420,7 +420,7 @@ const CASOS = [
     {tipo:'Pericia mecánica', detalle:'Numeración de cuadro limada; motor con numeración regrabada.'},
     {tipo:'Declaración de Matías Paz', detalle:'Reconoce el rodado por una calcomanía y una abolladura en el tanque.'}
   ],
-  testigo:{nombre:'Matías Paz', calidad:'damnificado, reconoce el rodado',
+  testigo:{genero:'m', nombre:'Matías Paz', calidad:'damnificado, reconoce el rodado',
     perfil:'26 años, repartidor. Seguro de que la moto es suya. No sabe casi nada de mecánica ni de numeraciones, y sus certezas descansan en detalles estéticos.'},
   previa:'Que el declarante es propietario de una motocicleta marca Honda, modelo Wave, color roja, la cual le fuera sustraída el día 17 de marzo del frente de su domicilio. Que el día de la fecha fue convocado a la dependencia policial a fin de reconocer un rodado secuestrado. Que al observarlo reconoció de inmediato que se trataba de su motocicleta, por presentar una calcomanía de un club deportivo en el guardabarros trasero y una abolladura en el tanque de combustible del lado derecho. Que no conserva la documentación del rodado por haberla extraviado.',
   contexto:{
@@ -474,7 +474,7 @@ const CASOS = [
     {tipo:'Informe de la billetera virtual', detalle:'Cuenta abierta el 28/1 con datos de Leiva. Retiros en cajeros de Córdoba.'},
     {tipo:'Detalle de llamadas entrantes', detalle:'No registra los llamados en los horarios denunciados.'}
   ],
-  testigo:{nombre:'Nélida Cabrera', calidad:'víctima',
+  testigo:{genero:'f', nombre:'Nélida Cabrera', calidad:'víctima',
     perfil:'74 años, jubilada docente. Lúcida pero angustiada por el episodio. Confunde fechas y horarios, y mezcla los cuatro llamados en un solo relato.'},
   previa:'Que la declarante recibió un llamado telefónico de una persona de sexo femenino que dijo ser empleada del banco donde percibe sus haberes, informándole que su cuenta había sido vulnerada y que debía resguardar el dinero transfiriéndolo a una cuenta segura. Que la declarante, creyendo en la veracidad de lo informado, realizó cuatro transferencias durante esa semana. Que no recuerda con exactitud los días ni los horarios de cada llamado. Que tomó conocimiento del engaño cuando concurrió personalmente a la sucursal.',
   contexto:{
@@ -530,7 +530,7 @@ const CASOS = [
     {tipo:'Autopsia', detalle:'Herida punzocortante única en tórax. Muerte por shock hipovolémico.'},
     {tipo:'Croquis del lugar', detalle:'Distancia del kiosco al punto del hecho: 47 metros.'}
   ],
-  testigo:{nombre:'Wanda Ocampo', calidad:'única testigo presencial',
+  testigo:{genero:'f', nombre:'Wanda Ocampo', calidad:'única testigo presencial',
     perfil:'24 años, empleada de kiosco, cursa el profesorado. Observadora y honesta, pero la fiscalía la presenta como si hubiera visto más de lo que vio. Si le preguntan bien, distingue con precisión lo que vio de lo que supuso.'},
   previa:'Que la declarante se encontraba trabajando en el kiosco sito en la esquina de Santa Fe y Rivadavia, cuando escuchó gritos provenientes de la mitad de cuadra. Que al mirar hacia allí observó a dos personas que forcejeaban con un joven. Que uno de ellos vestía ropa oscura y el otro una remera clara. Que luego ambos se retiraron corriendo en dirección opuesta y el joven quedó tendido en la vereda. Que la declarante llamó de inmediato al 911. Que no puede precisar las fisonomías por la distancia y la falta de iluminación en ese sector de la cuadra.',
   contexto:{
@@ -587,7 +587,7 @@ const CASOS = [
     {tipo:'Informe RENAR', detalle:'Sin registro del arma por supresión de numeración.'},
     {tipo:'Acta del control vehicular', detalle:'Control de rutina. Mercado viajaba como acompañante.'}
   ],
-  testigo:{nombre:'Perito Osvaldo Nieto', calidad:'perito balístico oficial',
+  testigo:{genero:'m', nombre:'Perito Osvaldo Nieto', calidad:'perito balístico oficial',
     perfil:'52 años, veinte años en el gabinete. Sólido en lo suyo, pero acostumbrado a que sus conclusiones no se discutan. Si le preguntan por el método concreto, responde bien; si le piden opiniones fuera de su área, las da igual, y ahí queda expuesto.'},
   previa:'Que el suscripto recibió el arma remitida por la Unidad interviniente a los fines de determinar su aptitud para el disparo. Que se efectuó el examen macroscópico del arma, verificándose el estado de sus mecanismos. Que se realizaron dos disparos de prueba con munición del mismo calibre, resultando ambos exitosos. Que en consecuencia se concluye que el arma resulta apta para producir disparos. Que la numeración identificatoria se encuentra suprimida por limado.',
   contexto:{
@@ -637,7 +637,7 @@ const CASOS = [
     {tipo:'Declaración de Héctor Villafañe', detalle:'Denunciante y titular registral.'},
     {tipo:'Informe municipal', detalle:'Sin registro de servicios ni de tributos abonados sobre el inmueble desde 2013.'}
   ],
-  testigo:{nombre:'Héctor Villafañe', calidad:'denunciante y titular registral',
+  testigo:{genero:'m', nombre:'Héctor Villafañe', calidad:'denunciante y titular registral',
     perfil:'68 años, comerciante retirado, vive en Capital. Convencido de su derecho y molesto por tener que explicar por qué no iba al campo. Confunde el derecho de propiedad con la posesión efectiva.'},
   previa:'Que el declarante es titular registral del inmueble rural identificado catastralmente, ubicado en el paraje La Quebrada, departamento Sanagasta, adquirido en el año 1998. Que el predio se encontraba cercado con alambrado perimetral y que el declarante concurría periódicamente a controlarlo. Que el día 11 de octubre tomó conocimiento por comentarios de vecinos de que un grupo de personas había ingresado al predio y levantado construcciones. Que nunca autorizó a persona alguna a ocupar el inmueble.',
   contexto:{
@@ -689,7 +689,7 @@ const CASOS = [
     {tipo:'Informe del médico policial sobre Albornoz', detalle:'Hematoma malar izquierdo y contusión costal derecha.'},
     {tipo:'Video de particular', detalle:'42 segundos. Registra el momento de la reducción desde unos 15 metros.'}
   ],
-  testigo:{nombre:'Agente Cristian Toledo', calidad:'preventor y damnificado',
+  testigo:{genero:'m', nombre:'Agente Cristian Toledo', calidad:'preventor y damnificado',
     perfil:'28 años, cuatro años en la fuerza. Está a la vez como testigo y como víctima, lo que compromete su imparcialidad. Recita el acta. Si se aparta del acta, se contradice.'},
   previa:'Que el declarante, junto al agente Villagra, fue comisionado a la Plaza del Sol por un llamado al 911 referido a disturbios en la vía pública. Que al arribar observaron a un masculino en actitud agresiva, a quien se procedió a identificar. Que el nombrado se negó a identificarse y comenzó a proferir insultos hacia el personal. Que al intentar reducirlo, el mismo forcejeó violentamente, ocasionándole al declarante una lesión en el antebrazo derecho. Que finalmente fue reducido con el auxilio del agente Villagra y trasladado a la dependencia.',
   contexto:{
