@@ -5,7 +5,7 @@
 /* IMPORTANTE: subí este número en CADA actualización de los archivos.
    Si no cambia, los navegadores que ya visitaron el sitio siguen sirviendo
    la copia vieja desde el caché y no ven los cambios nunca.              */
-const VERSION = 'lex-v4';
+const VERSION = 'lex-v5';
 const NUCLEO = [
   './',
   './index.html',

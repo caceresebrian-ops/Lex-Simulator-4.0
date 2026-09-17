@@ -239,6 +239,15 @@ textarea{resize:vertical;min-height:120px;font-size:14px;line-height:1.55}
 .turno.juez{border-left:3px solid var(--oro);padding-left:13px}
 .turno.juez .quien{color:var(--oro)}
 .pensando{font-family:Spectral,Georgia,serif;font-style:italic;color:var(--gris-claro)}
+.icono.chico{width:38px;height:38px}
+.icono.chico svg{width:17px;height:17px}
+.icono.chico[aria-pressed="false"]{opacity:.42}
+/* el testigo pensando: tres puntos que laten */
+.puntitos{display:inline-flex;gap:5px;align-items:center;height:22px}
+.puntitos i{width:6px;height:6px;border-radius:50%;background:var(--gris-claro);display:block;animation:pensar 1.25s ease-in-out infinite}
+.puntitos i:nth-child(2){animation-delay:.18s}
+.puntitos i:nth-child(3){animation-delay:.36s}
+@keyframes pensar{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
 
 #pie{background:var(--blanco);border-top:1px solid var(--borde);padding:12px clamp(12px,3vw,20px) 14px}
 .entrada{max-width:70ch;margin:0 auto;display:flex;gap:8px;align-items:flex-end}

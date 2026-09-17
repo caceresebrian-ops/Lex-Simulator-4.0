@@ -50,6 +50,20 @@ Abrí la dirección publicada y:
 Queda con ícono propio y abre a pantalla completa. El *service worker* cachea todo, así que después
 de la primera visita funciona sin señal.
 
+### El testigo
+
+Cada testigo maneja dos bancos de respuestas. Uno propio del caso, sobre lo que vio y lo que declaró
+antes. Otro universal, que le permite contestar sobre quién es, a qué se dedica, si conoce al
+imputado, si tuvo problemas con él, si espera algo del juicio, si usa anteojos, si había tomado, qué
+hacía antes del hecho, qué hizo después, a quién le contó, si habló con el fiscal y cuánto recuerda.
+Entiende cerca del 90 % de las preguntas habituales de una acreditación.
+
+Cuando no entiende, pide aclaración en lugar de quedarse mudo, y eso se te contabiliza: una pregunta
+que hay que repetir ya perdió efecto ante el tribunal, y aparece como eje propio en la devolución.
+
+Tarda entre dos y tres segundos en contestar, y algo más cuando la pregunta lo acorrala. La demora
+es deliberada: el silencio es donde uno se pone nervioso en una audiencia real.
+
 ### Litigar de manera oral
 
 Hay dos botones junto al campo de la pregunta.
@@ -57,6 +71,9 @@ Hay dos botones junto al campo de la pregunta.
 El **micrófono** dicta: hablás, el texto aparece en el campo y vos lo enviás cuando querés. Si la
 sala está hablando, tocarlo la corta en seco, que es lo que uno hace cuando el testigo se va por las
 ramas.
+
+La sala habla desde que entrás a la audiencia. El botón del **parlante**, arriba junto al reloj,
+la silencia si estás en un lugar donde no podés escuchar; la preferencia queda guardada.
 
 El botón de **auriculares** enciende el modo oral, que cierra el circuito completo: escucha sin que
 tengas que sostener nada, envía la pregunta sola cuando hacés una pausa de un segundo y medio, la

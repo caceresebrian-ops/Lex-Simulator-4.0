@@ -29,6 +29,23 @@ const CASOS = [
   testigo:{nombre:'Gustavo Nieva', calidad:'víctima y único testigo presencial',
     perfil:'38 años, empleado municipal, secundario completo. Está convencido de lo que vio y se ofende si se le sugiere que puede equivocarse. Habla rápido cuando se pone nervioso.'},
   previa:'Que el día de la fecha, siendo aproximadamente las 22:40 horas, el declarante se encontraba caminando por calle Benjamín de la Vega en dirección al sur, cuando a la altura de la intersección con calle Catamarca fue abordado por un sujeto de sexo masculino, de contextura delgada, de aproximadamente un metro setenta y cinco de estatura, quien vestía campera oscura con capucha colocada. Que dicho sujeto le exhibió lo que parecía ser un arma de fuego a la altura de la cintura y le exigió la entrega del teléfono celular y del dinero que llevara consigo. Que el declarante entregó un aparato marca Samsung y la suma de nueve mil pesos aproximadamente. Que todo sucedió muy rápido, en cuestión de segundos, y que la iluminación del lugar era escasa. Que el sujeto se retiró corriendo en dirección al este. Que el declarante cree que podría reconocerlo si lo viera nuevamente, aunque no le vio bien la cara por la capucha.',
+  contexto:{
+    ocupacion:'Soy empleado municipal, en la Dirección de Espacios Verdes.',
+    domicilio:'Vivo en el barrio Vargas, a unas doce cuadras de donde pasó.',
+    estudios:'Terminé la secundaria.',
+    familia:'Estoy en pareja, tengo un nene de seis años.',
+    relacionImputado:'No lo conocía. Lo vi esa noche y después en la rueda.',
+    interes:'Yo lo único que quiero es que no le pase a otro. La plata no la voy a recuperar.',
+    vista:'Veo bien, nunca usé anteojos.',
+    consumo:'No tomo. Venía del gimnasio, imagínese.',
+    antes:'Venía del gimnasio, entreno tres veces por semana y salgo cerca de las diez y media.',
+    compania:'Iba solo, caminando para mi casa.',
+    despues:'Me fui corriendo hasta la esquina y de ahí llamé. Después fui a la comisaría.',
+    conto:'Lo llamé a mi hermano y después le conté a mi señora cuando llegué.',
+    policia:'Esa misma noche fui a la Primera y radiqué la denuncia.',
+    consecuencias:'Un tiempo no quise caminar más por ahí de noche.',
+    preparacion:'Me citaron y me explicaron cómo era, nada más.'
+  },
   sobre:{
     verdad:'Nieva vio al agresor entre dos y tres segundos, de perfil y con capucha. En la rueda dudó entre el número 2 y el número 4, y eligió al 4 después de que el personal policial le comentara que "el que buscaban ya estaba adentro". Quiroga efectivamente estuvo esa noche a tres cuadras del lugar, pero no fue quien lo abordó.',
     puntos:[
@@ -71,6 +88,22 @@ const CASOS = [
   testigo:{nombre:'Aldo Páez', calidad:'testigo presencial, comerciante lindero',
     perfil:'57 años, dueño de una rotisería. Servicial, quiere ayudar, y por querer ayudar afirma más de lo que sabe. Se pone incómodo si lo corrigen.'},
   previa:'Que siendo aproximadamente las cuatro de la madrugada el declarante se encontraba en el interior de su comercio realizando tareas de limpieza, cuando escuchó ruidos provenientes del fondo del local lindero. Que se asomó por la puerta y alcanzó a ver a dos personas jóvenes, de sexo masculino, que cargaban bultos en una motocicleta de color oscuro. Que no pudo observar sus rostros ni la patente del rodado. Que uno de ellos le resultó conocido de vista del barrio. Que los mismos se retiraron por calle 19 de Febrero en dirección al norte.',
+  contexto:{
+    ocupacion:'Tengo una rotisería, hace veinte años que estoy ahí.',
+    domicilio:'Vivo arriba del local mismo, en 19 de Febrero.',
+    estudios:'Hice hasta séptimo grado nomás.',
+    familia:'Casado, tres hijos, ya grandes todos.',
+    relacionImputado:'Al muchacho lo tengo visto del barrio. Acá nos conocemos todos.',
+    interes:'A mí no me robaron nada. Yo vine porque me citaron.',
+    vista:'Veo bien para mi edad. De lejos me cuesta un poco.',
+    consumo:'Yo no tomo cuando trabajo.',
+    antes:'Estaba limpiando el local, que es lo que hago siempre a esa hora antes de cerrar.',
+    compania:'Estaba solo, mi señora ya se había ido a dormir.',
+    despues:'Me quedé mirando un rato y después cerré y me fui arriba.',
+    conto:'Al otro día se lo comenté al dueño de la ferretería.',
+    policia:'La policía vino después y yo les conté lo que había visto.',
+    consecuencias:'Desde entonces pongo la reja antes de limpiar.'
+  },
   sobre:{
     verdad:'Páez vio dos siluetas desde treinta metros, sin luz, a través del vidrio de su local. Reconoció a Agüero recién cuando la policía le mostró una foto tres días después, y dijo que "podía ser". El que efectivamente cargó los bultos fue otra persona: Agüero llegó después, a buscar a su hermano.',
     puntos:[
@@ -111,6 +144,22 @@ const CASOS = [
   testigo:{nombre:'Franco Luna', calidad:'testigo presencial, amigo de la víctima',
     perfil:'23 años, changarín. Leal a su amigo hasta la exageración. Había tomado esa noche. Responde con bronca si siente que se defiende al agresor.'},
   previa:'Que el declarante se encontraba junto a Marcelo Britos a la salida del local bailable La Cava, cuando se acercó Cristian Vera, a quien conoce del pueblo, y sin mediar palabra le propinó un golpe de puño en el rostro a Britos, quien cayó al suelo. Que luego de ello se generó una pelea generalizada entre varias personas. Que el declarante intervino para separar. Que había mucha gente en el lugar. Que ambos habían consumido bebidas alcohólicas durante la noche.',
+  contexto:{
+    ocupacion:'Hago changas, albañilería, lo que salga.',
+    domicilio:'Vivo en Aimogasta, en el barrio de atrás de la terminal.',
+    estudios:'Dejé en segundo año.',
+    familia:'Soltero, vivo con mi vieja.',
+    relacionImputado:'Al Vera lo conozco del pueblo, de vista y de nombre.',
+    conflicto:'Roces habíamos tenido, pero nada serio antes de esa noche.',
+    interes:'Yo quiero que se haga justicia por el Marcelo, es mi amigo de toda la vida.',
+    consumo:'Habíamos tomado, sí. Era sábado a la noche y estábamos en el boliche.',
+    antes:'Arrancamos como a las once en la casa de un amigo y de ahí nos fuimos a La Cava.',
+    compania:'Estaba con el Marcelo y con dos más del barrio.',
+    despues:'Lo levanté y lo llevamos al hospital en el auto de un conocido.',
+    conto:'Esa misma noche llamé a la familia del Marcelo.',
+    policia:'Declaré en la comisaría al otro día, cuando volví del hospital.',
+    consecuencias:'El Marcelo quedó mal del ojo y ya no ve igual.'
+  },
   sobre:{
     verdad:'Luna estaba de espaldas cuando cayó Britos y se dio vuelta al escuchar el golpe. Vio a Vera parado al lado, pero no vio el impacto. Había bebido siete u ocho cervezas. El golpe que produjo la lesión ocular se lo dio un tercero durante el tumulto, con un codazo.',
     puntos:[
@@ -151,6 +200,22 @@ const CASOS = [
   testigo:{nombre:'Raúl Cáceres', calidad:'víctima y denunciante',
     perfil:'61 años, jubilado. Meticuloso, trae fechas anotadas. Le cuesta separar este episodio del conflicto general con el vecino y se va todo el tiempo al tema de la medianera.'},
   previa:'Que el día 3 de mayo, siendo alrededor de las 19 horas, el declarante se encontraba regando el frente de su domicilio cuando se aproximó su vecino Sergio Olmos, con quien mantiene un litigio civil, y en tono agresivo le manifestó que debía retirar la denuncia por ruidos molestos que había efectuado en la Municipalidad. Que en un momento el nombrado se levantó la remera dejando ver lo que el declarante interpretó como la culata de un arma de fuego en la cintura. Que no puede precisar el tipo ni el color del arma. Que el declarante ingresó a su domicilio y cerró la puerta. Que decidió efectuar la denuncia al día siguiente luego de consultarlo con su hija.',
+  contexto:{
+    ocupacion:'Soy jubilado. Trabajé toda la vida en Vialidad.',
+    domicilio:'Vivo en Copiapó al 200, hace treinta años en la misma casa.',
+    estudios:'Secundario completo.',
+    familia:'Viudo. Tengo una hija que vive cerca.',
+    relacionImputado:'Es mi vecino de al lado, lo conozco desde que se mudó.',
+    conflicto:'Con Olmos venimos mal hace tres años por el tema de la medianera.',
+    interes:'Yo lo único que quiero es vivir tranquilo en mi casa.',
+    vista:'Uso anteojos para leer nomás. De lejos veo bien.',
+    antes:'Estaba regando el frente, como hago todas las tardes a esa hora.',
+    compania:'Estaba solo. Mi hija había venido más temprano.',
+    despues:'Entré a mi casa, cerré con llave y no salí más esa tarde.',
+    conto:'Lo llamé a mi hija enseguida y lo hablamos.',
+    policia:'Denuncié al otro día, después de hablarlo con ella.',
+    consecuencias:'Desde entonces no salgo al frente cuando lo veo a él.'
+  },
   sobre:{
     verdad:'Olmos se levantó la remera, pero lo que llevaba en la cintura era un teléfono con funda de cuero negra. Cáceres lo interpretó como un arma en el marco del conflicto y su hija lo convenció de denunciar como amenaza con arma para fortalecer su posición en el juicio civil.',
     puntos:[
@@ -192,6 +257,21 @@ const CASOS = [
   testigo:{nombre:'Yamila Torres', calidad:'víctima, testigo que se retracta',
     perfil:'29 años, dos hijos con el imputado, sin trabajo formal. Hoy sostiene la retractación. Está incómoda, responde corto y mira al piso. Es el caso clásico de impugnación con declaración previa, pero también de una víctima que puede estar bajo presión.'},
   previa:'Que el día de la fecha, siendo las 23 horas aproximadamente, se hizo presente en el domicilio de la declarante su ex pareja, Diego Morales, pese a tener prohibido el acercamiento. Que el nombrado ingresó por el patio, comenzó a increparla por cuestiones vinculadas a los hijos y, ante la negativa de la declarante a entregarle las llaves del vehículo, la tomó del brazo izquierdo y le propinó un golpe de puño en el rostro. Que la declarante logró comunicarse con el 911. Que el nombrado se retiró antes del arribo del personal policial.',
+  contexto:{
+    ocupacion:'Ahora no estoy trabajando. Hago limpieza por hora cuando sale.',
+    domicilio:'Vivo en la casa del barrio, con los nenes.',
+    estudios:'Llegué hasta cuarto año.',
+    familia:'Tenemos dos nenes con él.',
+    relacionImputado:'Es el padre de mis hijos. Estuvimos muchos años juntos.',
+    interes:'Yo no quiero que le pase nada. Solo quiero estar tranquila.',
+    antes:'Estaba en casa con los chicos, era de noche y estaban por dormirse.',
+    compania:'Estaba con los nenes nada más.',
+    despues:'Después llamé, vino la ambulancia y me revisaron.',
+    conto:'A nadie le conté al principio. Después se enteró mi hermana.',
+    policia:'Esa noche declaré en la comisaría.',
+    consecuencias:'Estuve unos días con el ojo así, después se fue.',
+    preparacion:'Hablé con la fiscalía cuando fui a aclarar lo que había pasado.'
+  },
   sobre:{
     verdad:'La primera declaración es la verdadera. Entre enero y marzo Morales volvió a la casa, retomaron la convivencia de hecho y él le pidió que retirara la denuncia. La retractación no es espontánea. Torres no va a decirlo si no se la interroga con cuidado sobre qué cambió entre una declaración y la otra.',
     puntos:[
@@ -235,6 +315,19 @@ const CASOS = [
   testigo:{nombre:'Cabo Emanuel Ramírez', calidad:'preventor, confeccionó el croquis',
     perfil:'31 años, ocho años en la fuerza, sin capacitación específica en accidentología. Contesta con seguridad institucional y tiende a presentar como constatado lo que en realidad dedujo.'},
   previa:'Que el declarante se constituyó en el lugar del hecho siendo aproximadamente las 7:20 horas, por orden de la superioridad. Que al arribar se encontraba presente personal de bomberos y una ambulancia. Que procedió a confeccionar el croquis ilustrativo del lugar, consignando la posición final de los rodados y los rastros visibles sobre la calzada. Que del análisis del lugar surge que el impacto se habría producido sobre el carril de circulación sur-norte. Que las condiciones de visibilidad al momento de su arribo eran regulares por presencia de niebla.',
+  contexto:{
+    ocupacion:'Soy cabo de la Policía de la Provincia, hace ocho años.',
+    domicilio:'Vivo en Patquía, en el casco urbano.',
+    estudios:'Tengo el secundario y la escuela de policía.',
+    familia:'Casado, dos hijos.',
+    relacionImputado:'No, al conductor no lo conocía. Lo vi ahí en el lugar.',
+    interes:'Yo cumplo con el servicio, nada más.',
+    antes:'Estaba de guardia en la comisaría cuando entró el llamado por la superioridad.',
+    compania:'Fui con otro efectivo en el móvil.',
+    despues:'Terminé el croquis, labré las actuaciones y volví a la dependencia.',
+    policia:'Yo soy el personal policial que intervino.',
+    preparacion:'Repasé las actuaciones antes de venir, es el procedimiento.'
+  },
   sobre:{
     verdad:'Ramírez llegó cuarenta minutos después. Los bomberos ya habían movido la moto para liberar al conductor y la ambulancia había pisado la zona de rastros. La ubicación del impacto no fue medida: la dedujo por la posición final de los vehículos. No tiene formación en accidentología y nunca hizo un curso de planimetría.',
     puntos:[
@@ -277,6 +370,17 @@ const CASOS = [
   testigo:{nombre:'Sargento Lucía Agüero', calidad:'preventora a cargo del procedimiento',
     perfil:'35 años, División Drogas. Profesional y precisa, pero acostumbrada a que no la contraexaminen. Si la pregunta es exacta, contesta exacto; si es vaga, se refugia en el acta.'},
   previa:'Que la declarante se desempeñó como jefa del procedimiento llevado a cabo en el domicilio sito en Manzana 14, Casa 7 del barrio Antártida, en virtud de orden emanada del juzgado interviniente. Que se ingresó al inmueble siendo las 6:15 horas, encontrándose en el lugar el imputado, su progenitora y dos menores de edad. Que durante el registro se procedió al secuestro de cuarenta y tres envoltorios de material vegetal compactado, una balanza de precisión y dinero en efectivo. Que los envoltorios fueron hallados en el sector posterior del inmueble. Que se labró la correspondiente acta con intervención de testigos hábiles.',
+  contexto:{
+    ocupacion:'Soy sargento de la División Drogas Peligrosas.',
+    domicilio:'No corresponde que dé mi domicilio particular.',
+    estudios:'Tengo la formación de la fuerza y cursos de la división.',
+    relacionImputado:'No lo conocía personalmente. Lo conocí en el procedimiento.',
+    interes:'Yo declaro sobre el procedimiento que encabecé.',
+    antes:'Nos reunimos a las cinco en la dependencia para el briefing previo al allanamiento.',
+    compania:'Fui con la comisión, cuatro efectivos más.',
+    despues:'Se trasladó el material secuestrado y se labró el acta correspondiente.',
+    preparacion:'Leí el acta antes de venir.'
+  },
   sobre:{
     verdad:'Los envoltorios estaban sobre el tapial, del lado del pasillo común, accesible desde tres viviendas. La balanza estaba en la cocina, de uso familiar. El acta dice "sector posterior" porque Agüero no quiso consignar la ambigüedad del lugar. Los testigos hábiles llegaron veinte minutos después de iniciado el registro.',
     puntos:[
@@ -319,6 +423,19 @@ const CASOS = [
   testigo:{nombre:'Matías Paz', calidad:'damnificado, reconoce el rodado',
     perfil:'26 años, repartidor. Seguro de que la moto es suya. No sabe casi nada de mecánica ni de numeraciones, y sus certezas descansan en detalles estéticos.'},
   previa:'Que el declarante es propietario de una motocicleta marca Honda, modelo Wave, color roja, la cual le fuera sustraída el día 17 de marzo del frente de su domicilio. Que el día de la fecha fue convocado a la dependencia policial a fin de reconocer un rodado secuestrado. Que al observarlo reconoció de inmediato que se trataba de su motocicleta, por presentar una calcomanía de un club deportivo en el guardabarros trasero y una abolladura en el tanque de combustible del lado derecho. Que no conserva la documentación del rodado por haberla extraviado.',
+  contexto:{
+    ocupacion:'Trabajo de repartidor, hago delivery con la moto.',
+    domicilio:'Vivo en el centro, en un departamento alquilado.',
+    estudios:'Secundario completo.',
+    familia:'Soltero.',
+    relacionImputado:'Al mecánico no lo conozco de nada. Lo vi cuando fui a reconocer la moto.',
+    interes:'Quiero recuperar mi moto, es mi herramienta de trabajo.',
+    antes:'Esa noche la dejé en la puerta como siempre, con la traba.',
+    despues:'A la mañana salí y no estaba. Denuncié ese mismo día.',
+    conto:'Le avisé a mi jefe que no iba a poder trabajar.',
+    policia:'Denuncié el 17 de marzo en la comisaría.',
+    consecuencias:'Estuve un mes sin trabajar por no tener la moto.'
+  },
   sobre:{
     verdad:'La moto es efectivamente de Paz. Pero la calcomanía es de un club con miles de hinchas y la abolladura es común en ese modelo. Paz no recuerda el número de dominio ni conserva documentación, y la identificación registral se hizo por un peritaje posterior, no por su reconocimiento. Funes, por su parte, sí recibió la moto de un tercero, pero sabía que era de origen dudoso porque le pidieron regrabar el motor.',
     puntos:[
@@ -360,6 +477,22 @@ const CASOS = [
   testigo:{nombre:'Nélida Cabrera', calidad:'víctima',
     perfil:'74 años, jubilada docente. Lúcida pero angustiada por el episodio. Confunde fechas y horarios, y mezcla los cuatro llamados en un solo relato.'},
   previa:'Que la declarante recibió un llamado telefónico de una persona de sexo femenino que dijo ser empleada del banco donde percibe sus haberes, informándole que su cuenta había sido vulnerada y que debía resguardar el dinero transfiriéndolo a una cuenta segura. Que la declarante, creyendo en la veracidad de lo informado, realizó cuatro transferencias durante esa semana. Que no recuerda con exactitud los días ni los horarios de cada llamado. Que tomó conocimiento del engaño cuando concurrió personalmente a la sucursal.',
+  contexto:{
+    ocupacion:'Soy jubilada. Fui maestra cuarenta años.',
+    domicilio:'Vivo sola en mi departamento, en el centro.',
+    estudios:'Soy maestra normal nacional.',
+    familia:'Viuda. Tengo dos hijos que viven afuera.',
+    relacionImputado:'A esa señorita no la vi nunca. Yo hablé por teléfono con alguien.',
+    interes:'Quiero recuperar mi plata, que me costó toda la vida juntarla.',
+    vista:'Veo bien con los anteojos puestos.',
+    oido:'Escucho bien, por eso le digo que era voz de mujer joven.',
+    antes:'Estaba en mi casa, había ido al banco esa semana a cobrar.',
+    compania:'Vivo sola, no había nadie conmigo.',
+    despues:'Seguí las instrucciones que me daban y después fui al banco.',
+    conto:'Le conté a mi hijo cuando me di cuenta, y él me dijo que denunciara.',
+    policia:'Denuncié el 10 de febrero.',
+    consecuencias:'No duermo bien desde entonces. Me da vergüenza haber caído.'
+  },
   sobre:{
     verdad:'Cabrera fue efectivamente engañada. Pero hubo también un llamado que ella hizo, no recibió: devolvió el llamado a un número que le dejaron. Ese dato no figura en la denuncia y explica por qué el detalle de entrantes no registra los contactos. Leiva no fue quien llamó: su rol fue prestar la cuenta.',
     puntos:[
@@ -400,6 +533,22 @@ const CASOS = [
   testigo:{nombre:'Wanda Ocampo', calidad:'única testigo presencial',
     perfil:'24 años, empleada de kiosco, cursa el profesorado. Observadora y honesta, pero la fiscalía la presenta como si hubiera visto más de lo que vio. Si le preguntan bien, distingue con precisión lo que vio de lo que supuso.'},
   previa:'Que la declarante se encontraba trabajando en el kiosco sito en la esquina de Santa Fe y Rivadavia, cuando escuchó gritos provenientes de la mitad de cuadra. Que al mirar hacia allí observó a dos personas que forcejeaban con un joven. Que uno de ellos vestía ropa oscura y el otro una remera clara. Que luego ambos se retiraron corriendo en dirección opuesta y el joven quedó tendido en la vereda. Que la declarante llamó de inmediato al 911. Que no puede precisar las fisonomías por la distancia y la falta de iluminación en ese sector de la cuadra.',
+  contexto:{
+    ocupacion:'Trabajo en el kiosco y estudio el profesorado de Lengua.',
+    domicilio:'Vivo a seis cuadras del kiosco.',
+    estudios:'Estoy en tercer año del profesorado.',
+    familia:'Soltera, vivo con una compañera.',
+    relacionImputado:'No conozco a nadie de los que estuvieron ahí.',
+    interes:'Yo no tengo nada que ver, vine porque me citaron.',
+    vista:'Veo bien, no uso anteojos.',
+    consumo:'Estaba trabajando, no había tomado nada.',
+    antes:'Estaba atendiendo el kiosco, era mi turno de noche.',
+    compania:'Estaba sola en el local.',
+    despues:'Llamé al 911 y salí a ver si el chico respiraba, pero no me animé a moverlo.',
+    conto:'Llamé a mi mamá cuando se fue la policía.',
+    policia:'Declaré esa misma madrugada.',
+    consecuencias:'Dejé el turno de noche después de eso.'
+  },
   sobre:{
     verdad:'Ocampo vio dos siluetas a 47 metros, de noche. No puede identificar a nadie y lo sabe. Vio que uno de los dos hizo un movimiento hacia adelante, pero no vio arma alguna. Soria estaba en la zona, pero el que tenía el cuchillo era el otro, que no fue identificado.',
     puntos:[
@@ -441,6 +590,15 @@ const CASOS = [
   testigo:{nombre:'Perito Osvaldo Nieto', calidad:'perito balístico oficial',
     perfil:'52 años, veinte años en el gabinete. Sólido en lo suyo, pero acostumbrado a que sus conclusiones no se discutan. Si le preguntan por el método concreto, responde bien; si le piden opiniones fuera de su área, las da igual, y ahí queda expuesto.'},
   previa:'Que el suscripto recibió el arma remitida por la Unidad interviniente a los fines de determinar su aptitud para el disparo. Que se efectuó el examen macroscópico del arma, verificándose el estado de sus mecanismos. Que se realizaron dos disparos de prueba con munición del mismo calibre, resultando ambos exitosos. Que en consecuencia se concluye que el arma resulta apta para producir disparos. Que la numeración identificatoria se encuentra suprimida por limado.',
+  contexto:{
+    ocupacion:'Soy perito balístico del gabinete, hace veinte años.',
+    estudios:'Tengo la formación técnica y los cursos de la especialidad.',
+    relacionImputado:'No conozco a ninguna de las partes.',
+    interes:'Yo hago el peritaje que se me encomienda.',
+    antes:'El arma ingresó al gabinete remitida por la Unidad interviniente.',
+    despues:'Elevé el informe con las conclusiones a la instrucción.',
+    preparacion:'Repasé mi informe antes de venir, como corresponde.'
+  },
   sobre:{
     verdad:'La pericia es correcta en cuanto a la aptitud. Pero Nieto no realizó el estudio de restauración de numeración, ni examinó rastros dactilares, porque el arma llegó ya manipulada y sin resguardo de cadena de custodia documentada. El encuadre como "arma de guerra" es una calificación jurídica que él consignó sin que corresponda a su función.',
     puntos:[
@@ -482,6 +640,18 @@ const CASOS = [
   testigo:{nombre:'Héctor Villafañe', calidad:'denunciante y titular registral',
     perfil:'68 años, comerciante retirado, vive en Capital. Convencido de su derecho y molesto por tener que explicar por qué no iba al campo. Confunde el derecho de propiedad con la posesión efectiva.'},
   previa:'Que el declarante es titular registral del inmueble rural identificado catastralmente, ubicado en el paraje La Quebrada, departamento Sanagasta, adquirido en el año 1998. Que el predio se encontraba cercado con alambrado perimetral y que el declarante concurría periódicamente a controlarlo. Que el día 11 de octubre tomó conocimiento por comentarios de vecinos de que un grupo de personas había ingresado al predio y levantado construcciones. Que nunca autorizó a persona alguna a ocupar el inmueble.',
+  contexto:{
+    ocupacion:'Soy comerciante retirado. Tuve una casa de repuestos.',
+    domicilio:'Vivo en la Capital, en el centro.',
+    estudios:'Secundario completo.',
+    familia:'Casado, dos hijos grandes.',
+    relacionImputado:'A esa gente no la conozco de nada.',
+    interes:'Quiero que me devuelvan mi campo, que lo compré con mi trabajo.',
+    antes:'Ese día yo estaba en la Capital, en mi casa.',
+    despues:'Cuando me avisaron fui hasta allá a ver y después denuncié.',
+    conto:'Lo hablé con mi abogado enseguida.',
+    consecuencias:'No puedo usar el campo desde entonces.'
+  },
   sobre:{
     verdad:'Villafañe no concurre al predio desde 2015. El alambrado estaba caído hacía años. No pagó tributos ni mantuvo el inmueble. Tomó conocimiento de la ocupación por un llamado, no por una visita. Es titular registral, pero perdió la posesión efectiva mucho antes del ingreso de los ocupantes.',
     puntos:[
@@ -522,6 +692,20 @@ const CASOS = [
   testigo:{nombre:'Agente Cristian Toledo', calidad:'preventor y damnificado',
     perfil:'28 años, cuatro años en la fuerza. Está a la vez como testigo y como víctima, lo que compromete su imparcialidad. Recita el acta. Si se aparta del acta, se contradice.'},
   previa:'Que el declarante, junto al agente Villagra, fue comisionado a la Plaza del Sol por un llamado al 911 referido a disturbios en la vía pública. Que al arribar observaron a un masculino en actitud agresiva, a quien se procedió a identificar. Que el nombrado se negó a identificarse y comenzó a proferir insultos hacia el personal. Que al intentar reducirlo, el mismo forcejeó violentamente, ocasionándole al declarante una lesión en el antebrazo derecho. Que finalmente fue reducido con el auxilio del agente Villagra y trasladado a la dependencia.',
+  contexto:{
+    ocupacion:'Soy agente de la Policía de la Provincia, hace cuatro años.',
+    domicilio:'Vivo en la Capital.',
+    estudios:'Secundario y escuela de policía.',
+    familia:'En pareja, sin hijos.',
+    relacionImputado:'No lo conocía. Lo vi en el procedimiento.',
+    interes:'Yo soy el damnificado de las lesiones, además del preventor.',
+    antes:'Estábamos de recorrida con el agente Villagra cuando entró el llamado.',
+    compania:'Iba con el agente Villagra en el móvil.',
+    despues:'Lo trasladamos a la dependencia y labramos el acta.',
+    policia:'Yo soy el personal que intervino.',
+    consecuencias:'Estuve con la curación unos días, nada grave.',
+    preparacion:'Leí el acta antes de venir.'
+  },
   sobre:{
     verdad:'Albornoz estaba alterado pero no agredió. Durante la reducción recibió dos golpes que no constan en el acta. La excoriación de Toledo se produjo al caer ambos sobre el cordón. El video muestra que Albornoz ya estaba en el suelo cuando se le aplican los golpes, y que el forcejeo duró menos de lo que dice el acta.',
     puntos:[

@@ -192,6 +192,9 @@ function pintarSetup(){
 /* ═══════════════ ABRIR LA AUDIENCIA ═══════════════ */
 $('#abrir').onclick = async () => {
   const m = MODULOS[S.modulo];
+  /* Este clic es el gesto que los navegadores exigen para permitir
+     que la página hable. Se aprovecha para habilitar la voz.       */
+  VOZ.desbloquear();
   if (S.casoId){
     S.caso = CASOS.find(c => c.id === S.casoId);
     S.generado = false;
@@ -321,6 +324,9 @@ function entrarSala(){
   $('#levantar').textContent = 'Levantar audiencia';
   $('#levantar').onclick = levantar;
 
+  VOZ.encendida = guardado.leer('voz', true) !== false;
+  $('#vozToggle').setAttribute('aria-pressed', VOZ.encendida);
+
   pintarLegajo();
   marca(m.tipo === 'alegato'
     ? `Se declara abierta la audiencia. Tiene la palabra la ${ROLES[S.rol].toLowerCase()}. Sugerido: ${m.minutos} minutos.`
@@ -379,6 +385,18 @@ function turno(quien, texto, clase){
   return d;
 }
 const alFinal = () => { const a = $('#acta'); a.scrollTop = a.scrollHeight; };
+
+/* El testigo piensa antes de contestar. Una respuesta instantánea
+   rompe la ilusión y además no entrena el silencio, que en una
+   audiencia real es donde uno se pone nervioso.                  */
+function pensando(quien){
+  const d = document.createElement('div');
+  d.className = 'turno';
+  d.innerHTML = '<div class="quien">'+esc(quien)+'</div>' +
+                '<span class="puntitos"><i></i><i></i><i></i></span>';
+  $('#hilo').appendChild(d); alFinal(); return d;
+}
+const demora = ms => new Promise(r => setTimeout(r, ms));
 function aviso(t, malo){ const e = $('#pistaDer'); e.textContent = t||''; e.className = malo ? 'err' : (t ? 'ok' : ''); }
 
 function arrancarReloj(obj){
@@ -412,17 +430,18 @@ async function formular(){
   }
 
   if (hayIA()) await turnoConModelo(txt, fila);
-  else turnoOffline(an, fila);
+  else await turnoOffline(an, fila);
 
   $('#pregunta').focus();
 }
 
 /* ─── sin conexión ─── */
-function turnoOffline(an, fila){
+async function turnoOffline(an, fila){
   const m = MODULOS[S.modulo], otro = otroDe(S.rol);
   S.estado.desdeUltimaObjecion++;
 
   const obj = m.testigo ? decidirObjecion(an, S.modulo, S.estado) : null;
+  if (obj) await demora(500 + Math.random()*400);   // la objeción salta rápido
   if (obj){
     S.estado.desdeUltimaObjecion = 0;
     fila.objetada = true;
@@ -430,6 +449,7 @@ function turnoOffline(an, fila){
     turno(otro, 'Objeción, su señoría: ' + obj.defecto.nombre.toLowerCase() +
       (fal ? '. ' + fal.planteo.replace(/^Objeto[^:]*:\s*/,'') : '. ' + obj.defecto.motivo + '.'), 'objecion');
     S.registro.push({ quien:otro, texto:'objeción' });
+    await demora(700 + Math.random()*500);           // el juez resuelve
     if (obj.prospera){
       turno('JUEZ', 'Ha lugar. Reformule la pregunta.', 'juez');
       S.registro.push({ quien:'JUEZ', texto:'ha lugar' });
@@ -441,16 +461,29 @@ function turnoOffline(an, fila){
   }
 
   if (!m.testigo){
+    const ind = pensando('SALA');
+    await demora(1400 + Math.random()*900);
+    ind.remove();
     turno(otro, 'La contraparte se opone y solicita que se resuelva conforme a los arts. 127 a 129.', 'objecion');
+    await demora(900);
     turno('JUEZ', 'Escuchada la parte, continúe fundando su petición. Recuerde precisar el plazo.', 'juez');
     S.registro.push({ quien:'JUEZ', texto:'continúe' });
     return;
   }
 
+  /* El testigo tarda más cuanto más lo aprieta la pregunta */
   const r = responderOffline(S.caso, an, S.estado);
+  const ind = pensando('TESTIGO');
+  let espera = 1900 + Math.random()*900;
+  if (r.revelado) espera += 900;                   // duda antes de conceder
+  if (r.aclara)   espera -= 600;                   // el "no entiendo" sale antes
+  await demora(Math.max(700, espera));
+  ind.remove();
+
   turno('TESTIGO', r.texto, '');
-  S.registro.push({ quien:'TESTIGO', texto:r.texto, revelo:r.revelado });
+  S.registro.push({ quien:'TESTIGO', texto:r.texto, revelo:r.revelado, aclara:r.aclara });
   if (r.revelado) aviso('Sacaste un punto del sobre cerrado.');
+  else if (r.aclara) aviso('El testigo no entendió la pregunta.', true);
   else if (an.defectos.length && !obj) aviso(an.defectos[0].nombre + ': ' + an.defectos[0].motivo, true);
 }
 
@@ -507,12 +540,14 @@ Si la objeción prospera: ${otro} objeta, JUEZ resuelve, el testigo NO responde.
 }
 
 async function turnoConModelo(txt, fila){
-  const pensando = turno('SALA', 'Pensando…', '');
-  pensando.querySelector('.dicho').className = 'pensando';
+  const ind = pensando('TESTIGO');
+  const desde = Date.now();
   const mens = [{ role:'user', content: instrucciones() }, ...S.turnos.slice(-14), { role:'user', content: txt }];
   try {
     const r = await pedirJson(mens, { modelo: MODELO_TURNO, tope: 900 });
-    pensando.remove();
+    const falta = 2000 - (Date.now() - desde);
+    if (falta > 0) await demora(falta);
+    ind.remove();
     const ivs = Array.isArray(r.intervenciones) ? r.intervenciones : [];
     if (!ivs.length) throw new Error('No hubo respuesta. Reformulá.');
     const eco = [];
@@ -529,7 +564,7 @@ async function turnoConModelo(txt, fila){
     else aviso('');
     S.turnos.push({ role:'user', content: txt }, { role:'assistant', content: eco.join('\n') });
   } catch (e){
-    pensando.remove();
+    ind.remove();
     aviso(e.message, true);
     $('#pregunta').value = txt; altoAuto();
     S.registro.pop(); S.previas.pop();
@@ -793,6 +828,14 @@ function altoAuto(){ ta.style.height = 'auto'; ta.style.height = Math.min(ta.scr
 ta.addEventListener('input', altoAuto);
 ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); formular(); } });
 $('#enviar').onclick = formular;
+$('#vozToggle').onclick = () => {
+  if (!VOZ.soportada){ aviso('Este navegador no puede hablar.', true); return; }
+  VOZ.encendida = !VOZ.encendida;
+  if (!VOZ.encendida) VOZ.callar(); else VOZ.desbloquear();
+  guardado.escribir('voz', VOZ.encendida);
+  $('#vozToggle').setAttribute('aria-pressed', VOZ.encendida);
+  aviso(VOZ.encendida ? 'La sala habla.' : 'Sala en silencio.');
+};
 $('#verLegajo').onclick = () => $('#legajo').classList.toggle('abierto');
 $('#acta').addEventListener('click', () => $('#legajo').classList.remove('abierto'));
 
@@ -812,6 +855,7 @@ const ORAL = {
     }
     VOZ.encendida = true;
     VOZ.desbloquear();                       // iOS exige el gesto inicial
+    $('#vozToggle').setAttribute('aria-pressed','true');
     $('#modoOral').setAttribute('aria-pressed','true');
     if (!SR){
       /* Safari en iPhone suele no reconocer voz, pero sí hablar.
@@ -829,7 +873,6 @@ const ORAL = {
 
   apagar(){
     this.activo = false;
-    VOZ.encendida = false;
     this.soloAudio = false;
     VOZ.callar();
     clearTimeout(this.reloj);
