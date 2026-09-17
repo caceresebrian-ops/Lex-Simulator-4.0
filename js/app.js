@@ -500,7 +500,10 @@ async function formular(){
   const esCautelar = S.modulo === 'cautelar';
   const an = (m.tipo === 'audiencia' && !esCautelar) ? analizar(txt, S.modulo, S.previas) : null;
   if (an) S.previas.push(an.toks);
-  if (esCautelar) S.fundado = (S.fundado || '') + ' \n ' + txt;
+  if (esCautelar){
+    S.fundado = (S.fundado || '') + ' \n ' + txt;
+    fila.cautelar = analizarCautelar(txt);
+  }
   const fila = { quien:'LITIGANTE', texto:txt, analisis:an, objetada:false, revelo:null };
   S.registro.push(fila);
 
@@ -575,7 +578,7 @@ async function turnoOffline(an, fila){
     const ind = pensando('SALA');
     await demora(1500 + Math.random()*900);
     ind.remove();
-    const { replica, interpela } = tribunalCautelar();
+    const { replica, interpela } = tribunalCautelar(fila.cautelar);
     turno(otro, replica, 'objecion');
     S.registro.push({ quien:otro, texto:replica });
     await demora(1200 + Math.random()*600);
@@ -603,53 +606,73 @@ async function turnoOffline(an, fila){
 /* El tribunal reacciona a lo que todavía no fundaste. Si no diste el
    plazo, el juez te lo pide; si no descartaste las medidas del art. 116,
    la contraparte se apoya justo ahí.                                   */
-function tribunalCautelar(){
+/* El debate de la cautelar.
+   La contraparte contesta el punto que vos acabás de plantear, con el
+   argumento que ese caso tiene para ese punto, y no repite. El juez
+   alterna entre exigirte lo que falta y devolverte el argumento del
+   otro para que te hagas cargo.                                      */
+function tribunalCautelar(an){
+  const c = S.caso;
+  const otroRol = S.rol === 'fiscal' ? 'defensa' : 'fiscal';
+  const deb = (c.debate && c.debate[otroRol]) || {};
   const todo = window.LEX.sinTildes(S.fundado || '');
   const faltan = EJES_CAUTELAR.filter(e => !e.re.test(todo));
-  const soyFiscal = S.rol === 'fiscal';
+  const usados = S.estado.replicas || (S.estado.replicas = new Set());
+  const vuelta = S.estado.vueltas = (S.estado.vueltas || 0) + 1;
 
-  const REPLICAS = {
-    conviccion: soyFiscal
-      ? 'Su señoría, la fiscalía no ha acreditado elementos de convicción suficientes sobre la participación de mi asistido. El art. 127 inciso 1 es el punto de partida y todavía no se satisfizo.'
-      : 'La defensa pretende discutir el mérito, pero los elementos de convicción están acreditados y el art. 127 inciso 1 se encuentra satisfecho.',
-    arraigo: soyFiscal
-      ? 'Mi asistido tiene arraigo constatado: domicilio, familia a cargo y trabajo. El art. 128 inciso 1 juega en contra del pedido fiscal.'
-      : 'El arraigo invocado por la defensa no está respaldado en constancias del legajo.',
-    alternativa: soyFiscal
-      ? 'La fiscalía pide la medida más gravosa sin descartar ninguna de las diez anteriores del art. 116. El último párrafo es imperativo, su señoría.'
-      : 'Las medidas alternativas no resultan suficientes para neutralizar el peligro en este caso.',
-    entorpecimiento: soyFiscal
-      ? 'No se invocó ningún indicio concreto de entorpecimiento en los términos del art. 129.'
-      : 'El riesgo del art. 129 está presente y la defensa no se hace cargo de él.',
-    plazo: 'La contraparte no ha precisado el plazo de la medida, como exige el art. 127 inciso 3.',
-    limitaciones: soyFiscal
-      ? 'Además, el art. 124 bloquea la prisión preventiva en este caso, y la fiscalía lo omitió por completo.'
-      : 'El art. 124 no resulta aplicable a este supuesto.',
-    conducta: 'Nada se dijo sobre el comportamiento procesal previo, que es la segunda pauta del art. 128.',
-    peticion: 'La contraparte no ha formulado una petición concreta.',
-    contradiccion: 'La contraparte no se hace cargo de los argumentos que ya expusimos.'
+  /* 1. Contestar lo que el litigante acaba de plantear */
+  let replica = null, tema = null;
+  for (const id of (an && an.cubre) || []){
+    if (deb[id] && !usados.has(id)){ usados.add(id); replica = deb[id]; tema = id; break; }
+  }
+  /* 2. Si no trajo nada nuevo, atacar por donde todavía no fundó */
+  if (!replica){
+    const f = faltan.find(e => deb[e.id] && !usados.has(e.id));
+    if (f){ usados.add(f.id); replica = deb[f.id]; tema = f.id; }
+  }
+  /* 3. Agotados los argumentos, la contraparte mantiene su posición */
+  if (!replica) replica = deb.cierre || 'Mantengo mi posición en los términos ya expuestos, su señoría.';
+  if (vuelta === 1 && deb.apertura) replica = deb.apertura + ' ' + replica;
+
+  /* El juez: primero exige lo esencial, después te devuelve el argumento
+     de la contraparte, y al final anuncia que va a resolver.          */
+  const CRITICOS = ['conviccion','alternativa','plazo','peticion'];
+  const EXIGE = {
+    conviccion:'Doctor, antes de seguir: ¿con qué elementos concretos del legajo acredita el hecho y la participación?',
+    arraigo:'¿Qué dice el informe socioambiental sobre domicilio y trabajo? Necesito el dato, no la afirmación.',
+    conducta:'¿Hubo rebeldías, incomparecencias u ocultamiento de identidad en esta causa?',
+    entorpecimiento:'¿Qué indicio concreto de entorpecimiento invoca? El art. 129 pide vehementes indicios, no posibilidades.',
+    alternativa:'Le pido que me explique por qué ninguna de las medidas del art. 116 alcanza para neutralizar el peligro que describe.',
+    limitaciones:'¿Considera aplicable alguna de las limitaciones del art. 124 a este caso?',
+    plazo:'No me ha dado el plazo, doctor. ¿Por cuánto tiempo pide la medida?',
+    peticion:'Concretamente, ¿qué le está pidiendo a este tribunal?',
+    contradiccion:'¿Qué responde al planteo de la contraparte?'
   };
-  const INTERPELA = {
-    conviccion: 'Doctor, concretamente: ¿con qué elementos del legajo acredita usted la participación?',
-    arraigo: '¿Qué dice el informe socioambiental sobre el domicilio y el trabajo? Sea concreto, por favor.',
-    conducta: '¿Hubo rebeldías o incomparecencias previas en esta causa?',
-    entorpecimiento: '¿Qué indicio concreto tiene usted de entorpecimiento? No me alcanza con la posibilidad abstracta.',
-    alternativa: 'Le voy a pedir que me explique por qué ninguna de las medidas del art. 116 alcanza para neutralizar el peligro que invoca.',
-    limitaciones: '¿Considera usted aplicable alguna de las limitaciones del art. 124?',
-    plazo: 'Doctor, no me ha dado el plazo. ¿Por cuánto tiempo pide la medida?',
-    peticion: 'Concretamente, ¿qué está pidiendo usted a este tribunal?',
-    contradiccion: '¿Qué responde al planteo de la contraparte?'
+  const DEVUELVE = {
+    conviccion:'La contraparte sostiene que el mérito no se discute. ¿Coincide usted, o quiere agregar algo?',
+    arraigo:'Acaba de escuchar el planteo sobre el arraigo. ¿Qué responde?',
+    conducta:'Se invocó el comportamiento procesal previo. ¿Cómo lo contesta?',
+    entorpecimiento:'La contraparte plantea el art. 129 en términos concretos. Le escucho la respuesta.',
+    alternativa:'Se le ofrecieron medidas alternativas del art. 116. ¿Por qué no serían idóneas, o por qué sí lo son?',
+    limitaciones:'Se invocó el art. 124. ¿Qué tiene para decir sobre ese punto?',
+    plazo:'Hay una discusión sobre el plazo. ¿Mantiene el que propuso?',
+    peticion:'Ambas peticiones están sobre la mesa. ¿Agrega algo antes de que resuelva?'
   };
-  const OK = [
-    'Escuchada la parte. Continúe.',
-    'Tomo nota. ¿Algo más que quiera agregar antes de que resuelva?',
-    'Bien. La contraparte tendrá su oportunidad de responder.'
-  ];
-  const f = faltan[0];
-  return {
-    replica: (f && REPLICAS[f.id]) || 'Su señoría, la defensa se opone en los términos ya expuestos.',
-    interpela: (f && INTERPELA[f.id]) || OK[Math.floor(Math.random()*OK.length)]
-  };
+
+  let interpela;
+  const critico = faltan.find(e => CRITICOS.includes(e.id));
+  if (vuelta >= 5){
+    interpela = 'Bien. Voy a resolver. ¿Alguna última consideración antes de que lo haga?';
+  } else if (critico && vuelta <= 3){
+    interpela = EXIGE[critico.id];
+  } else if (tema && DEVUELVE[tema]){
+    interpela = DEVUELVE[tema];
+  } else if (critico){
+    interpela = EXIGE[critico.id];
+  } else {
+    interpela = 'Tomo nota. ¿Algo más que quiera agregar?';
+  }
+  return { replica, interpela };
 }
 
 /* ─── con modelo ─── */

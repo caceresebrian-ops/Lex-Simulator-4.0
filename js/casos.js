@@ -745,6 +745,30 @@ const CASOS = [
     {tipo:'Constancia laboral', detalle:'Nota del titular de la gomería donde trabaja sin registrar.'}
   ],
   imputado:{nombre:'Maximiliano Pereyra', perfil:'27 años, gomero informal, domicilio constatado en barrio Ñuñorco, convive con su madre y una hija de 4 años. Condena condicional de 2023. Sin rebeldías previas.'},
+  debate:{
+    fiscal:{
+      conviccion:'La aprehensión fue en flagrancia, a tres cuadras del hecho y con el rodado en su poder. El mérito sustantivo del art. 127 inciso 1 no admite discusión seria en este expediente.',
+      arraigo:'La defensa invoca arraigo, pero se trata de un trabajo informal, sin registración ni recibo. Un empleo que no está documentado no ata a nadie al proceso, y el art. 128 habla de asiento de los negocios o trabajo, no de una nota del dueño de una gomería.',
+      conducta:'Es cierto que no registra rebeldías, pero tiene una condena condicional de 2023. Esa condena impide una nueva condicional, y el pronóstico es de pena de cumplimiento efectivo. Es precisamente eso lo que incrementa el incentivo a sustraerse.',
+      entorpecimiento:'No invoco entorpecimiento, su señoría. Mi pedido se apoya exclusivamente en el peligro de fuga del art. 128, y la defensa está contestando algo que no planteé.',
+      alternativa:'Las medidas que ofrece la defensa se apoyan todas en el mismo domicilio cuya estabilidad no está acreditada. Una presentación periódica exige un domicilio real; el dispositivo de rastreo exige quien lo controle. La escala del art. 166 va de cinco a quince años.',
+      limitaciones:'El art. 124 inciso 1 no opera acá: con la condena condicional de 2023 vigente, no hay posibilidad de una nueva condena condicional. La limitación que invoca la defensa está fuera de este caso.',
+      plazo:'Solicito la medida por el plazo de tres meses del art. 130, con investigación de cuatro meses.',
+      apertura:'Su señoría, la fiscalía solicita la prisión preventiva de Maximiliano Pereyra por el plazo de tres meses.',
+      cierre:'Mantengo el pedido en los términos expuestos.'
+    },
+    defensa:{
+      conviccion:'No discuto el mérito sustantivo. Lo que discuto es que el mérito no es un peligro procesal: son dos requisitos distintos del art. 127 y la fiscalía los está fundiendo en uno solo.',
+      arraigo:'El informe socioambiental constató el domicilio en barrio Ñuñorco, la convivencia con la madre y una hija de cuatro años. La informalidad del trabajo es la regla en La Rioja, no un indicio de fuga: si la informalidad laboral fundara el peligro procesal, la preventiva sería la regla para los pobres.',
+      conducta:'Mi asistido nunca fue declarado rebelde, jamás ocultó su identidad ni dio domicilio falso. El art. 128 inciso 2 mide el comportamiento durante el procedimiento, y el suyo es intachable. La condena anterior es un antecedente, no una conducta procesal.',
+      entorpecimiento:'No hay ningún indicio de entorpecimiento y la fiscalía ni siquiera lo invocó. La aprehensión fue en flagrancia: la prueba está producida y no hay testigos sobre quienes influir.',
+      alternativa:'El art. 116 último párrafo es imperativo. Ofrezco presentación periódica semanal, prohibición de salir del ámbito territorial y dispositivo de rastreo, en forma combinada. Si la fiscalía sostiene que no alcanzan, tiene que explicar por qué, no simplemente afirmarlo.',
+      limitaciones:'Aun con el antecedente, corresponde analizar la ejecución morigerada de la ley 24.660, que el art. 124 inciso 1 contempla expresamente además de la condicional.',
+      plazo:'Si se impusiera alguna medida, debe serlo por plazo determinado y el más breve posible.',
+      apertura:'Su señoría, la defensa se opone a la prisión preventiva y ofrece medidas alternativas.',
+      cierre:'Mantengo la oposición y el ofrecimiento de medidas alternativas.'
+    }
+  },
   sobre:{
     verdad:'El arraigo es real y verificable. La condena condicional de 2023 impide una nueva condicional, lo que agrava el pronóstico de pena efectiva y por tanto el peligro de fuga. No hay ningún indicio concreto de entorpecimiento: no hay testigos a los que pueda influir, porque la aprehensión fue en flagrancia.',
     puntos:[
@@ -769,6 +793,30 @@ const CASOS = [
     {tipo:'Constancia laboral', detalle:'Empleado municipal con 12 años de antigüedad.'}
   ],
   imputado:{nombre:'Rubén Salvatierra', perfil:'41 años, empleado municipal, 12 años de antigüedad. Convive con la víctima y dos hijos menores. Sin antecedentes condenatorios. Tres denuncias en 14 meses.'},
+  debate:{
+    fiscal:{
+      conviccion:'El informe médico constata excoriaciones en cuello y antebrazos, y el informe de la Dirección de Violencia de Género califica el riesgo como alto. El mérito está acreditado.',
+      arraigo:'Concedo el arraigo: es empleado municipal con doce años de antigüedad. No fundo mi pedido en el peligro de fuga, y la defensa está litigando contra un argumento que no hice.',
+      conducta:'Hay dos denuncias previas en catorce meses, ambas archivadas por falta de impulso de la víctima. Ese patrón no es casual y es exactamente el indicio que el art. 129 pide.',
+      entorpecimiento:'El art. 129 inciso 4 de la Ley 10.797 es nuevo y está hecho para este caso: contempla los actos intimidatorios o amenazantes contra la víctima o su familia. Dos archivos por desistimiento de la víctima, conviviendo con el imputado, configuran el riesgo que la norma quiere evitar.',
+      alternativa:'Puedo aceptar que la preventiva sea el último recurso, pero la exclusión sola no basta si mantiene el contacto. Solicito exclusión del hogar del inciso 7, prohibición de comunicación del inciso 6 y dispositivo de rastreo del inciso 9, en forma combinada.',
+      limitaciones:'El art. 124 no obsta a las medidas del art. 116 que estoy pidiendo: solo limita la prisión preventiva.',
+      plazo:'Solicito las medidas por el plazo de tres meses.',
+      apertura:'Su señoría, la fiscalía solicita medidas de coerción respecto de Rubén Salvatierra.',
+      cierre:'Mantengo el pedido de exclusión y prohibición de contacto.'
+    },
+    defensa:{
+      conviccion:'El informe médico describe lesiones compatibles con múltiples mecanismos. El informe de riesgo es una evaluación técnica, no una acreditación del hecho.',
+      arraigo:'Mi asistido tiene empleo público con doce años de antigüedad y domicilio estable. No hay ningún peligro de fuga y la fiscalía lo reconoce.',
+      conducta:'Las dos denuncias anteriores fueron archivadas. Un archivo no es un antecedente en contra: es la constatación de que no se acreditó el hecho. Construir el peligro procesal sobre causas archivadas es invertir la presunción de inocencia.',
+      entorpecimiento:'El art. 129 exige vehementes indicios que justifiquen la grave sospecha. La fiscalía no aporta un solo acto concreto de intimidación: infiere la presión a partir del desistimiento, que también puede explicarse por la dependencia económica y por la voluntad de la víctima de sostener la convivencia.',
+      alternativa:'La vivienda está a nombre de la víctima, así que la exclusión del art. 116 inciso 7 es materialmente posible y neutraliza el riesgo sin privar de libertad. Lo que resisto es que se agregue el dispositivo de rastreo, que es la medida inmediatamente anterior a la privación de libertad.',
+      limitaciones:'Se trata de lesiones leves: la pena en expectativa admite condena condicional y el art. 124 inciso 1 bloquea de plano la prisión preventiva.',
+      plazo:'Cualquier medida debe tener plazo determinado y revisión.',
+      apertura:'Su señoría, la defensa acepta discutir medidas, pero no la privación de libertad.',
+      cierre:'Mantengo lo expuesto.'
+    }
+  },
   sobre:{
     verdad:'No hay peligro de fuga: arraigo fuerte y empleo público. El riesgo real está en el art. 129, que la Ley 10.797 ya no titula solo como peligro de entorpecimiento sino como PELIGRO DE ENTORPECIMIENTO Y RIESGO DE LA VÍCTIMA, y que en su inciso 4 contempla expresamente los actos intimidatorios o amenazantes contra la víctima o su familia y la violación de las cautelares impuestas. La medida adecuada no es la preventiva sino la del art. 116 inc. 7 combinada con el inc. 6 y el inc. 9.',
     puntos:[
@@ -795,6 +843,30 @@ const CASOS = [
     {tipo:'Informe socioambiental', detalle:'Domicilio y arraigo familiar constatados. Sin antecedentes.'}
   ],
   imputado:{nombre:'Fabián Roldán', perfil:'53 años, contador público, estudio propio, casado, dos hijos mayores. Sin antecedentes. Arraigo sólido.'},
+  debate:{
+    fiscal:{
+      conviccion:'La pericia contable preliminar determinó desvíos por treinta y cuatro millones de pesos en dos ejercicios. El mérito sustantivo está sobradamente acreditado.',
+      arraigo:'Concedo el arraigo: estudio propio, familia, sin antecedentes. No es el peligro de fuga lo que fundo.',
+      conducta:'No hay antecedentes, es cierto. Pero hay conducta posterior al hecho: dos empleadas declararon haber recibido llamados del imputado después de la denuncia.',
+      entorpecimiento:'Acá está el núcleo. El art. 129 se configura en sus tres primeros incisos: conserva credenciales de acceso al sistema donde está el soporte documental, llamó a dos testigos después de la denuncia, y por su posición puede inducir a otros empleados. No es una posibilidad abstracta: son hechos verificados.',
+      alternativa:'Puedo aceptar que existan medidas menos gravosas, pero deben ser eficaces. La prohibición de comunicación por sí sola no impide el acceso remoto al sistema.',
+      limitaciones:'El art. 124 inciso 1 podría jugar, lo reconozco, y por eso mi pedido principal contempla medidas del art. 116.',
+      plazo:'Solicito las medidas por tres meses, mientras se completa el secuestro documental.',
+      apertura:'Su señoría, la fiscalía solicita medidas respecto de Fabián Roldán por riesgo de entorpecimiento.',
+      cierre:'Mantengo el pedido.'
+    },
+    defensa:{
+      conviccion:'Es una pericia preliminar, no definitiva, y no distingue entre desvío y error de registración.',
+      arraigo:'Contador público, estudio propio, casado, dos hijos mayores, sin antecedentes. No hay discusión posible sobre el arraigo.',
+      conducta:'Los llamados que se invocan fueron para pedir documentación de su propio descargo. Eso es ejercicio del derecho de defensa, y el art. 116 inciso 6 condiciona expresamente la prohibición de comunicarse a que no se afecte ese derecho.',
+      entorpecimiento:'Si el peligro es el acceso al sistema, la solución es el bloqueo de credenciales y el secuestro del soporte, no la prisión de una persona. Neutralizado el medio, desaparece el peligro y con él el fundamento de la medida.',
+      alternativa:'El art. 116 último párrafo es imperativo: acreditado que existe una medida menos gravosa idónea, el juez debe imponer esa. Ofrezco prohibición de contacto con el personal de la cooperativa, salvo por intermedio de esta defensa, y entrega de credenciales.',
+      limitaciones:'El art. 124 inciso 1 es decisivo: la pena en expectativa admite condena condicional, de modo que la prisión preventiva está bloqueada de plano.',
+      plazo:'Si se dispone alguna medida, debe fijarse plazo breve y revisable.',
+      apertura:'Su señoría, la defensa se opone a la prisión preventiva.',
+      cierre:'Mantengo la oposición.'
+    }
+  },
   sobre:{
     verdad:'El arraigo es indiscutible y la pena en expectativa admitiría condicional, lo que activa el art. 124 inc. 1. Pero el peligro de entorpecimiento del art. 129 está acreditado en sus tres incisos: acceso al soporte documental, llamados a testigos y capacidad de inducir a otros. La solución del código no es la preventiva sino medidas del art. 116 dirigidas a neutralizar ese peligro específico.',
     puntos:[
@@ -819,6 +891,30 @@ const CASOS = [
     {tipo:'Constancia de la oficina judicial', detalle:'Sin requerimiento de apertura a juicio a la fecha.'}
   ],
   imputado:{nombre:'Luis Herrera', perfil:'34 años, siete meses en prisión preventiva, sin acusación formulada.'},
+  debate:{
+    fiscal:{
+      conviccion:'El mérito que sostuvo la preventiva no se ha modificado, su señoría.',
+      arraigo:'El arraigo es el mismo que se valoró al disponerse la medida, y entonces no alcanzó.',
+      conducta:'La demora obedece a la complejidad de la prueba pendiente, no a una inactividad de esta fiscalía.',
+      entorpecimiento:'Subsisten los riesgos que fundaron la medida original.',
+      alternativa:'De disponerse el cese, solicito que se impongan medidas del art. 116 para asegurar la comparecencia.',
+      limitaciones:'Las limitaciones del art. 124 no fueron invocadas en la oportunidad correspondiente.',
+      plazo:'Solicito una última prórroga para formular acusación.',
+      apertura:'Su señoría, la fiscalía se opone al cese solicitado por la defensa.',
+      cierre:'Mantengo la oposición al cese.'
+    },
+    defensa:{
+      conviccion:'El mérito no está en discusión en esta audiencia. Lo que se discute es el vencimiento de un plazo, y los plazos no dependen del mérito.',
+      arraigo:'Tampoco discutimos arraigo. El art. 132 opera por el mero vencimiento, sin necesidad de valorar peligros procesales.',
+      conducta:'La complejidad de la prueba no suspende los plazos. El art. 132 inciso 1 no admite excepción por carga de trabajo.',
+      entorpecimiento:'Es indiferente: el cese del art. 132 es automático y no habilita a revisar los peligros procesales.',
+      alternativa:'El cese procede sin perjuicio de otras medidas del art. 116, pero la libertad no puede condicionarse a ellas.',
+      limitaciones:'Además del inciso 1, opera el inciso 7: el mínimo del art. 164 es de un mes y mi asistido lleva siete en prisión preventiva.',
+      plazo:'La prórroga venció el 2 de agosto y no hubo acusación. No hay plazo que prorrogar.',
+      apertura:'Su señoría, la defensa solicita el cese de la prisión preventiva por vencimiento de los plazos del art. 132.',
+      cierre:'Solicito el cese inmediato y la libertad de mi asistido.'
+    }
+  },
   sobre:{
     verdad:'Operan dos causales de cese autónomas. El art. 132 inc. 1 se configuró al vencer la prórroga sin acusación. Y el inc. 7 se configuró mucho antes, porque el mínimo del art. 164 es de un mes. El código dispone que vencidos los plazos la persona queda automáticamente en libertad y que no puede volver a imponerse la preventiva cuando cesó por estas razones.',
     puntos:[

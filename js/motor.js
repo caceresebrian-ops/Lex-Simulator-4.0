@@ -646,9 +646,20 @@ const VICIOS_CAUTELAR = [
 
 function analizarCautelar(texto){
   const p = sinTildes(texto);
+  /* Ordenado por fuerza de la coincidencia, no por el orden de la lista:
+     un párrafo sobre arraigo menciona "acredita" al pasar, pero nombra
+     domicilio, familia, trabajo e informe socioambiental. Gana el tema
+     que más señales tiene, que es del que realmente se está hablando. */
+  const puntajes = EJES_CAUTELAR.map(e => {
+    const g = new RegExp(e.re.source, 'g');
+    const m = p.match(g);
+    return { id:e.id, n: m ? new Set(m.map(x=>x.trim())).size : 0 };
+  }).filter(x => x.n > 0).sort((a,b) => b.n - a.n);
+
   return {
     texto, palabras: texto.split(/\s+/).filter(Boolean).length,
-    cubre: EJES_CAUTELAR.filter(e => e.re.test(p)).map(e => e.id),
+    cubre: puntajes.map(x => x.id),
+    fuerza: puntajes,
     vicios: VICIOS_CAUTELAR.filter(v => v.re.test(p)).map(v => v.id)
   };
 }
