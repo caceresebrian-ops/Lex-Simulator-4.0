@@ -64,6 +64,19 @@ que hay que repetir ya perdió efecto ante el tribunal, y aparece como eje propi
 Tarda entre dos y tres segundos en contestar, y algo más cuando la pregunta lo acorrala. La demora
 es deliberada: el silencio es donde uno se pone nervioso en una audiencia real.
 
+### Las voces
+
+La app usa el motor de voz del dispositivo, así que la naturalidad depende de qué tenga instalado.
+En **Ajustes → Voces de la sala** podés elegir una voz masculina y una femenina entre las
+disponibles, escucharlas antes de asignarlas y regular la velocidad.
+
+Si todas suenan robóticas, en Android se instalan voces mejores desde Configuración →
+Administración general → Texto a voz → Motor de Google → instalar datos de voz en español. Las
+voces marcadas como "red" suenan bastante más humanas que las locales.
+
+Cada testigo tiene género asignado en el caso; el juez y la contraparte se sortean en cada
+audiencia. Si el dispositivo tiene una sola voz castellana, la diferencia se marca por el tono.
+
 ### Litigar de manera oral
 
 Hay dos botones junto al campo de la pregunta.

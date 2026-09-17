@@ -192,6 +192,7 @@ a{color:var(--azul)}
 .op:hover{border-color:var(--celeste)}
 .op[aria-pressed="true"]{background:var(--azul);border-color:var(--azul);color:var(--blanco)}
 .op small{display:block;font-size:12px;opacity:.75;margin-top:2px}
+input[type=range]{accent-color:var(--azul);height:26px}
 input[type=text],input[type=password],textarea,select{
   width:100%;background:var(--blanco);border:1px solid var(--borde);border-radius:8px;
   padding:11px 13px;font:inherit;color:inherit;

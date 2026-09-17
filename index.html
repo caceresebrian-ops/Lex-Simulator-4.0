@@ -229,6 +229,29 @@
   </div>
 
   <div class="tarjeta">
+    <h3>Voces de la sala</h3>
+    <p class="ayuda">La app usa el motor de voz de tu dispositivo. Elegí cuál suena mejor y probala
+      antes de asignarla. Si todas suenan robóticas, podés instalar voces mejores desde los ajustes
+      del teléfono: Configuración → Administración general → Texto a voz → Motor de Google, y ahí
+      instalar los datos de voz en español. Las voces de red suenan bastante más humanas.</p>
+
+    <div class="campo"><span>Voz masculina · testigo, juez o parte</span>
+      <select id="vozM"></select>
+      <div class="acciones" style="margin-top:9px"><button class="secundario" id="probarM">Escuchar</button></div>
+    </div>
+    <div class="campo"><span>Voz femenina · testigo, juez o parte</span>
+      <select id="vozF"></select>
+      <div class="acciones" style="margin-top:9px"><button class="secundario" id="probarF">Escuchar</button></div>
+    </div>
+    <div class="campo"><span>Velocidad al hablar</span>
+      <input type="range" id="vozRate" min="70" max="125" step="5" style="width:100%">
+      <div class="ayuda" id="vozRateVal"></div>
+    </div>
+    <div class="acciones"><button class="principal" id="guardarVoces">Guardar voces</button></div>
+    <div id="estadoVoces" class="ayuda"></div>
+  </div>
+
+  <div class="tarjeta">
     <h3>Datos guardados</h3>
     <p class="ayuda">El historial de audiencias y la base de conocimiento viven en este navegador.</p>
     <div class="acciones"><button class="secundario" id="borrarTodo">Borrar todos mis datos</button></div>

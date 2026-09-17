@@ -271,12 +271,19 @@ const VOZ = {
   /* Busca una voz del género pedido; si el sistema no las distingue,
      devuelve la mejor y el tono se encarga de diferenciarlas.        */
   vozDe(g){
+    const elegida = guardado.leer(g === 'm' ? 'vozM' : 'vozF', '');
+    if (elegida){
+      const v = this.voces.find(x => x.name === elegida) ||
+                (speechSynthesis.getVoices()||[]).find(x => x.name === elegida);
+      if (v) return v;
+    }
     const re = g === 'm' ? this.MASC : this.FEM;
     const otra = g === 'm' ? this.FEM : this.MASC;
     return this.voces.find(v => re.test(v.name))
         || this.voces.find(v => !otra.test(v.name))
         || this.voces[0] || null;
   },
+  factorRate(){ return (guardado.leer('vozRate', 100) || 100) / 100; },
 
   perfil(quien){
     const q = String(quien || '').toUpperCase();
@@ -290,18 +297,27 @@ const VOZ = {
     let pitch = g === 'm' ? 0.80 : 1.14;
     let rate  = 1.0;
     if (rol === 'juez'){ pitch -= 0.06; rate = 0.93; }
-    if (rol === 'contraparte'){ rate = 1.08; }
-    return { v: this.vozDe(g), rate, pitch };
+    if (rol === 'contraparte'){ rate = 0.97; }   // objetar pausado, no atropellado
+    return { v: this.vozDe(g), rate: rate * this.factorRate(), pitch };
   },
 
   /* Los sonidos de duda se deletrean si se los manda tal cual:
      "Mmm" sale como "eme eme eme". Se cambian por una pausa.   */
   paraHablar(t){
     return String(t)
-      .replace(/\b(m+h*m+|hm+|mmm+|ajá|aja|ehh+|uhm+)\b/gi, ',')
+      .replace(/\b(m+h*m+|hm+|mmm+|ehh+|uhm+)\b/gi, ',')
+      /* Las abreviaturas se deletrean o se leen como palabra suelta.
+         En una audiencia nadie dice "art punto": dice "artículo".   */
+      .replace(/\barts?\.\s*/gi, m => /arts/i.test(m) ? 'artículos ' : 'artículo ')
+      .replace(/\bincs?\.\s*/gi, m => /incs/i.test(m) ? 'incisos ' : 'inciso ')
+      .replace(/\bC\.?P\.?P\b/g, 'Código Procesal Penal')
+      .replace(/\bCPP\b/g, 'Código Procesal Penal')
+      .replace(/\bCP\b/g, 'Código Penal')
+      .replace(/\bDr\.\s*/g, 'doctor ').replace(/\bDra\.\s*/g, 'doctora ')
+      .replace(/\bNº|\bN°/g, 'número ')
       .replace(/…/g, ', ')
       .replace(/\s*,\s*,+/g, ',')
-      .replace(/^\s*,\s*/, '')
+      .replace(/^\s*[,\.]\s*/, '')
       .replace(/\s+/g, ' ')
       .trim();
   },
@@ -312,7 +328,15 @@ const VOZ = {
     if (!p) return;
     const limpio = this.paraHablar(texto).slice(0, 600);
     if (!limpio) return;
-    this.cola.push({ texto: limpio, p });
+    /* Nadie habla de corrido en una audiencia. Se parte por oraciones y
+       se deja una respiración entre una y otra; quien objeta o resuelve
+       hace pausas más largas, porque está midiendo al tribunal.      */
+    const q = String(quien||'').toUpperCase();
+    const formal = q.includes('JUEZ') || q.includes('FISCAL') || q.includes('DEFENSA');
+    const trozos = limpio.split(/(?<=[.:;?!])\s+/).filter(Boolean);
+    trozos.forEach((t, i) => {
+      this.cola.push({ texto:t, p, pausa: i < trozos.length-1 ? (formal ? 520 : 260) : 0 });
+    });
     if (!this.hablando) this._siguiente();
   },
 
@@ -330,8 +354,9 @@ const VOZ = {
       u.lang = (item.p.v && item.p.v.lang) || 'es-AR';
       u.rate = item.p.rate; u.pitch = item.p.pitch;
       if (item.p.v) u.voice = item.p.v;
-      u.onend = () => this._siguiente();
-      u.onerror = () => this._siguiente();
+      const seguir = () => item.pausa ? setTimeout(() => this._siguiente(), item.pausa) : this._siguiente();
+      u.onend = seguir;
+      u.onerror = seguir;
       speechSynthesis.speak(u);
     } catch { this._siguiente(); }
   },
@@ -490,6 +515,37 @@ async function formular(){
 }
 
 /* ─── sin conexión ─── */
+
+/* Cómo se funda cada objeción en voz alta. Una oración por idea, para que
+   la voz pueda respirar entre una y otra.                              */
+const FUNDAMENTOS = {
+  sugestiva:  'La pregunta es sugestiva: contiene la respuesta que se busca. El artículo 209 no las admite en el examen directo.',
+  compuesta:  'La pregunta es compuesta. Contiene más de un hecho, y la respuesta va a ser ambigua. Pido que se divida.',
+  vaguedad:   'La pregunta es ambigua. El término empleado no tiene contenido preciso. El artículo 209 no admite preguntas ambiguas.',
+  repetitiva: 'La pregunta ya fue formulada y respondida. El artículo 209 no admite preguntas repetitivas.',
+  coaccion:   'La pregunta contiene una advertencia dirigida a condicionar la respuesta. El artículo 209 prohíbe las preguntas destinadas a coaccionar al testigo.',
+  opinion:    'Se le está pidiendo al testigo una conclusión que excede lo que percibió por sus sentidos.',
+  asume:      'La pregunta presupone un hecho que no está acreditado en esta audiencia. Pido que se divida.',
+  adhominem:  'La pregunta no se dirige a los hechos sino a denostar al testigo. Es impertinente.',
+  conclusion: 'Se le está pidiendo al testigo la conclusión, que es materia del alegato y no del interrogatorio.',
+  larga:      'La pregunta es confusa por su extensión. Pido que se reformule.'
+};
+const APERTURAS = ['Objeción, su señoría.', 'Objeción.', 'Objeto la pregunta, su señoría.', 'Objeción, señor juez.'];
+const RESUELVE_SI = [
+  'Ha lugar. Reformule la pregunta, doctor.',
+  'Ha lugar la objeción. Reformule.',
+  'Es correcto el planteo. Ha lugar. Reformule la pregunta.'
+];
+const RESUELVE_NO = [
+  'No ha lugar. Prosiga.',
+  'No ha lugar. Puede responder el testigo.',
+  'Se rechaza la objeción. Continúe, doctor.'
+];
+function armarObjecion(d){
+  const ap = APERTURAS[Math.floor(Math.random()*APERTURAS.length)];
+  const fund = FUNDAMENTOS[d.id] || (d.motivo.charAt(0).toUpperCase() + d.motivo.slice(1) + '.');
+  return ap + ' ' + fund;
+}
 async function turnoOffline(an, fila){
   const m = MODULOS[S.modulo], otro = otroDe(S.rol);
   S.estado.desdeUltimaObjecion++;
@@ -499,18 +555,16 @@ async function turnoOffline(an, fila){
   if (obj){
     S.estado.desdeUltimaObjecion = 0;
     fila.objetada = true;
-    const fal = FALACIAS.find(f => f.id === obj.defecto.falacia);
-    turno(otro, 'Objeción, su señoría: ' + obj.defecto.nombre.toLowerCase() +
-      (fal ? '. ' + fal.planteo.replace(/^Objeto[^:]*:\s*/,'') : '. ' + obj.defecto.motivo + '.'), 'objecion');
+    turno(otro, armarObjecion(obj.defecto), 'objecion');
     S.registro.push({ quien:otro, texto:'objeción' });
-    await demora(700 + Math.random()*500);           // el juez resuelve
+    await demora(1100 + Math.random()*700);          // el juez toma su tiempo
     if (obj.prospera){
-      turno('JUEZ', 'Ha lugar. Reformule la pregunta.', 'juez');
+      turno('JUEZ', RESUELVE_SI[Math.floor(Math.random()*RESUELVE_SI.length)], 'juez');
       S.registro.push({ quien:'JUEZ', texto:'ha lugar' });
       aviso(obj.defecto.nombre + ': ' + obj.defecto.motivo, true);
       return;
     }
-    turno('JUEZ', 'No ha lugar. Prosiga.', 'juez');
+    turno('JUEZ', RESUELVE_NO[Math.floor(Math.random()*RESUELVE_NO.length)], 'juez');
     S.registro.push({ quien:'JUEZ', texto:'no ha lugar' });
   }
 
@@ -861,7 +915,54 @@ function pintarEjemplos(){
 }
 
 /* ═══════════════ AJUSTES ═══════════════ */
+function pintarVoces(){
+  const listar = () => {
+    VOZ.cargarVoces();
+    const todas = (typeof speechSynthesis !== 'undefined' ? speechSynthesis.getVoices() : []) || [];
+    const es = todas.filter(v => /^es/i.test(v.lang));
+    const pool = es.length ? es : todas;
+    for (const [id, key] of [['#vozM','vozM'], ['#vozF','vozF']]){
+      const sel = $(id);
+      if (!sel) return;
+      const actual = guardado.leer(key, '');
+      sel.innerHTML = '<option value="">Elegir automáticamente</option>' +
+        pool.map(v => '<option value="'+esc(v.name)+'"'+(v.name===actual?' selected':'')+'>'+
+                      esc(v.name)+' · '+esc(v.lang)+(v.localService===false?' · red':'')+'</option>').join('');
+    }
+    $('#estadoVoces').textContent = pool.length
+      ? pool.length + ' voces disponibles en este dispositivo' + (es.length ? '' : ' (ninguna en español)')
+      : 'Este navegador no expone voces.';
+  };
+  listar();
+  if (typeof speechSynthesis !== 'undefined') speechSynthesis.onvoiceschanged = listar;
+  const r = guardado.leer('vozRate', 100);
+  $('#vozRate').value = r;
+  $('#vozRateVal').textContent = r + ' % de la velocidad normal';
+}
+$('#vozRate') && ($('#vozRate').oninput = e => {
+  $('#vozRateVal').textContent = e.target.value + ' % de la velocidad normal';
+});
+function probar(g){
+  const nombre = $(g === 'm' ? '#vozM' : '#vozF').value;
+  guardado.escribir(g === 'm' ? 'vozM' : 'vozF', nombre);
+  guardado.escribir('vozRate', parseInt($('#vozRate').value, 10) || 100);
+  VOZ.encendida = true; VOZ.desbloquear(); VOZ.callar();
+  VOZ.generos = { testigo:g, juez:g, contraparte:g };
+  VOZ.decir('TESTIGO', g === 'm'
+    ? 'Objeción, su señoría. La pregunta es sugestiva. El artículo 209 no las admite en el examen directo.'
+    : 'Yo estaba atrás del mostrador del kiosco. Escuché gritos y miré hacia la mitad de cuadra.');
+}
+$('#probarM') && ($('#probarM').onclick = () => probar('m'));
+$('#probarF') && ($('#probarF').onclick = () => probar('f'));
+$('#guardarVoces') && ($('#guardarVoces').onclick = () => {
+  guardado.escribir('vozM', $('#vozM').value);
+  guardado.escribir('vozF', $('#vozF').value);
+  guardado.escribir('vozRate', parseInt($('#vozRate').value, 10) || 100);
+  $('#estadoVoces').textContent = 'Voces guardadas para este dispositivo.';
+});
+
 function pintarAjustes(){
+  pintarVoces();
   const c = clave();
   $('#clave').value = c;
   $('#estadoClave').textContent = c ? 'Hay una clave guardada en este navegador.' : 'Sin clave: la app funciona en modo sin conexión.';
