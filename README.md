@@ -137,6 +137,17 @@ apple-touch-icon.png
 emblema.png
 ```
 
+## Pruebas
+
+El proyecto trae una batería de pruebas que corre fuera del navegador, con un simulacro mínimo del
+DOM. Sirve para detectar la clase de error que rompe una audiencia entera en silencio, que ya pasó
+dos veces: una función usada antes de declararse, y un módulo que exportaba funciones que `app.js`
+nunca importaba.
+
+Cubre: carga sin excepciones, los cinco módulos de punta a punta con su devolución, los seis
+paneles, el circuito completo de ingesta de causas reales, la capa con modelo contra una API
+simulada, el rechazo de artículos inventados y el bloqueo de fugas del sobre cerrado.
+
 ## Actualizar el sitio
 
 Para reemplazar archivos no hace falta borrar nada: subí los nuevos con el mismo nombre y GitHub

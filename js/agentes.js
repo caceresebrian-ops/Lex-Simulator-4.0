@@ -145,6 +145,8 @@ function instruccionesAgente(agente, caso, rol, modulo, mem, extra){
     'Hablás en castellano rioplatense, con voseo, como se habla en una sala de La Rioja.',
     'NORMAS APLICABLES (texto oficial; no cites ningún artículo que no esté acá):',
     reglasDe(modulo, extra && extra.arts),
+    (['cautelar','impugnacion'].includes(modulo) && window.LEX.PREVIAS)
+      ? 'CRITERIOS DE LITIGACIÓN EN AUDIENCIAS PREVIAS:\n' + window.LEX.PREVIAS : '',
     resumenCoherencia(mem)
   ].filter(Boolean).join('\n\n');
 

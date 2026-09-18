@@ -6,8 +6,31 @@
 (function(){
 "use strict";
 
-const { CPP, TECNICA, LOGICA, FALACIAS, EJEMPLOS, CASOS,
-        analizar, decidirObjecion, responderOffline, informeOffline, fichas } = window.LEX;
+/* Todo lo que app.js toma de los otros módulos. Si falta uno acá, la
+   función que lo use muere en silencio: por eso abajo hay un control
+   que avisa en consola apenas arranca.                               */
+const LEXAPI = ['CPP','TECNICA','PREVIAS','LOGICA','FALACIAS','EJEMPLOS','CASOS',
+  'analizar','decidirObjecion','responderOffline','informeOffline','reformular','fichas','sinTildes',
+  'analizarCautelar','informeCautelar','informeAlegato','EJES_CAUTELAR',
+  'clasificar','planificar','instruccionesAgente','verificarFuga','nuevaMemoria','registrar',
+  'articulo','citaLey','verificarCitas','buscarLey','contextoLey',
+  'detectarPersonales','sanear','extraerEstructura','construirCaso','bancoUniversal'];
+const faltantes = LEXAPI.filter(k => window.LEX[k] === undefined);
+if (faltantes.length) console.error('LEX: faltan módulos o funciones →', faltantes.join(', '));
+
+/* Todo lo que app.js usa de los otros módulos. Si falta un nombre acá,
+   la función que lo use muere en silencio: ya pasó una vez.        */
+const {
+        CASOS, CPP, EJEMPLOS, EJES_CAUTELAR, FALACIAS, LOGICA, PREVIAS, TECNICA, analizar,
+        analizarCautelar, citaLey, clasificar, construirCaso, decidirObjecion,
+        detectarPersonales, extraerEstructura, fichas, informeAlegato, informeCautelar,
+        informeOffline, instruccionesAgente, nuevaMemoria, planificar, reformular, registrar,
+        responderOffline, sanear, verificarCitas, verificarFuga
+} = window.LEX;
+
+/* Red de seguridad: si algún módulo no cargó, se ve en la consola. */
+for (const n of ['CASOS', 'CPP', 'EJEMPLOS', 'EJES_CAUTELAR', 'FALACIAS', 'LOGICA', 'PREVIAS', 'TECNICA', 'analizar', 'analizarCautelar', 'citaLey', 'clasificar', 'construirCaso', 'decidirObjecion', 'detectarPersonales', 'extraerEstructura', 'fichas', 'informeAlegato', 'informeCautelar', 'informeOffline', 'instruccionesAgente', 'nuevaMemoria', 'planificar', 'reformular', 'registrar', 'responderOffline', 'sanear', 'verificarCitas', 'verificarFuga'])
+  if (window.LEX[n] === undefined) console.error("LEX: falta " + n);
 
 /* ─────────────── configuración ─────────────── */
 const MODULOS = {
@@ -190,7 +213,7 @@ function pintarSetup(){
   av.className = 'aviso';
   av.innerHTML = hayIA()
     ? 'Modo con modelo activo: el testigo improvisa y la devolución la escribe Claude.'
-    : 'Modo sin conexión: testigo por banco de respuestas y objeciones por reglas. Para que el testigo improvise, cargá tu clave en <b>Ajustes</b>.';
+    : 'Estás en <b>modo autónomo</b>: el testigo responde por banco de respuestas, así que entiende lo habitual pero no improvisa. Esto no depende de tu conexión a internet sino de la clave: cargala en <b>Ajustes</b> y el testigo pasa a contestar cualquier pregunta.';
   $('#abrir').disabled = !hayIA() && !dispo.length;
 }
 
@@ -396,7 +419,11 @@ function entrarSala(){
   S.mem = nuevaMemoria();
   $('#hilo').innerHTML = '';
   $('#caratula').textContent = c.caratula || 'Causa sin carátula';
-  $('#subtitulo').textContent = `${m.nombre} · ${ROLES[S.rol]}${hayIA() ? '' : ' · sin conexión'}`;
+  $('#subtitulo').innerHTML = `${esc(m.nombre)} · ${esc(ROLES[S.rol])} · ` +
+    (hayIA() ? '<b style="color:var(--laurel)">testigo con IA</b>'
+             : '<button class="plano" id="irClave" style="font-size:12px">modo autónomo · activar IA</button>');
+  const bc = $('#irClave');
+  if (bc) bc.onclick = () => { pintarAjustes(); ver('ajustes'); };
   $('#pie').style.display = '';
   $('#levantar').textContent = 'Levantar audiencia';
   $('#levantar').onclick = levantar;
@@ -498,6 +525,15 @@ function arrancarReloj(obj){
 
 /* ═══════════════ TURNO ═══════════════ */
 async function formular(){
+  try { await formularInterno(); }
+  catch (e){
+    console.error(e);
+    aviso('Se cortó el turno: ' + (e && e.message ? e.message : 'error inesperado') +
+          '. Volvé a intentar o levantá la audiencia.', true);
+  }
+}
+
+async function formularInterno(){
   const txt = $('#pregunta').value.trim();
   if (!txt) return;
   const m = MODULOS[S.modulo];
@@ -508,11 +544,14 @@ async function formular(){
   const esCautelar = S.modulo === 'cautelar';
   const an = (m.tipo === 'audiencia' && !esCautelar) ? analizar(txt, S.modulo, S.previas) : null;
   if (an) S.previas.push(an.toks);
+
+  /* La fila se declara ANTES de usarla. Parece obvio, pero acá hubo un
+     error que rompía la audiencia de cautelar entera y en silencio.  */
+  const fila = { quien:'LITIGANTE', texto:txt, analisis:an, objetada:false, revelo:null };
   if (esCautelar){
     S.fundado = (S.fundado || '') + ' \n ' + txt;
     fila.cautelar = analizarCautelar(txt);
   }
-  const fila = { quien:'LITIGANTE', texto:txt, analisis:an, objetada:false, revelo:null };
   S.registro.push(fila);
 
   if (m.tipo === 'alegato'){
@@ -887,6 +926,8 @@ ${CPP}
 
 ${TECNICA}
 
+${PREVIAS}
+
 ${LOGICA}
 
 MÓDULO: ${m.nombre}. ${m.reglas}
@@ -936,7 +977,7 @@ function informeAlegatoOffline(seg){
   const global = Math.round((ejes.reduce((a,e)=>a+e.puntaje,0)/ejes.length)*10)/10;
   return { global, ejes, correcciones:[], aciertos:[],
     perdido:(S.caso.sobre?.puntos||[]).filter(p => !plano.includes(window.LEX.sinTildes(p).slice(0,25))),
-    veredicto:'Informe sin conexión: se evalúa estructura y cumplimiento del art. 211. Para una devolución que cite tus frases y te reescriba los pasajes flojos, cargá tu clave en Ajustes.' };
+    veredicto:'Informe en modo autónomo: se evalúa estructura y cumplimiento del art. 211. Para una devolución que cite tus frases y te reescriba los pasajes flojos, cargá tu clave en Ajustes.' };
 }
 
 function pintarDevolucion(d, seg){
@@ -1276,7 +1317,9 @@ function pintarAjustes(){
   pintarVoces();
   const c = clave();
   $('#clave').value = c;
-  $('#estadoClave').textContent = c ? 'Hay una clave guardada en este navegador.' : 'Sin clave: la app funciona en modo sin conexión.';
+  $('#estadoClave').textContent = c
+    ? 'Hay una clave guardada en este navegador. El testigo improvisa y la devolución la escribe el modelo.'
+    : 'Sin clave: la app funciona en modo autónomo, con banco de respuestas y reglas. No tiene que ver con tu conexión a internet.';
 }
 $('#guardarClave').onclick = () => {
   const v = $('#clave').value.trim();

@@ -481,7 +481,102 @@ const EJEMPLOS = [
     bien:'(dejar pasar la pregunta si la respuesta no te perjudica)',
     porque:'La objeción le avisa al tribunal que algo te incomoda e interrumpe tu propio ritmo. Es una decisión estratégica, no un reflejo.' }
 ]}
+,
+
+{ grupo:'Eslóganes frente a información', nota:'El vicio más extendido en las audiencias de coerción: sustituir la información por la etiqueta legal. Por cada afirmación normativa, una proposición fáctica verificable que la sostenga (Alliaud).',
+  items:[
+  { tipo:'Arraigo', mal:'Mi asistido posee arraigo suficiente.',
+    bien:'Vive con sus padres en el mismo domicilio desde hace veinte años. Cursa el último año de enfermería. Trabaja hace cinco años como ayudante de laboratorio. Es el sostén económico de sus padres jubilados.',
+    porque:'"Arraigo" es la conclusión. Lo que el juez necesita para verificarla son los hechos que la sostienen, y están todos en el informe socioambiental.' },
+  { tipo:'Peligro de fuga', mal:'Existe peligro de fuga, su señoría.',
+    bien:'El domicilio que denunció no es donde vive: el notificador constató que allí no reside desde hace ocho meses, y se desconoce su paradero actual.',
+    porque:'El art. 128 pide pautas concretas. Alliaud lo dice derecho: información es acreditar que no vive donde dice vivir, no afirmar el riesgo.' },
+  { tipo:'Peligro de entorpecimiento', mal:'Podría entorpecer la investigación.',
+    bien:'Conserva las credenciales de acceso al sistema donde está el soporte documental, y dos empleadas declararon haber recibido llamados suyos después de la denuncia.',
+    porque:'El art. 129 exige vehementes indicios que justifiquen la grave sospecha. "Podría" no es un indicio: es una posibilidad abstracta.' },
+  { tipo:'Gravedad del delito', mal:'Se trata de un delito de suma gravedad, con una escala penal de cinco a quince años.',
+    bien:'(no usarlo como fundamento del peligro)',
+    porque:'Lorenzo es categórica: los requisitos legales no pueden entenderse como existentes en todos los casos, porque eso violaría el estado de inocencia. La escala penal puede agravar el pronóstico de pena, pero no es por sí sola un peligro procesal.' },
+  { tipo:'Graduación del riesgo', mal:'El peligro está acreditado, corresponde la prisión preventiva.',
+    bien:'El peligro está acreditado, pero su intensidad es baja: no tiene medios ni contactos para sostenerse oculto. Una presentación periódica con dispositivo de rastreo lo neutraliza.',
+    porque:'No alcanza con que el peligro exista: hay que graduarlo. Si el riesgo es bajo, difícilmente se justifique la preventiva como única medida.' },
+  { tipo:'Elección de la medida', mal:'Solicito la prisión preventiva.',
+    bien:'Solicito la prisión preventiva porque la presentación periódica no alcanza en este caso, ya que no tiene domicilio verificable donde presentarse, y el dispositivo de rastreo requiere un domicilio fijo que tampoco tiene.',
+    porque:'La excepcionalidad obliga al tribunal a explicar por qué eligió esa medida por sobre las otras. Si vos no le das ese fundamento, la decisión queda expuesta a revocación.' }
+]}
 ];
+
+
+/* ───────────── 4. AUDIENCIAS PREVIAS AL JUICIO ─────────────
+   Leticia Lorenzo, "Herramientas para la litigación en un sistema
+   acusatorio"; Alejandra Alliaud, "Audiencias preliminares al juicio oral"
+   (colección dirigida por Binder). Doctrina argentina sobre la etapa
+   previa, que es donde la doctrina chilena de litigación no llega.    */
+
+const PREVIAS = `
+LITIGACIÓN EN AUDIENCIAS PREVIAS AL JUICIO (Lorenzo; Alliaud):
+
+LA AUDIENCIA COMO METODOLOGÍA. En la etapa previa la decisión judicial habilita o impide un avance;
+en el juicio establece responsabilidad. Son lógicas distintas y se litigan distinto. Las etapas del
+trabajo del litigante son cuatro: análisis del caso, decisión sobre el caso, preparación de las
+actuaciones y sustento en la audiencia. La audiencia es el momento de sustentar, no de descubrir.
+
+SLOGANS NORMATIVOS FRENTE A INFORMACIÓN DE CALIDAD (Alliaud). El vicio más extendido en las
+audiencias de coerción es sustituir la información por la etiqueta legal. Decir "posee arraigo" es
+un eslogan. La información de calidad es: vive con sus padres en el mismo domicilio desde hace
+veinte años; cursa el último año de enfermería; trabaja hace cinco años en un laboratorio; es el
+sostén de sus padres jubilados. Lo mismo del otro lado: "existe peligro de fuga" es un eslogan;
+información es que no vive donde dice vivir y se desconoce dónde lo hace, o que tiene facilidades
+concretas para abandonar el país vinculadas a su profesión o a tener familia en otro país.
+REGLA PRÁCTICA: por cada afirmación normativa, una proposición fáctica verificable que la sostenga.
+
+EL PELIGRO PROCESAL NO SE PRESUME (Lorenzo). Los requisitos legales no pueden entenderse como
+existentes en todos los casos: eso violaría el estado de inocencia. El tribunal debe, en cada caso
+concreto y atendiendo a circunstancias fácticas ciertas aportadas por los litigantes, formular un
+juicio sobre la existencia probable del peligro. Si los litigantes no entregan proposiciones
+fácticas que permitan verificar esa existencia en concreto, el juez no puede disponer la medida.
+
+EXCEPCIONALIDAD (Lorenzo). Surge del derecho a la libertad ambulatoria combinado con la prohibición
+de aplicar pena antes de sentencia firme. Obliga a aplicar siempre la medida menos gravosa, incluso
+cuando ninguna de las discutidas implique privación de libertad. Obliga al tribunal a explicar en su
+decisión por qué eligió esa medida por sobre las otras posibles: si no lo explica, la decisión es
+recurrible.
+
+PROPORCIONALIDAD (Lorenzo; Alliaud). No alcanza con que el peligro esté acreditado: hay que graduar
+el riesgo. Un mismo peligro de fuga puede presentarse con riesgo bajo o altísimo según las
+posibilidades reales de esa persona de llevar adelante un plan para evadir la justicia. Si el riesgo
+es bajo, difícilmente se justifique la prisión preventiva como única medida.
+
+PROVISIONALIDAD. La medida dura mientras subsisten las razones que la fundaron. Cambiadas las
+circunstancias, corresponde revisarla.
+
+CARGA DE LA ACREDITACIÓN (Alliaud, con jurisprudencia interamericana). Pesa sobre la acusación
+probar con elementos del caso concreto la necesidad de la medida. El juez no solo conduce: tiene que
+exigirle a las partes que lo informen para poder decidir con calidad. Y si el fiscal no acreditó un
+riesgo tan grave como para la prisión preventiva pero el juez advierte algún peligro, puede imponer
+una restricción menos lesiva.
+
+MOMENTOS DE LA AUDIENCIA DE MEDIDAS CAUTELARES (Lorenzo). Tres, y conviene litigarlos separados:
+1) participación probable del imputado en el hecho, que es el supuesto material;
+2) peligro procesal, con sus pautas concretas;
+3) tiempo de duración de la medida.
+Mezclarlos es el error más común: se termina discutiendo el mérito cuando lo que estaba en juego era
+el peligro, o al revés.
+
+ROLES EN LA AUDIENCIA DE COERCIÓN.
+· ACUSACIÓN: acredita el supuesto material, aporta información de calidad sobre el peligro, gradúa
+  el riesgo y pide plazo. No puede apoyarse en la escala penal como si fuera un peligro.
+· DEFENSA: su mejor terreno no es negar el hecho sino atacar el peligro procesal con información
+  concreta y ofrecer la medida menos gravosa que lo neutralice. Conceder lo indiscutible fortalece.
+· JUZGADOR: exige información, no eslóganes; explica por qué eligió esa medida y no otra; fija plazo.
+
+AUDIENCIA DE EXCLUSIÓN PROBATORIA (Lorenzo). Primero definir el objeto de la discusión; después el
+desarrollo; puede haber prueba sobre prueba. Se discute legalidad de la obtención y pertinencia, que
+son cosas distintas y no deben mezclarse.
+
+QUÉ NO HACER EN UN ALEGATO DE APERTURA (Lorenzo). No argumentar, no valorar prueba que todavía no se
+produjo, no prometer lo que no se va a poder cumplir, no leer, no abrumar con detalle.
+`;
 
 /* Resumen compacto para inyectar en los prompts del modelo */
 const LOGICA = `
@@ -496,5 +591,5 @@ limita a afirmar que miente, o si de la impugnación se concluye que todo lo que
 `;
 
 if (typeof window !== 'undefined') {
-  window.LEX = Object.assign(window.LEX || {}, { CPP, TECNICA, LOGICA, FALACIAS, EJEMPLOS });
+  window.LEX = Object.assign(window.LEX || {}, { CPP, TECNICA, PREVIAS, LOGICA, FALACIAS, EJEMPLOS });
 }

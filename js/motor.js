@@ -326,7 +326,15 @@ function responderOffline(caso, an, estado){
   }
   if (!mejor || punt < 0.12){
     estado.confusiones = (estado.confusiones || 0) + 1;
-    return { texto: humanizar('No sabría decirle. Eso no lo tengo presente.', {titubea:true}), revelado:null, aclara:true };
+    const NOSE = [
+      'No sabría decirle. Eso no lo tengo presente.',
+      'De eso no me acuerdo.',
+      'Eso no se lo puedo contestar, no me consta.',
+      'No, eso no lo vi.',
+      'No tengo idea, la verdad.'
+    ];
+    return { texto: humanizar(NOSE[Math.floor(Math.random()*NOSE.length)], {titubea:true}),
+             revelado:null, aclara:true };
   }
 
   let texto;
@@ -335,7 +343,24 @@ function responderOffline(caso, an, estado){
   else texto = mejor.texto;
 
   if (estado.dichos.has(mejor)){
-    texto = 'Ya se lo dije: ' + texto.charAt(0).toLowerCase() + texto.slice(1);
+    /* Ya contestó esto. Una persona no repite la misma frase: reformula,
+       agrega un detalle, o se impacienta si se lo preguntan de nuevo.  */
+    const veces = (estado.repes = estado.repes || new Map()).get(mejor) || 1;
+    estado.repes.set(mejor, veces + 1);
+    const base = texto.charAt(0).toLowerCase() + texto.slice(1);
+    if (veces === 1){
+      const giros = [
+        'Como le decía, ' + base,
+        'Lo mismo que le dije recién: ' + base,
+        'Sí, ' + base
+      ];
+      texto = giros[Math.floor(Math.random()*giros.length)];
+      if (mejor.extra && typeof mejor.extra === 'string') texto += ' ' + mejor.extra;
+    } else if (veces === 2){
+      texto = 'Perdón, pero eso ya se lo contesté dos veces. ' + texto;
+    } else {
+      texto = 'Señor juez, ¿tengo que volver a contestar lo mismo?';
+    }
   } else {
     texto = humanizar(texto, { titubea: !!mejor.reservado || punt < 0.4, remata: an.abierta });
   }
@@ -398,11 +423,11 @@ function reformular(d, texto, modulo){
      que jamás se puede sugerir una como corrección. En el contraexamen
      son la herramienta principal.                                      */
   const directo = modulo === 'directo';
-  const cerrar = f => directo ? abierta(f) : (f + ', ¿no es cierto?');
   const abierta = f => {
     for (const [re, sug] of ABIERTAS) if (re.test(sinTildes(f))) return sug;
     return '¿Qué fue lo que pasó en ese momento?';
   };
+  const cerrar = f => directo ? abierta(f) : (f + ', ¿no es cierto?');
 
   if (d.id === 'compuesta'){
     let partes = texto.split(/\?\s*/).filter(x => x.trim().length > 4);
