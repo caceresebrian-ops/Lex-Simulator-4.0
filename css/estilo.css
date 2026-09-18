@@ -55,12 +55,18 @@ a{color:var(--azul)}
   border-bottom:1px solid var(--borde);
   position:relative;overflow:hidden;
 }
-/* La franja punzó de la bandera provincial, ascendente de izquierda a
-   derecha. Apenas insinuada: es una aplicación para tribunales.      */
+/* La bandera provincial: blanco arriba, azul abajo, y la banda punzó
+   cruzando en diagonal ascendente. Se cita de verdad, no se insinúa.  */
+.cabecera{
+  background:linear-gradient(to bottom, var(--blanco) 0 54%, var(--celeste-pal) 54%);
+}
 .cabecera::after{
-  content:'';position:absolute;right:-40px;top:-60px;width:150px;height:230px;
-  background:linear-gradient(to bottom, transparent 0 38%, var(--punzo) 38% 62%, transparent 62%);
-  transform:rotate(-58deg);opacity:.09;pointer-events:none;
+  content:'';position:absolute;right:-30px;top:-70px;bottom:-70px;width:74px;
+  background:var(--punzo);opacity:.88;transform:rotate(24deg);pointer-events:none;
+}
+.cabecera::before{
+  content:'';position:absolute;right:56px;top:-70px;bottom:-70px;width:16px;
+  background:var(--punzo);opacity:.32;transform:rotate(24deg);pointer-events:none;
 }
 .cabecera img{width:38px;height:38px;flex-shrink:0}
 .cabecera .marca{font-weight:600;letter-spacing:.04em;font-size:15px;line-height:1.15;color:var(--marino)}
@@ -71,7 +77,21 @@ a{color:var(--azul)}
 .heroe{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;padding:38px clamp(20px,5vw,40px) 30px;min-height:0;
-  background:linear-gradient(170deg,var(--blanco) 0%,var(--celeste-pal) 100%);
+  position:relative;overflow:hidden;
+  background:
+    linear-gradient(104deg, transparent 0 calc(50% - 3px), var(--punzo) calc(50% - 3px) calc(50% + 3px), transparent calc(50% + 3px)),
+    linear-gradient(170deg, var(--blanco) 0%, var(--celeste-pal) 100%);
+}
+/* laurel: las dos ramas verdes, como marco lateral tenue */
+.heroe::before{
+  content:'';position:absolute;left:0;top:14%;bottom:14%;width:5px;
+  background:linear-gradient(to bottom, transparent, var(--laurel), transparent);
+  opacity:.5;
+}
+.heroe::after{
+  content:'';position:absolute;right:0;top:14%;bottom:14%;width:5px;
+  background:linear-gradient(to bottom, transparent, var(--laurel), transparent);
+  opacity:.5;
 }
 .heroe img{width:clamp(110px,20vw,160px);height:auto;margin-bottom:18px}
 .heroe h1{
@@ -107,9 +127,10 @@ a{color:var(--azul)}
 }
 .rasgo h3{font-size:15px;margin:0 0 7px;color:var(--marino)}
 .rasgo p{font-size:13.5px;color:var(--gris);margin:0}
+/* Los laureles de los dieciocho departamentos */
 .emblemita{
   display:grid;place-items:center;width:38px;height:38px;border-radius:50%;
-  background:#EAF3EE;border:1px solid #BFD9CB;margin-bottom:12px;
+  background:#E7F2EB;border:1.5px solid var(--laurel);margin-bottom:12px;
 }
 .emblemita svg{width:19px;height:19px;fill:none;stroke:var(--laurel);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .puntos{display:none}
@@ -229,9 +250,17 @@ textarea{resize:vertical;min-height:120px;font-size:14px;line-height:1.55}
 #sala.activo{display:flex}
 #barra{
   display:flex;align-items:center;gap:12px;padding:10px clamp(12px,3vw,20px);
-  background:var(--blanco);flex-wrap:wrap;
-  border-bottom:2px solid transparent;
-  border-image:linear-gradient(to right, var(--marino) 0 62%, var(--punzo) 62% 74%, var(--borde) 74%) 1;
+  background:var(--blanco);flex-wrap:wrap;position:relative;
+  border-bottom:1px solid var(--borde);
+}
+/* Franja tricolor que además marca cuánto va de la audiencia:
+   el punzó avanza con el reloj.                                  */
+#barra::after{
+  content:'';position:absolute;left:0;right:0;bottom:-1px;height:4px;
+  background:
+    linear-gradient(to right, var(--punzo) 0 var(--avance,0%), transparent var(--avance,0%)),
+    linear-gradient(to right, var(--blanco) 0 8%, var(--marino) 8% 100%);
+  background-repeat:no-repeat;
 }
 #barra .id{flex:1;min-width:160px}
 #barra .id b{display:block;font-family:Spectral,Georgia,serif;font-size:14.5px;line-height:1.25}
@@ -312,6 +341,11 @@ ul.limpia li{font-family:Spectral,Georgia,serif;font-size:15.5px;line-height:1.5
 .acciones{display:flex;gap:9px;flex-wrap:wrap;margin-top:34px}
 
 /* ───────────── tablas y listas ───────────── */
+.dato{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-top:1px solid var(--borde);font-size:13.5px}
+.dato input{width:auto;margin-top:3px;accent-color:var(--punzo)}
+.dato .val{font-family:Spectral,Georgia,serif;font-size:15px;word-break:break-word}
+.dato .meta{display:block;font-size:11.5px;color:var(--gris-claro)}
+.dato.alto .val{color:var(--punzo)}
 .fila{display:flex;justify-content:space-between;gap:14px;padding:12px 0;border-top:1px solid var(--borde);font-size:14px}
 .fila span{display:block;color:var(--gris-claro);font-size:12.5px}
 .fila .num{font-size:19px;color:var(--azul);font-variant-numeric:tabular-nums}
@@ -345,3 +379,42 @@ ul.limpia li{font-family:Spectral,Georgia,serif;font-size:15.5px;line-height:1.5
   .heroe{padding:34px 20px 40px}
 }
 @media (min-width:781px){#verLegajo{display:none}}
+
+
+/* ─────────────── cita legal tocable ─────────────── */
+.cita{
+  background:var(--celeste-pal);border:none;border-bottom:1.5px solid var(--azul);
+  border-radius:3px;padding:0 3px;font:inherit;color:var(--azul);cursor:pointer;
+}
+.cita:hover{background:var(--azul);color:var(--blanco)}
+#hojaArt{
+  position:fixed;inset:0;z-index:60;background:rgba(15,42,77,.42);
+  display:flex;align-items:flex-end;justify-content:center;padding:0;
+}
+#hojaArt.oculto{display:none}
+.hojaArtCaja{
+  background:var(--blanco);width:100%;max-width:680px;max-height:78vh;overflow-y:auto;
+  border-radius:14px 14px 0 0;padding:24px 22px 30px;position:relative;
+  border-top:4px solid var(--punzo);box-shadow:var(--sombra-alta);
+}
+.hojaArtCaja h3{margin:0 0 3px;font-family:Spectral,Georgia,serif;font-size:22px;color:var(--marino)}
+.hojaArtCaja .rub{margin:0 0 14px;font-size:12px;letter-spacing:.07em;color:var(--punzo);text-transform:uppercase}
+.hojaArtCaja .cuerpo{font-family:Spectral,Georgia,serif;font-size:16px;line-height:1.62;margin:0 0 16px;white-space:pre-wrap}
+.hojaArtCaja .fuente{font-size:12px;color:var(--gris-claro);margin:0;border-top:1px solid var(--borde);padding-top:11px}
+.cerrarX{
+  position:absolute;top:12px;right:14px;width:32px;height:32px;border:none;border-radius:50%;
+  background:var(--fondo);font-size:22px;line-height:1;color:var(--gris)
+}
+@media (min-width:700px){ #hojaArt{align-items:center} .hojaArtCaja{border-radius:14px} }
+
+
+/* ─────────────── indicador con la diagonal de la bandera ─────────────── */
+.puntitos i{background:var(--punzo)}
+.puntitos i:nth-child(2){background:var(--marino)}
+.puntitos i:nth-child(3){background:var(--laurel)}
+
+/* Los ejes cubiertos y los aciertos, en laurel; los vicios, en punzó */
+.eje .pt{color:var(--laurel)}
+.global b{color:var(--marino)}
+.medidor i{background:linear-gradient(to right,var(--laurel),var(--azul))}
+.medidor.alto i{background:var(--punzo)}

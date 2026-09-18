@@ -28,6 +28,7 @@
     <div class="marca">LEX SIMULATOR<small>Litigación penal oral</small></div>
     <div class="relleno"></div>
     <nav class="menu">
+      <button class="plano" id="irCausa">Cargar causa</button>
       <button class="plano" id="irBase">Base de conocimiento</button>
       <button class="plano" id="irEjemplos">Ejemplos</button>
       <button class="plano" id="irFalacias">Falacias</button>
@@ -137,6 +138,17 @@
   </footer>
 </section>
 
+<!-- ═══════════ ARTÍCULO CITADO ═══════════ -->
+<div id="hojaArt" class="oculto">
+  <div class="hojaArtCaja">
+    <button class="cerrarX" id="cerrarArt" aria-label="Cerrar">×</button>
+    <h3 id="artNumero"></h3>
+    <p class="rub" id="artRubrica"></p>
+    <p class="cuerpo" id="artTexto"></p>
+    <p class="fuente" id="artFuente"></p>
+  </div>
+</div>
+
 <!-- ═══════════ DEVOLUCIÓN ═══════════ -->
 <section class="panel" id="devolucion"><div class="hoja" id="hojaDev"></div></section>
 
@@ -187,6 +199,80 @@
     <button class="secundario" id="importarKb">Importar</button>
     <input type="file" id="archivoKb" accept="application/json" class="oculto">
   </div>
+</div></section>
+
+<!-- ═══════════ CARGAR CAUSA REAL ═══════════ -->
+<section class="panel" id="causa"><div class="hoja">
+  <button class="plano" data-volver="portada">← Volver</button>
+  <h2>Cargar una causa real</h2>
+  <p>Convierte el texto de una causa <b>previamente anonimizada</b> en un caso jugable, con su
+     testigo y su sobre cerrado.</p>
+
+  <div class="aviso malo">
+    <b>Antes de pegar nada.</b> Solo material del que ya hayas quitado los datos personales. Todo el
+    procesamiento ocurre en este dispositivo y nada se sube a ningún lado, pero el paso 2 revisa el
+    texto y te avisa si quedó algo. Si cargaste tu clave de la API y pedís que el modelo arme el
+    sobre cerrado, ese texto sí viaja a Anthropic, y se te avisa antes.
+  </div>
+
+  <!-- paso 1 -->
+  <div class="tarjeta" id="pasoTexto">
+    <h3>1 · El texto de la causa</h3>
+    <p class="ayuda">Pegá el contenido, o subí un archivo de texto. Si tenés un PDF, abrilo,
+      seleccioná todo y pegalo acá.</p>
+    <textarea id="txtCausa" style="min-height:200px" placeholder="DECLARACIÓN TESTIMONIAL — Que el día… "></textarea>
+    <div class="acciones">
+      <button class="secundario" id="subirCausa">Subir archivo .txt</button>
+      <input type="file" id="archivoCausa" accept=".txt,.md,text/plain" class="oculto">
+      <button class="principal" id="revisarCausa">Revisar datos personales</button>
+    </div>
+  </div>
+
+  <!-- paso 2 -->
+  <div class="tarjeta oculto" id="pasoDatos">
+    <h3>2 · Datos personales encontrados</h3>
+    <p class="ayuda" id="resumenDatos"></p>
+    <div id="listaDatos"></div>
+    <div class="acciones">
+      <button class="secundario" id="marcarTodo">Marcar todos</button>
+      <button class="principal" id="sanearCausa">Reemplazar y continuar</button>
+    </div>
+  </div>
+
+  <!-- paso 3 -->
+  <div class="tarjeta oculto" id="pasoEstructura">
+    <h3>3 · El legajo, como quedó</h3>
+    <p class="ayuda">Esto lo armó el extractor leyendo el texto. Corregí lo que haya sacado mal:
+      todo es editable.</p>
+    <div class="campo"><span>Carátula</span><input type="text" id="cCaratula"></div>
+    <div class="campo"><span>Calificación legal</span><input type="text" id="cDelito"></div>
+    <div class="campo"><span>Hecho imputado</span><textarea id="cSintesis" style="min-height:80px"></textarea></div>
+    <div class="campo"><span>Estado del legajo</span><textarea id="cHechos" style="min-height:110px"></textarea></div>
+    <div class="campo"><span>Testigo</span><input type="text" id="cTestigo" placeholder="Nombre"></div>
+    <div class="campo"><span>Calidad y perfil del testigo</span><input type="text" id="cPerfil" placeholder="víctima, preventor, perito… edad, oficio, temperamento"></div>
+    <div class="campo"><span>Voz</span><div class="opciones" id="cGenero"></div></div>
+    <div class="campo"><span>Declaración previa</span><textarea id="cPrevia" style="min-height:150px"></textarea></div>
+    <div class="acciones"><button class="principal" id="irSobre">Continuar al sobre cerrado</button></div>
+  </div>
+
+  <!-- paso 4 -->
+  <div class="tarjeta oculto" id="pasoSobre">
+    <h3>4 · El sobre cerrado</h3>
+    <p class="ayuda">Acá está el corazón del ejercicio: lo que el testigo sabe y no va a decir salvo
+      que le preguntes justo en el punto. Escribí uno por renglón. Si preparás tu propia audiencia,
+      poné lo que sospechás que el testigo oculta; si entrena otra persona, no se lo muestres.</p>
+    <div class="campo"><span>Qué pasó realmente</span><textarea id="cVerdad" style="min-height:80px" placeholder="La versión completa, incluido lo que nadie sabe todavía."></textarea></div>
+    <div class="campo"><span>Puntos que el testigo se guarda (uno por renglón)</span>
+      <textarea id="cPuntos" style="min-height:110px" placeholder="En la declaración previa dijo que no le vio bien la cara.&#10;La observación duró apenas segundos.&#10;En la rueda dudó entre dos personas."></textarea></div>
+    <div class="campo"><span>Conducta del testigo en la audiencia</span><textarea id="cConducta" style="min-height:70px" placeholder="Se planta y repite que está seguro. Si lo llevan paso a paso, concede a regañadientes."></textarea></div>
+    <div class="acciones">
+      <button class="secundario" id="generarSobre">Que lo proponga el modelo</button>
+      <button class="principal" id="guardarCausa">Guardar el caso</button>
+    </div>
+    <div class="ayuda" id="estadoSobre"></div>
+  </div>
+
+  <div id="misCausas"></div>
 </div></section>
 
 <!-- ═══════════ EJEMPLOS ═══════════ -->
@@ -302,7 +388,10 @@
 
 <script src="./js/conocimiento.js"></script>
 <script src="./js/casos.js"></script>
+<script src="./js/biblioteca.js"></script>
 <script src="./js/motor.js"></script>
+<script src="./js/agentes.js"></script>
+<script src="./js/ingesta.js"></script>
 <script src="./js/app.js"></script>
 </body>
 </html>

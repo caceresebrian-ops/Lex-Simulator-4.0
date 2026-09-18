@@ -14,7 +14,14 @@
 const sinTildes = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const VACIAS = new Set(('a al ante antes con contra de del desde durante en entre hacia hasta la las le les lo los mas me mi mis nos o para pero por que se sin sobre su sus te tras tu tus un una uno unos unas y ya el es era son fue ser esta estaba estan he ha han hay muy si no como cuando donde quien cual usted ud vos yo nos les eso esa ese esto esta senor senora doctor diga digame').split(' '));
 const fichas = s => sinTildes(s).replace(/[^a-z0-9ñ\s]/g,' ').split(/\s+/).filter(w => w.length>2 && !VACIAS.has(w));
-const raiz = w => w.length > 6 ? w.slice(0,6) : w;
+/* Raíz: saca el plural y recorta, para que "horas" encuentre "hora"
+   y "testigos" encuentre "testigo".                                */
+const raiz = w => {
+  let x = w;
+  if (x.length > 4 && x.endsWith('es')) x = x.slice(0,-2);
+  else if (x.length > 4 && x.endsWith('s')) x = x.slice(0,-1);
+  return x.length > 6 ? x.slice(0,6) : x;
+};
 
 /* Sinónimos: el testigo no puede depender de que uses su misma palabra */
 const SINONIMOS = {
@@ -55,16 +62,17 @@ function pesos(banco){
 function solape(pregunta, claves, w){
   if (!pregunta.length || !claves.length) return 0;
   const sp = new Set(pregunta);
-  let suma = 0, total = 0, n = 0;
+  let suma = 0, n = 0;
   for (const c of claves.map(raiz)){
-    const peso = w ? (w.get(c) || 1) : 1;
-    total += peso;
-    if (sp.has(c)){ suma += peso; n++; }
+    if (sp.has(c)){ suma += (w ? (w.get(c) || 1) : 1); n++; }
   }
-  if (!total) return 0;
-  const cobertura = n / Math.min(3, claves.length);          // cuánto del tema cubre
-  const precision = suma / total;                            // cuán informativo fue
-  return cobertura * 0.65 + precision * 0.35;
+  if (!n) return 0;
+  /* Cobertura: cuántas señales del tema aparecieron.
+     Relevancia: cuán informativas eran esas señales. No se divide por el
+     total de claves, para no castigar a las entradas más descriptivas. */
+  const cobertura = Math.min(1, n / Math.min(3, claves.length));
+  const relevancia = suma / (1.4 + suma);
+  return cobertura * 0.55 + relevancia * 0.45;
 }
 function jaccard(a, b){
   const sa = new Set(a), sb = new Set(b);
@@ -295,7 +303,9 @@ function responderOffline(caso, an, estado){
 
   let mejor = null, punt = 0, abierto = null, puntAbierto = 0;
   for (const h of banco){
-    const s = solape(an.expandidos, fichas(h.claves), estado.pesos);
+    /* Ante puntajes parejos gana lo propio del expediente: el banco
+       universal es el respaldo, no la primera opción.              */
+    const s = solape(an.expandidos, fichas(h.claves), estado.pesos) + (h.generico ? 0 : 0.07);
     if (s > punt){ punt = s; mejor = h; }
     if (!h.reservado && s > puntAbierto){ puntAbierto = s; abierto = h; }
   }

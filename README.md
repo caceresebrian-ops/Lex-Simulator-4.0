@@ -97,6 +97,27 @@ El reconocimiento de voz anda bien en Chrome sobre Android y en Chrome de escrit
 sobre iPhone suele no estar disponible: en ese caso el modo oral se enciende igual, pero solo de
 salida, así que escuchás la audiencia y escribís tus preguntas.
 
+## Biblioteca jurídica
+
+`js/biblioteca.js` contiene los **359 artículos** de la Ley 10.797 en texto completo, con búsqueda
+por número, búsqueda por tema y verificación de citas. Funciona sin conexión.
+
+Sirve para cumplir el requisito central del proyecto: **ningún interviniente puede inventar una
+norma**. Todo lo que genera el modelo pasa por `verificarCitas()`; si cita un artículo que no
+existe, la respuesta se descarta y se regenera. En pantalla, cada cita legal queda tocable y abre el
+texto oficial del artículo.
+
+## Director de audiencia
+
+`js/agentes.js` orquesta a todos los intervinientes. Cada uno es un agente con su propio **paquete
+de conocimiento**: el testigo conoce su declaración previa y su sobre cerrado; la contraparte conoce
+el legajo y sus argumentos, nunca el sobre; el juez conoce solo el legajo público. Esa separación es
+lo que sostiene la asimetría de información.
+
+Antes de emitir cualquier respuesta se verifican dos cosas: que no haya inventado un artículo y que
+no haya filtrado un punto del sobre cerrado que la pregunta del usuario no habilitaba. Si algo
+falla, se regenera.
+
 ## Estructura
 
 ```
@@ -104,7 +125,9 @@ index.html              portada, sala de audiencia y paneles
 manifest.json           metadatos de la app instalable
 service-worker.js       caché para uso sin conexión
 css/estilo.css          hoja de estilos
-js/conocimiento.js      CPP de La Rioja, técnica de litigación y tabla de falacias
+js/biblioteca.js        los 359 artículos de la Ley 10.797, con búsqueda y verificación
+js/agentes.js           director de audiencia: agentes, paquetes de conocimiento, antifuga
+js/conocimiento.js      técnica de litigación, tabla de falacias y ejemplos de estudio
 js/casos.js             las 20 causas con su banco de respuestas
 js/motor.js             análisis de preguntas, objeciones, testigo e informe offline
 js/app.js               navegación, flujos, llamadas a la API y almacenamiento
@@ -124,6 +147,32 @@ archivos nuevos.
 
 Si actualizaste y no ves los cambios, en la computadora hacé Ctrl+Shift+R, y en el teléfono cerrá la
 app instalada del todo y volvé a abrirla.
+
+## Cargar una causa real
+
+En **Cargar causa** se convierte el texto de una causa anonimizada en un caso jugable, en cuatro
+pasos.
+
+1. Pegás el texto o subís un `.txt`.
+2. La app detecta datos personales que hayan quedado: documentos, CUIL, teléfonos, correos,
+   dominios, números de expediente, domicilios y posibles nombres. Los de riesgo alto vienen
+   marcados; revisás el resto y reemplazás todo lo marcado por datos ficticios riojanos.
+3. Extrae el legajo: carátula, calificación, hecho, prueba, testigo y declaración previa. **Todo es
+   editable**, porque ningún extractor automático acierta siempre.
+4. Cargás el sobre cerrado: qué pasó realmente y los puntos que el testigo se guarda. Podés
+   escribirlo vos, que conocés el caso, o pedirle una propuesta al modelo si tenés clave cargada.
+
+Cada afirmación de la declaración previa se convierte en una respuesta del testigo, pasada de la
+redacción de acta a primera persona hablada. Los puntos del sobre entran como respuestas reservadas,
+que solo salen con una pregunta precisa.
+
+Las causas cargadas quedan en este dispositivo, aparecen marcadas con estrella al armar una
+audiencia y no se comparten con nadie.
+
+**Advertencia.** Cargá solo material previamente anonimizado. El detector ayuda pero ningún detector
+automático es completo: la responsabilidad de revisar el texto es tuya. Todo el procesamiento ocurre
+en el dispositivo; lo único que viaja es el texto que le mandes al modelo si pedís que proponga el
+sobre cerrado, y en ese caso se te avisa antes.
 
 ## Agregar casos
 

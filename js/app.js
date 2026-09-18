@@ -60,6 +60,7 @@ $$('[data-volver]').forEach(b => b.onclick = () => ver(b.dataset.volver));
 $('#empezar').onclick    = () => { pintarSetup(); ver('setup'); };
 $('#irHistorial').onclick= () => { pintarHistorial(); ver('historial'); };
 $('#irBase').onclick     = () => { pintarBase(); ver('base'); };
+$('#irCausa').onclick    = () => { pintarCausa(); ver('causa'); };
 $('#irFalacias').onclick = () => { pintarFalacias(); ver('falacias'); };
 $('#irEjemplos').onclick = () => { pintarEjemplos(); ver('ejemplos'); };
 $('#irAjustes').onclick  = () => { pintarAjustes(); ver('ajustes'); };
@@ -161,7 +162,8 @@ function pintarSetup(){
   }
 
   const oc = $('#opCaso'); oc.innerHTML = '';
-  const dispo = CASOS.filter(c => c.modulos.includes(S.modulo));
+  const dispo = causasPropias().filter(c => (c.modulos||[]).includes(S.modulo))
+                .concat(CASOS.filter(c => c.modulos.includes(S.modulo)));
   if (hayIA()){
     const b = document.createElement('button');
     b.className = 'op'; b.dataset.k = '';
@@ -176,7 +178,9 @@ function pintarSetup(){
     const b = document.createElement('button');
     b.className = 'op'; b.dataset.k = c.id;
     b.setAttribute('aria-pressed', c.id === S.casoId);
-    b.innerHTML = esc(c.delito.split('(')[0].trim()) + '<small>' + esc(c.caratula.replace(/^F\. c\/ /,'')) + '</small>';
+    b.innerHTML = (c.propio ? '★ ' : '') + esc(String(c.delito||'').split('(')[0].trim()) +
+                  '<small>' + esc(String(c.caratula||'').replace(/^F\. c\/ /,'')) +
+                  (c.propio ? ' · causa propia' : '') + '</small>';
     b.onclick = () => { S.casoId = c.id; pintarSetup(); };
     oc.appendChild(b);
   }
@@ -197,7 +201,7 @@ $('#abrir').onclick = async () => {
      que la página hable. Se aprovecha para habilitar la voz.       */
   VOZ.desbloquear();
   if (S.casoId){
-    S.caso = CASOS.find(c => c.id === S.casoId);
+    S.caso = causasPropias().find(c => c.id === S.casoId) || CASOS.find(c => c.id === S.casoId);
     S.generado = false;
     entrarSala();
   } else {
@@ -389,6 +393,7 @@ function entrarSala(){
   S.registro = []; S.turnos = []; S.previas = [];
   S.estado = { desdeUltimaObjecion: 9, dichos: new Set() };
   S.fundado = '';
+  S.mem = nuevaMemoria();
   $('#hilo').innerHTML = '';
   $('#caratula').textContent = c.caratula || 'Causa sin carátula';
   $('#subtitulo').textContent = `${m.nombre} · ${ROLES[S.rol]}${hayIA() ? '' : ' · sin conexión'}`;
@@ -484,6 +489,9 @@ function arrancarReloj(obj){
   S.tick = setInterval(() => {
     const s = Math.floor((Date.now()-S.t0)/1000);
     $('#reloj').textContent = mmss(s);
+    /* la franja punzó de la barra avanza con el tiempo de audiencia */
+    const meta = (obj || 12) * 60;
+    $('#barra').style.setProperty('--avance', Math.min(100, (s/meta)*100).toFixed(1) + '%');
     if (obj) $('#reloj').classList.toggle('excedido', s > obj*60);
   }, 250);
 }
@@ -727,38 +735,114 @@ Si la objeción prospera: ${otro} objeta, JUEZ resuelve, el testigo NO responde.
 "revelo" es true si en este turno salió algo del sobre cerrado.`;
 }
 
-async function turnoConModelo(txt, fila){
-  const ind = pensando('TESTIGO');
-  const desde = Date.now();
-  const mens = [{ role:'user', content: instrucciones() }, ...S.turnos.slice(-14), { role:'user', content: txt }];
-  try {
-    const r = await pedirJson(mens, { modelo: MODELO_TURNO, tope: 900 });
-    const falta = 2000 - (Date.now() - desde);
-    if (falta > 0) await demora(falta);
-    ind.remove();
-    const ivs = Array.isArray(r.intervenciones) ? r.intervenciones : [];
-    if (!ivs.length) throw new Error('No hubo respuesta. Reformulá.');
-    const eco = [];
-    for (const iv of ivs){
-      const q = String(iv.quien||'TESTIGO').toUpperCase();
-      const cl = q.includes('JUEZ') ? 'juez' : (q.includes('FISCAL')||q.includes('DEFENSA')) ? 'objecion' : '';
-      if (cl === 'objecion') fila.objetada = true;
-      turno(q, iv.texto, cl);
-      S.registro.push({ quien:q, texto:iv.texto });
-      eco.push(q + ': ' + iv.texto);
+/* Cada agente habla por separado, con su propio paquete de conocimiento.
+   Antes de emitir, se verifica que no haya inventado un artículo y que no
+   haya filtrado el sobre cerrado.                                       */
+async function hablarAgente(paso, txt, fila){
+  const extra = paso.defecto ? { arts: [209, 210] } : null;
+  const sistema = instruccionesAgente(paso.agente, S.caso, S.rol, S.modulo, S.mem, extra);
+  const otro = otroDe(S.rol);
+
+  const consigna = {
+    objetar:   `La ${ROLES[S.rol].toLowerCase()} acaba de formular: "${txt}". Objetala: el defecto es ${paso.defecto?.nombre}. Decí "Objeción" y fundá el motivo en el artículo que corresponda.`,
+    resolver:  `Se objetó la pregunta "${txt}" por ${paso.defecto?.nombre}. Resolvé: ${paso.prospera ? 'hacés lugar y mandás reformular' : 'no hacés lugar y mandás proseguir'}. Una o dos oraciones.`,
+    responder: `Te preguntan: "${txt}". Contestá como el testigo que sos.`,
+    replicar:  `La contraparte acaba de sostener: "${txt}". Contestá ESE punto concreto con tu mejor argumento para este caso.`,
+    interpelar:`La ${ROLES[S.rol].toLowerCase()} acaba de fundar: "${txt}". Como juez, exigí lo que falte o devolvele el argumento de la contraparte.`,
+    cerrar:    `Anunciá que vas a resolver y ofrecé una última consideración a las partes.`
+  }[paso.intencion] || txt;
+
+  const historia = S.registro.slice(-8).map(r => r.quien + ': ' + r.texto).join('\n');
+
+  for (let intento = 0; intento < 2; intento++){
+    const salida = await pedir(
+      [{ role:'user', content: (historia ? 'ÚLTIMOS TRAMOS DEL ACTA:\n' + historia + '\n\n' : '') + consigna }],
+      { modelo: MODELO_TURNO, tope: 600, sistema }
+    );
+    const limpio = String(salida).replace(/^["“]|["”]$/g,'').trim();
+    if (!limpio) continue;
+
+    /* ¿Inventó un artículo? */
+    const vc = verificarCitas(limpio);
+    if (!vc.valido && intento === 0) continue;
+
+    /* ¿Filtró el sobre cerrado? Solo aplica al testigo. */
+    if (paso.agente === 'testigo'){
+      const vf = verificarFuga(limpio, txt, S.caso, S.mem);
+      if (!vf.limpio && intento === 0) continue;
+      if (vf.limpio || intento > 0) fila.revelo = S.mem.revelados.size > (S.revelPrev || 0);
+      S.revelPrev = S.mem.revelados.size;
     }
-    if (r.revelo){ fila.revelo = true; aviso('Sacaste un punto del sobre cerrado.'); }
-    else if (r.falta) aviso('Objetable: ' + r.falta, true);
+    return { texto: limpio, citas: vc.citas };
+  }
+  return null;
+}
+
+async function turnoConModelo(txt, fila){
+  const ind = pensando(MODULOS[S.modulo].testigo ? 'TESTIGO' : 'SALA');
+  const desde = Date.now();
+  const intencion = clasificar(txt, S.modulo);
+  fila.intencion = intencion;
+  S.estado.desdeUltimaObjecion++;
+  const plan = planificar(intencion, fila.analisis, S.modulo, S.mem, S.estado);
+
+  try {
+    let primero = true;
+    for (const paso of plan.escena){
+      const quien = paso.agente === 'testigo' ? 'TESTIGO'
+                  : paso.agente === 'juez' ? 'JUEZ' : otroDe(S.rol);
+      const r = await hablarAgente(paso, txt, fila);
+      if (!r) continue;
+      if (primero){
+        const falta = 1900 - (Date.now() - desde);
+        if (falta > 0) await demora(falta);
+        ind.remove(); primero = false;
+      } else {
+        await demora(paso.agente === 'juez' ? 900 : 600);
+      }
+      const clase = paso.agente === 'juez' ? 'juez'
+                  : paso.agente === 'contraparte' ? 'objecion' : '';
+      if (paso.intencion === 'objetar'){ fila.objetada = true; S.estado.desdeUltimaObjecion = 0; }
+      const nodo = turno(quien, r.texto, clase);
+      marcarCitas(nodo, r.citas);
+      S.registro.push({ quien, texto:r.texto });
+      registrar(S.mem, quien, r.texto);
+    }
+    if (primero) ind.remove();
+    if (fila.revelo) aviso('Sacaste un punto del sobre cerrado.');
+    else if (fila.analisis?.defectos?.length) aviso(fila.analisis.defectos[0].nombre + ': ' + fila.analisis.defectos[0].motivo, true);
     else aviso('');
-    S.turnos.push({ role:'user', content: txt }, { role:'assistant', content: eco.join('\n') });
   } catch (e){
     ind.remove();
     aviso(e.message, true);
     $('#pregunta').value = txt; altoAuto();
-    S.registro.pop(); S.previas.pop();
+    S.registro.pop(); if (fila.analisis) S.previas.pop();
     $('#hilo').lastElementChild?.remove();
   }
 }
+
+/* Las citas legales quedan tocables: muestran el texto oficial del artículo */
+function marcarCitas(nodo, citas){
+  if (!nodo || !citas || !citas.length) return;
+  const p = nodo.querySelector('.dicho');
+  if (!p) return;
+  p.innerHTML = p.textContent.replace(/\bart(?:[íi]culos?)?\.?\s*(\d{1,3})\b/gi, (m, n) => {
+    const c = citas.find(x => String(x.n) === n && x.estado !== 'otra-norma' && x.estado !== 'inexistente');
+    return c ? '<button class="cita" data-art="' + n + '">' + m + '</button>' : m;
+  });
+  p.querySelectorAll('.cita').forEach(b => b.onclick = () => verArticulo(b.dataset.art));
+}
+
+function verArticulo(n){
+  const c = citaLey(n);
+  if (!c){ aviso('Ese artículo no figura en la biblioteca.', true); return; }
+  $('#artNumero').textContent = 'Artículo ' + c.numero;
+  $('#artRubrica').textContent = c.rubrica;
+  $('#artTexto').textContent = c.texto;
+  $('#artFuente').textContent = c.fuente;
+  $('#hojaArt').classList.remove('oculto');
+}
+$('#cerrarArt') && ($('#cerrarArt').onclick = () => $('#hojaArt').classList.add('oculto'));
 
 /* ═══════════════ DEVOLUCIÓN ═══════════════ */
 async function levantar(){
@@ -974,6 +1058,149 @@ $('#archivoKb').onchange = async e => {
     alert('Material importado.');
   } catch { alert('El archivo no tiene el formato esperado.'); }
   e.target.value = '';
+};
+
+/* ═══════════════ CARGA DE CAUSAS REALES ═══════════════ */
+const ING = { texto:'', hallazgos:[], datos:null };
+
+const causasPropias = () => guardado.leer('causas', []);
+
+function pintarCausa(){
+  ['#pasoDatos','#pasoEstructura','#pasoSobre'].forEach(id => $(id).classList.add('oculto'));
+  const mias = causasPropias();
+  $('#misCausas').innerHTML = mias.length
+    ? '<h3>Mis causas cargadas</h3>' + mias.map((c,i) =>
+        '<div class="fila"><div>' + esc(c.caratula) +
+        '<span>' + esc(c.delito) + ' · ' + (c.banco||[]).length + ' respuestas · ' +
+        new Date(c.fecha||Date.now()).toLocaleDateString('es-AR') + '</span></div>' +
+        '<button class="plano" data-borrar="' + i + '">Borrar</button></div>').join('')
+    : '';
+  $$('#misCausas [data-borrar]').forEach(b => b.onclick = () => {
+    const m = causasPropias(); m.splice(+b.dataset.borrar, 1);
+    guardado.escribir('causas', m); pintarCausa();
+  });
+}
+
+$('#subirCausa').onclick = () => $('#archivoCausa').click();
+$('#archivoCausa').onchange = async e => {
+  const f = e.target.files?.[0]; if (!f) return;
+  try { $('#txtCausa').value = await f.text(); } catch { alert('No se pudo leer el archivo.'); }
+  e.target.value = '';
+};
+
+$('#revisarCausa').onclick = () => {
+  const t = $('#txtCausa').value.trim();
+  if (t.length < 200){ alert('Pegá el texto de la causa: hacen falta al menos unos párrafos.'); return; }
+  ING.texto = t;
+  ING.hallazgos = detectarPersonales(t);
+  const altos = ING.hallazgos.filter(h => h.riesgo === 'alto').length;
+  $('#resumenDatos').innerHTML = ING.hallazgos.length
+    ? '<b>' + ING.hallazgos.length + ' hallazgos</b>, de los cuales ' + altos +
+      ' son de riesgo alto. Están marcados los de riesgo alto; revisá los demás y marcá los que sean datos reales. Todo lo marcado se reemplaza por datos ficticios riojanos.'
+    : 'No se encontraron datos personales evidentes. Revisá igual el texto antes de continuar: ningún detector automático es completo.';
+  $('#listaDatos').innerHTML = ING.hallazgos.map((h,i) =>
+    '<label class="dato ' + h.riesgo + '"><input type="checkbox" data-i="' + i + '"' +
+    (h.riesgo === 'alto' ? ' checked' : '') + '>' +
+    '<span class="val">' + esc(h.valor) +
+    '<span class="meta">' + esc(h.nombre) + ' · riesgo ' + h.riesgo +
+    (h.veces > 1 ? ' · aparece ' + h.veces + ' veces' : '') + '</span></span></label>').join('');
+  $('#pasoDatos').classList.remove('oculto');
+  $('#pasoDatos').scrollIntoView({ behavior:'smooth', block:'start' });
+};
+
+$('#marcarTodo').onclick = () => $$('#listaDatos input').forEach(c => c.checked = true);
+
+$('#sanearCausa').onclick = () => {
+  const sel = $$('#listaDatos input').filter(c => c.checked).map(c => ING.hallazgos[+c.dataset.i]);
+  const r = sanear(ING.texto, sel);
+  ING.texto = r.texto;
+  $('#txtCausa').value = r.texto;
+  ING.datos = extraerEstructura(r.texto);
+  const d = ING.datos;
+  $('#cCaratula').value = d.caratula;
+  $('#cDelito').value   = d.delito;
+  $('#cSintesis').value = d.sintesis;
+  $('#cHechos').value   = d.hechos;
+  $('#cTestigo').value  = d.testigo.nombre;
+  $('#cPerfil').value   = d.testigo.perfil;
+  $('#cPrevia').value   = d.previa;
+  const g = $('#cGenero'); g.innerHTML = '';
+  for (const [k,n] of [['m','Voz masculina'],['f','Voz femenina']]){
+    const b = document.createElement('button');
+    b.className = 'op'; b.dataset.k = k;
+    b.setAttribute('aria-pressed', k === (d.testigo.genero||'m'));
+    b.textContent = n;
+    b.onclick = () => { d.testigo.genero = k; [...g.children].forEach(x => x.setAttribute('aria-pressed', x.dataset.k===k)); };
+    g.appendChild(b);
+  }
+  $('#pasoEstructura').classList.remove('oculto');
+  $('#pasoEstructura').scrollIntoView({ behavior:'smooth', block:'start' });
+};
+
+$('#irSobre').onclick = () => {
+  $('#pasoSobre').classList.remove('oculto');
+  $('#pasoSobre').scrollIntoView({ behavior:'smooth', block:'start' });
+};
+
+$('#generarSobre').onclick = async () => {
+  if (!hayIA()){ $('#estadoSobre').textContent = 'Para esto hace falta cargar tu clave en Ajustes. Si no, escribilo vos: nadie conoce el caso mejor.'; return; }
+  if (!confirm('El texto de la declaración previa y del hecho va a enviarse a la API de Anthropic para que proponga el sobre cerrado. ¿Continuar?')) return;
+  $('#estadoSobre').textContent = 'Pensando qué puede estar ocultando este testigo…';
+  try {
+    const r = await pedirJson(`Sos instructor de litigación penal oral. Leé este legajo y proponé el "sobre cerrado":
+lo que el testigo realmente vivió y que no figura en su declaración, para usar como material de contraexamen.
+
+CARÁTULA: ${$('#cCaratula').value}
+CALIFICACIÓN: ${$('#cDelito').value}
+HECHO: ${$('#cSintesis').value}
+LEGAJO: ${$('#cHechos').value.slice(0,2000)}
+DECLARACIÓN PREVIA DEL TESTIGO:
+${$('#cPrevia').value.slice(0,3000)}
+
+Buscá las debilidades que el propio texto ya insinúa: condiciones de percepción, tiempo de
+observación, iluminación, distancia, contradicciones internas, vaguedades, fuentes de conocimiento
+indirecto, interés en el resultado. Si el texto no las trae, inventá dos o tres compatibles con él.
+
+Respondé SOLO este JSON:
+{"verdad":"qué pasó realmente, 3 a 5 oraciones","puntos":["punto explotable 1","2","3"],"conducta":"cómo se comporta el testigo al ser interrogado"}`,
+      { modelo: MODELO_FONDO, tope: 1200 });
+    $('#cVerdad').value   = r.verdad || '';
+    $('#cPuntos').value   = (r.puntos || []).join('\n');
+    $('#cConducta').value = r.conducta || '';
+    $('#estadoSobre').textContent = 'Propuesta lista. Revisala y corregí lo que no cierre con el caso.';
+  } catch (e){ $('#estadoSobre').textContent = e.message; }
+};
+
+$('#guardarCausa').onclick = () => {
+  const puntos = $('#cPuntos').value.split('\n').map(x => x.trim()).filter(Boolean);
+  if (!puntos.length && !confirm('Sin puntos en el sobre cerrado, el testigo no va a tener nada que ocultar y el ejercicio pierde su parte más útil. ¿Guardar igual?')) return;
+  const datos = {
+    caratula: $('#cCaratula').value.trim() || 'Causa importada',
+    delito:   $('#cDelito').value.trim(),
+    sintesis: $('#cSintesis').value.trim(),
+    hechos:   $('#cHechos').value.trim(),
+    prueba:   (ING.datos && ING.datos.prueba) || [],
+    testigo:  { nombre: $('#cTestigo').value.trim() || 'Testigo',
+                calidad: 'testigo',
+                genero: (ING.datos && ING.datos.testigo.genero) || 'm',
+                perfil: $('#cPerfil').value.trim() },
+    previa:   $('#cPrevia').value.trim()
+  };
+  const caso = construirCaso(datos, {
+    verdad: $('#cVerdad').value.trim(),
+    puntos,
+    conducta: $('#cConducta').value.trim()
+  }, ['directo','contra']);
+  caso.fecha = Date.now();
+  const mias = causasPropias();
+  mias.unshift(caso);
+  if (!guardado.escribir('causas', mias.slice(0, 40))){
+    alert('No hubo lugar para guardar. Borrá alguna causa cargada.'); return;
+  }
+  alert('Caso guardado con ' + caso.banco.length + ' respuestas. Ya podés elegirlo al armar una audiencia.');
+  pintarCausa();
+  $('#txtCausa').value = '';
+  ['#pasoDatos','#pasoEstructura','#pasoSobre'].forEach(id => $(id).classList.add('oculto'));
 };
 
 /* ═══════════════ FALACIAS ═══════════════ */
