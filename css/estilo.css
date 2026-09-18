@@ -16,8 +16,15 @@
   --gris:#5A6B7E;
   --gris-claro:#8B9AAB;
   --oro:#A8791F;
-  --rojo:#B3372A;
-  --verde:#1F7A5A;
+  /* Bandera de La Rioja (Ley 4.891): franja blanca sobre azul, cruzada en
+     diagonal ascendente por una banda punzó que simboliza el federalismo,
+     con laureles verdes por los dieciocho departamentos. Los tonos exactos
+     nunca se fijaron, así que se eligen para convivir con el azul del emblema. */
+  --punzo:#C1272D;
+  --punzo-suave:#F6E4E4;
+  --laurel:#2E7D57;
+  --rojo:#C1272D;
+  --verde:#2E7D57;
   --sombra:0 1px 2px rgba(15,42,77,.06), 0 4px 12px rgba(15,42,77,.05);
   --sombra-alta:0 8px 32px rgba(15,42,77,.14);
   --radio:10px;
@@ -46,6 +53,14 @@ a{color:var(--azul)}
   display:flex;align-items:center;gap:12px;flex-shrink:0;
   padding:12px clamp(14px,4vw,36px);background:var(--blanco);
   border-bottom:1px solid var(--borde);
+  position:relative;overflow:hidden;
+}
+/* La franja punzó de la bandera provincial, ascendente de izquierda a
+   derecha. Apenas insinuada: es una aplicación para tribunales.      */
+.cabecera::after{
+  content:'';position:absolute;right:-40px;top:-60px;width:150px;height:230px;
+  background:linear-gradient(to bottom, transparent 0 38%, var(--punzo) 38% 62%, transparent 62%);
+  transform:rotate(-58deg);opacity:.09;pointer-events:none;
 }
 .cabecera img{width:38px;height:38px;flex-shrink:0}
 .cabecera .marca{font-weight:600;letter-spacing:.04em;font-size:15px;line-height:1.15;color:var(--marino)}
@@ -94,9 +109,9 @@ a{color:var(--azul)}
 .rasgo p{font-size:13.5px;color:var(--gris);margin:0}
 .emblemita{
   display:grid;place-items:center;width:38px;height:38px;border-radius:50%;
-  background:var(--celeste-pal);border:1px solid var(--celeste);margin-bottom:12px;
+  background:#EAF3EE;border:1px solid #BFD9CB;margin-bottom:12px;
 }
-.emblemita svg{width:19px;height:19px;fill:none;stroke:var(--azul);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.emblemita svg{width:19px;height:19px;fill:none;stroke:var(--laurel);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .puntos{display:none}
 .detalles{
   display:block;margin:12px auto 0;background:var(--blanco);border:1px solid var(--borde);
@@ -104,7 +119,14 @@ a{color:var(--azul)}
   letter-spacing:.03em;
 }
 .detalles:hover{border-color:var(--celeste)}
-.pie{text-align:center;padding:22px;font-size:12px;color:var(--gris-claro);border-top:1px solid var(--borde);background:var(--blanco);margin-top:24px;flex-shrink:0}
+.pie{
+  text-align:center;padding:22px;font-size:12px;color:var(--gris-claro);
+  background:var(--blanco);margin-top:24px;flex-shrink:0;
+  border-top:3px solid transparent;
+  border-image:linear-gradient(to right,
+    var(--blanco) 0 8%, var(--marino) 8% 44%, var(--punzo) 44% 56%,
+    var(--marino) 56% 92%, var(--blanco) 92%) 1;
+}
 
 /* ── el teléfono: todo en una pantalla, sin scroll ── */
 @media (max-width:780px){
@@ -207,7 +229,9 @@ textarea{resize:vertical;min-height:120px;font-size:14px;line-height:1.55}
 #sala.activo{display:flex}
 #barra{
   display:flex;align-items:center;gap:12px;padding:10px clamp(12px,3vw,20px);
-  background:var(--blanco);border-bottom:1px solid var(--borde);flex-wrap:wrap;
+  background:var(--blanco);flex-wrap:wrap;
+  border-bottom:2px solid transparent;
+  border-image:linear-gradient(to right, var(--marino) 0 62%, var(--punzo) 62% 74%, var(--borde) 74%) 1;
 }
 #barra .id{flex:1;min-width:160px}
 #barra .id b{display:block;font-family:Spectral,Georgia,serif;font-size:14.5px;line-height:1.25}
@@ -281,7 +305,7 @@ textarea{resize:vertical;min-height:120px;font-size:14px;line-height:1.55}
 .corr{border-left:3px solid var(--borde);padding-left:15px;margin:0 0 18px}
 .corr .tuya{font-family:Spectral,Georgia,serif;font-style:italic;font-size:15.5px;margin:0 0 5px}
 .corr .mal{font-size:13px;color:var(--rojo);margin:0 0 5px}
-.corr .bien{font-family:Spectral,Georgia,serif;font-size:15.5px;margin:0;border-left:3px solid var(--verde);padding-left:12px}
+.corr .bien{font-family:Spectral,Georgia,serif;font-size:15.5px;margin:0;border-left:3px solid var(--laurel);padding-left:12px}
 ul.limpia{list-style:none;padding:0;margin:0}
 ul.limpia li{font-family:Spectral,Georgia,serif;font-size:15.5px;line-height:1.5;padding:9px 0;border-top:1px solid var(--borde)}
 .sobre{background:var(--celeste-pal);border:1px solid var(--celeste);border-radius:var(--radio);padding:18px;font-family:Spectral,Georgia,serif;font-size:15.5px;line-height:1.58}
