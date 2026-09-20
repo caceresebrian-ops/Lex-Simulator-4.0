@@ -1,5 +1,5 @@
 require('./simulacro-dom.js');
-['conocimiento','casos','biblioteca','motor','agentes','ingesta','app'].forEach(f =>
+['conocimiento','casos','biblioteca','motor','agentes','ingesta','aprendizaje','app'].forEach(f =>
   require('/home/claude/lex/js/'+f+'.js'));
 const $ = s => global.document.querySelector(s);
 const espera = ms => new Promise(r => setTimeout(r, ms));
@@ -46,7 +46,7 @@ const PLANTEOS = {
   console.log('\n═══ 3. PANELES ═══');
   for (const [nom, sel] of [['Base de conocimiento','#irBase'],['Ejemplos','#irEjemplos'],
                             ['Falacias','#irFalacias'],['Ajustes','#irAjustes'],
-                            ['Cargar causa','#irCausa'],['Historial','#irHistorial']]){
+                            ['Cargar causa','#irCausa'],['Historial','#irHistorial'],['Diagnóstico','#irDiagnostico']]){
     try { $(sel).onclick(); ok(nom+' abre', true); }
     catch(e){ ok(nom+' abre', false, e.message); }
   }

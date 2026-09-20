@@ -26,6 +26,7 @@ const {
         detectarPersonales, extraerEstructura, fichas, informeAlegato, informeCautelar,
         informeOffline, instruccionesAgente, nuevaMemoria, planificar, reformular, registrar,
         responderOffline, sanear, verificarCitas, verificarFuga
+, comoCautelar, diagnostico, perfilDe, recomendar, dificultadDe
 } = window.LEX;
 
 /* Red de seguridad: si algún módulo no cargó, se ve en la consola. */
@@ -84,7 +85,25 @@ $('#empezar').onclick    = () => { pintarSetup(); ver('setup'); };
 $('#irHistorial').onclick= () => { pintarHistorial(); ver('historial'); };
 $('#irBase').onclick     = () => { pintarBase(); ver('base'); };
 $('#irCausa').onclick    = () => { pintarCausa(); ver('causa'); };
+
+/* Menú desplegable: en el teléfono la barra no alcanza para seis secciones */
+const menu = $('#menu'), hb = $('#abrirMenu');
+if (hb){
+  hb.onclick = e => {
+    e.stopPropagation();
+    const abierto = menu.classList.contains('abierto');
+    menu.classList.toggle('abierto', !abierto);
+    hb.setAttribute('aria-expanded', String(!abierto));
+  };
+  document.addEventListener('click', () => {
+    menu.classList.remove('abierto'); hb.setAttribute('aria-expanded','false');
+  });
+  menu.addEventListener('click', () => {
+    menu.classList.remove('abierto'); hb.setAttribute('aria-expanded','false');
+  });
+}
 $('#irFalacias').onclick = () => { pintarFalacias(); ver('falacias'); };
+$('#irDiagnostico').onclick = () => { pintarDiagnostico(); ver('diagnostico'); };
 $('#irEjemplos').onclick = () => { pintarEjemplos(); ver('ejemplos'); };
 $('#irAjustes').onclick  = () => { pintarAjustes(); ver('ajustes'); };
 $('#verDetalles').onclick = () => ver('detalles');
@@ -225,6 +244,9 @@ $('#abrir').onclick = async () => {
   VOZ.desbloquear();
   if (S.casoId){
     S.caso = causasPropias().find(c => c.id === S.casoId) || CASOS.find(c => c.id === S.casoId);
+    /* Cualquier caso sirve para litigar su cautelar: si no trae argumentos
+       escritos, se arman desde el propio legajo.                         */
+    if (S.modulo === 'cautelar') S.caso = comoCautelar(S.caso);
     S.generado = false;
     entrarSala();
   } else {
@@ -414,7 +436,8 @@ if (VOZ.soportada){
 function entrarSala(){
   const m = MODULOS[S.modulo], c = S.caso;
   S.registro = []; S.turnos = []; S.previas = [];
-  S.estado = { desdeUltimaObjecion: 9, dichos: new Set() };
+  S.dificultad = dificultadDe(perfilDe(guardado.leer('historial', [])));
+  S.estado = { desdeUltimaObjecion: 9, dichos: new Set(), dificultad: S.dificultad };
   S.fundado = '';
   S.mem = nuevaMemoria();
   $('#hilo').innerHTML = '';
@@ -1019,8 +1042,11 @@ function pintarDevolucion(d, seg){
 /* ═══════════════ HISTORIAL ═══════════════ */
 function archivar(d, seg){
   const h = guardado.leer('historial', []);
+  const defectos = {};
+  for (const r of S.registro)
+    for (const x of (r.analisis?.defectos || [])) defectos[x.nombre] = (defectos[x.nombre]||0) + 1;
   h.unshift({ fecha:Date.now(), modulo:S.modulo, rol:S.rol, caratula:S.caso.caratula||'',
-              global:d.global ?? null, duracion:seg, conIA:hayIA(),
+              global:d.global ?? null, duracion:seg, conIA:hayIA(), defectos,
               ejes:(d.ejes||[]).map(e => ({ eje:e.eje, puntaje:e.puntaje })) });
   guardado.escribir('historial', h.slice(0, 60));
 }
@@ -1123,9 +1149,64 @@ function pintarCausa(){
 }
 
 $('#subirCausa').onclick = () => $('#archivoCausa').click();
+
+/* Lectura de PDF en el propio dispositivo. La biblioteca se baja solo
+   cuando hace falta, para no cargarla en cada visita.               */
+let pdfListo = null;
+function cargarPdfJs(){
+  if (pdfListo) return pdfListo;
+  pdfListo = new Promise((resolver, rechazar) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload = () => {
+      try {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        resolver(window.pdfjsLib);
+      } catch (e){ rechazar(e); }
+    };
+    s.onerror = () => rechazar(new Error('sin conexión'));
+    document.head.appendChild(s);
+  });
+  return pdfListo;
+}
+
+async function textoDePdf(archivo, avisar){
+  const pdfjs = await cargarPdfJs();
+  const datos = new Uint8Array(await archivo.arrayBuffer());
+  const doc = await pdfjs.getDocument({ data: datos }).promise;
+  const partes = [];
+  for (let p = 1; p <= doc.numPages; p++){
+    if (avisar) avisar(`Leyendo página ${p} de ${doc.numPages}…`);
+    const pag = await doc.getPage(p);
+    const c = await pag.getTextContent();
+    partes.push(c.items.map(i => i.str).join(' '));
+  }
+  return partes.join('\n\n').replace(/[ \t]{2,}/g, ' ');
+}
+
 $('#archivoCausa').onchange = async e => {
   const f = e.target.files?.[0]; if (!f) return;
-  try { $('#txtCausa').value = await f.text(); } catch { alert('No se pudo leer el archivo.'); }
+  const estado = $('#estadoArchivo');
+  try {
+    if (/\.pdf$/i.test(f.name) || f.type === 'application/pdf'){
+      estado.textContent = 'Abriendo el PDF…';
+      const t = await textoDePdf(f, m => estado.textContent = m);
+      if (t.replace(/\s/g,'').length < 200){
+        estado.textContent = 'Ese PDF no tiene texto: parece un escaneo. Habría que pasarle OCR, o pegar el texto a mano.';
+      } else {
+        $('#txtCausa').value = t;
+        estado.textContent = `Listo: ${t.length.toLocaleString('es-AR')} caracteres leídos del PDF.`;
+      }
+    } else {
+      $('#txtCausa').value = await f.text();
+      estado.textContent = 'Archivo cargado.';
+    }
+  } catch (err){
+    estado.textContent = err.message === 'sin conexión'
+      ? 'Para leer PDF hace falta conexión la primera vez. Podés pegar el texto igual.'
+      : 'No se pudo leer el archivo: ' + err.message;
+  }
   e.target.value = '';
 };
 
@@ -1150,6 +1231,15 @@ $('#revisarCausa').onclick = () => {
 };
 
 $('#marcarTodo').onclick = () => $$('#listaDatos input').forEach(c => c.checked = true);
+
+/* Un solo toque: marca todo lo encontrado, lo reemplaza y avanza. */
+$('#anonimizarTodo').onclick = () => {
+  $$('#listaDatos input').forEach(c => c.checked = true);
+  $('#sanearCausa').onclick();
+  const n = ING.hallazgos.length;
+  $('#resumenDatos').innerHTML = '<b>' + n + ' datos reemplazados</b> por datos ficticios riojanos. ' +
+    'Revisá el texto igual antes de seguir: ningún detector automático es completo.';
+};
 
 $('#sanearCausa').onclick = () => {
   const sel = $$('#listaDatos input').filter(c => c.checked).map(c => ING.hallazgos[+c.dataset.i]);
@@ -1243,6 +1333,57 @@ $('#guardarCausa').onclick = () => {
   $('#txtCausa').value = '';
   ['#pasoDatos','#pasoEstructura','#pasoSobre'].forEach(id => $(id).classList.add('oculto'));
 };
+
+/* ═══════════════ DIAGNÓSTICO Y APRENDIZAJE ═══════════════ */
+function pintarDiagnostico(){
+  /* — cómo va el usuario — */
+  const perfil = perfilDe(guardado.leer('historial', []));
+  const cont = $('#miPerfil');
+  if (perfil.vacio){
+    cont.innerHTML = '<p class="ayuda">Todavía no cerraste ninguna audiencia. Cuando tengas dos o tres, ' +
+      'acá vas a ver qué eje te cuesta, qué defecto repetís y qué conviene practicar.</p>';
+  } else {
+    const r = recomendar(perfil, MODULOS);
+    const dif = dificultadDe(perfil);
+    let s = '<div class="global"><b>' + perfil.global + '</b><span>promedio en ' + perfil.sesiones +
+            ' audiencia' + (perfil.sesiones>1?'s':'') +
+            (perfil.tendencia ? ' · ' + (perfil.tendencia>0?'+':'') + perfil.tendencia + ' respecto de las primeras' : '') +
+            '</span></div>';
+    s += '<div class="reco"><b>' + esc(MODULOS[r.modulo]?.nombre || r.modulo) + '</b><p>' + esc(r.razon) + '</p></div>';
+    s += '<h3>Tus ejes, del más flojo al más firme</h3>';
+    for (const e of perfil.ejes)
+      s += '<div class="eje"><strong>' + esc(e.eje) + '</strong><span class="pt">' + e.prom +
+           '</span><em><span class="medidor' + (e.prom < 5 ? ' alto' : '') + '"><i style="width:' +
+           (e.prom*10) + '%"></i></span>' + e.veces + ' audiencias' +
+           (e.delta ? ' · ' + (e.delta>0?'mejorando ':'cayendo ') + Math.abs(e.delta) : '') + '</em></div>';
+    if (perfil.recurrentes.length){
+      s += '<h3>Lo que más repetís</h3><ul class="limpia">' +
+challengeRec(perfil) + '</ul>';
+    }
+    s += '<p class="ayuda" style="margin-top:16px">Exigencia actual de la sala: <b>' +
+         Math.round(dif*100) + '%</b>. Sube a medida que mejorás: la contraparte objeta con más ' +
+         'precisión y el testigo se pone más difícil.</p>';
+    cont.innerHTML = s;
+  }
+
+  /* — cómo está la aplicación — */
+  const d = diagnostico();
+  $('#resultadoDiag').innerHTML =
+    '<div class="resumenDiag ' + (d.ok ? 'bien' : 'mal') + '">' +
+    (d.ok ? 'Las ' + d.total + ' verificaciones pasaron. La aplicación está entera.'
+          : d.fallas.length + ' de ' + d.total + ' verificaciones fallaron.') + '</div>' +
+    d.pruebas.map(x =>
+      '<div class="chk ' + (x.ok?'si':'no') + '"><span class="marca">' + (x.ok?'✓':'!') + '</span>' +
+      '<span><span class="area">' + esc(x.area) + '</span><br>' + esc(x.nombre) +
+      (x.detalle ? '<span class="det">' + esc(x.detalle) + '</span>' : '') + '</span></div>').join('');
+}
+
+function challengeRec(perfil){
+  return perfil.recurrentes.map(x =>
+    '<li>' + esc(x.id) + ' — ' + x.n + ' ' + (x.n===1?'vez':'veces') + '</li>').join('');
+}
+
+$('#correrDiag').onclick = () => pintarDiagnostico();
 
 /* ═══════════════ FALACIAS ═══════════════ */
 function pintarFalacias(){

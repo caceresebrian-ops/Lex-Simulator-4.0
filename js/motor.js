@@ -189,9 +189,12 @@ function decidirObjecion(an, modulo, estado){
   const grave = an.defectos.find(x => lista.includes(x.id));
   if (!grave) return null;
   const manifiesto = ['sugestiva','coaccion','adhominem','compuesta'].includes(grave.id);
-  if (!manifiesto && estado.desdeUltimaObjecion < 3) return null;
-  if (manifiesto && estado.desdeUltimaObjecion < 1) return null;
-  return { defecto: grave, prospera: manifiesto || Math.random() < 0.7 };
+  /* Dificultad adaptativa: cuanto mejor litiga el usuario, menos deja
+     pasar la contraparte y más fino hila el juez.                    */
+  const d = typeof estado.dificultad === 'number' ? estado.dificultad : 0.35;
+  const espera = manifiesto ? (d > 0.6 ? 0 : 1) : Math.round(4 - d * 2.5);
+  if (estado.desdeUltimaObjecion < espera) return null;
+  return { defecto: grave, prospera: manifiesto || Math.random() < (0.55 + d * 0.35) };
 }
 
 /* ═══════════════ 2. EL TESTIGO ═══════════════ */
@@ -881,3 +884,90 @@ if (typeof window !== 'undefined') {
     analizarCautelar, informeCautelar, informeAlegato, EJES_CAUTELAR
   });
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   7. DEBATE GENERADO DESDE EL CASO
+   Los cuatro casos de cautelar tienen argumentos escritos a mano. Los otros
+   dieciséis no, y sin esto la contraparte se queda muda. Acá se arma el
+   debate con los datos del propio expediente: la calificación, la prueba,
+   el perfil del imputado y lo que el sobre cerrado guarda.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+function imputadoDe(caso){
+  if (caso.imputado) return caso.imputado;
+  const m = String(caso.caratula||'').match(/c\/\s*([A-ZÁÉÍÓÚÑ][^s]*?)\s+s\//);
+  const nombre = m ? m[1].replace(/,\s*/, ', ').trim() : 'el imputado';
+  return { nombre, perfil: 'Sin informe socioambiental incorporado al legajo.' };
+}
+
+function debateGenerico(caso){
+  const imp = imputadoDe(caso);
+  const delito = String(caso.delito || 'el hecho imputado').split('(')[0].trim();
+  const pruebas = (caso.prueba || []).map(p => p.tipo).slice(0, 3).join(', ') || 'las constancias del legajo';
+  const primera = (caso.prueba || [])[0];
+
+  const fiscal = {
+    conviccion: `Los elementos de convicción del art. 127 inciso 1 están reunidos: ${pruebas}. ` +
+      (primera ? `En particular, ${primera.tipo.toLowerCase()} acredita lo sustancial: ${primera.detalle}` : ''),
+    arraigo: `La defensa invoca arraigo, pero el art. 128 inciso 1 pide datos verificables, no la etiqueta. ` +
+      `Que diga dónde vive no acredita que viva ahí, ni que tenga trabajo estable, ni cuánto hace que lo tiene.`,
+    conducta: `El art. 128 inciso 2 manda mirar el comportamiento durante el procedimiento. La defensa todavía ` +
+      `no explicó cómo se comportó ${imp.nombre} desde que se inició esta causa.`,
+    entorpecimiento: `Subsiste el riesgo del art. 129: la prueba de ${delito.toLowerCase()} depende de personas que ` +
+      `siguen expuestas, y el inciso 4 incorporó expresamente el riesgo de la víctima.`,
+    alternativa: `Las medidas del art. 116 que ofrece la defensa no neutralizan el peligro concreto que planteo: ` +
+      `ninguna de ellas impide el contacto con quienes tienen que declarar.`,
+    limitaciones: `El art. 124 no opera acá: la escala del delito imputado descarta la condena condicional.`,
+    plazo: `Solicito la medida por el plazo de tres meses que fija el art. 130, con el plazo de investigación de rigor.`,
+    peticion: `Mantengo el pedido de prisión preventiva en los términos expuestos.`,
+    contradiccion: `Lo que sostiene la defensa no se apoya en ninguna constancia del legajo.`,
+    apertura: `Su señoría, la fiscalía solicita medidas de coerción respecto de ${imp.nombre} en esta causa por ${delito.toLowerCase()}.`,
+    cierre: `Mantengo mi posición en los términos ya expuestos.`
+  };
+
+  const defensa = {
+    conviccion: `No discuto acá el mérito. El art. 127 distingue dos requisitos y la fiscalía los está fundiendo: ` +
+      `que existan elementos de convicción no dice nada sobre el peligro procesal.`,
+    arraigo: `El art. 128 inciso 1 mira domicilio, asiento de la familia y de los negocios o trabajo. ` +
+      `${imp.nombre} tiene todo eso en esta ciudad, y la fiscalía no aportó un solo dato que lo desmienta.`,
+    conducta: `No hay rebeldías, no ocultó su identidad ni dio domicilio falso. El art. 128 inciso 2 juega a favor.`,
+    entorpecimiento: `El art. 129 exige vehementes indicios que justifiquen la grave sospecha, no posibilidades. ` +
+      `La prueba de esta causa ya está producida: ${pruebas}. No hay nada que entorpecer.`,
+    alternativa: `El último párrafo del art. 116 es imperativo: si el peligro puede evitarse razonablemente con una ` +
+      `medida menos gravosa, el juez DEBE imponer esa. Ofrezco presentación periódica y prohibición de salir del ` +
+      `ámbito territorial, combinadas.`,
+    limitaciones: `Corresponde analizar el art. 124: la posibilidad de condena condicional o de ejecución morigerada ` +
+      `bloquea de plano la prisión preventiva.`,
+    plazo: `Si se impusiera alguna medida, debe serlo por el plazo más breve posible y con revisión.`,
+    peticion: `Solicito el rechazo de la prisión preventiva y la imposición de medidas alternativas.`,
+    contradiccion: `La fiscalía no se hace cargo de lo que ya planteamos.`,
+    apertura: `Su señoría, la defensa se opone a la prisión preventiva de ${imp.nombre}.`,
+    cierre: `Mantengo la oposición en los términos expuestos.`
+  };
+
+  return { fiscal, defensa };
+}
+
+/* Un caso de testigo también sirve para litigar su cautelar: se arma
+   el expediente de coerción con lo que el legajo ya tiene.          */
+function comoCautelar(caso){
+  if (caso.debate) return caso;
+  const imp = imputadoDe(caso);
+  const puntos = (caso.sobre?.puntos || []).slice(0, 3);
+  return Object.assign({}, caso, {
+    imputado: imp,
+    debate: debateGenerico(caso),
+    sobre: {
+      verdad: caso.sobre?.verdad || '',
+      puntos: [
+        'Hay que separar los tres momentos de la audiencia: supuesto material, peligro procesal y plazo. Mezclarlos es el error más común.',
+        'El peligro procesal no se presume: hace falta información concreta de este caso, no la etiqueta legal.',
+        'El art. 116 obliga a descartar las diez medidas anteriores antes de llegar a la prisión preventiva.'
+      ].concat(puntos),
+      conducta: ''
+    }
+  });
+}
+
+if (typeof window !== 'undefined')
+  window.LEX = Object.assign(window.LEX || {}, { debateGenerico, comoCautelar, imputadoDe });

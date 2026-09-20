@@ -15,7 +15,7 @@ const CASOS = [
 /* ───────────────────────── 1 ───────────────────────── */
 {
   id:'robo-vargas',
-  modulos:['contra','directo'],
+  modulos:['contra','directo','cautelar'],
   caratula:'F. c/ QUIROGA, Ramón Alberto s/ robo agravado',
   delito:'Robo agravado por el uso de arma de fuego (art. 166 inc. 2 CP)',
   sintesis:'El 14 de marzo, alrededor de las 22:40, en la intersección de Benjamín de la Vega y Catamarca, barrio Vargas, un hombre habría abordado a Gustavo Nieva exhibiendo un arma de fuego y le sustrajo un teléfono celular y dinero en efectivo.',
@@ -74,7 +74,7 @@ const CASOS = [
 /* ───────────────────────── 2 ───────────────────────── */
 {
   id:'hurto-chilecito',
-  modulos:['contra','directo'],
+  modulos:['contra','directo','cautelar'],
   caratula:'F. c/ AGÜERO, Nahuel y otro s/ hurto agravado',
   delito:'Hurto agravado en poblado y en banda (art. 163 inc. 2 CP)',
   sintesis:'En la madrugada del 2 de julio se sustrajeron herramientas y una amoladora del depósito de la ferretería "El Tornillo", de calle 19 de Febrero al 400, Chilecito.',
@@ -130,7 +130,7 @@ const CASOS = [
 /* ───────────────────────── 3 ───────────────────────── */
 {
   id:'lesiones-aimogasta',
-  modulos:['contra','directo'],
+  modulos:['contra','directo','cautelar'],
   caratula:'F. c/ VERA, Cristian s/ lesiones graves',
   delito:'Lesiones graves (art. 90 CP)',
   sintesis:'En la madrugada del 8 de octubre, a la salida del boliche "La Cava" de Aimogasta, Cristian Vera habría golpeado a Marcelo Britos, provocándole fractura de tabique y pérdida parcial de visión del ojo derecho.',
@@ -186,7 +186,7 @@ const CASOS = [
 /* ───────────────────────── 4 ───────────────────────── */
 {
   id:'amenazas-chamical',
-  modulos:['contra','directo'],
+  modulos:['contra','directo','cautelar'],
   caratula:'F. c/ OLMOS, Sergio s/ amenazas coactivas',
   delito:'Amenazas coactivas agravadas por el uso de arma (art. 149 ter inc. 1 CP)',
   sintesis:'El 3 de mayo, en calle Copiapó al 200 de Chamical, Sergio Olmos habría exhibido un arma de fuego a su vecino Raúl Cáceres exigiéndole que retirara una denuncia por ruidos molestos.',
@@ -242,7 +242,7 @@ const CASOS = [
 /* ───────────────────────── 5 ───────────────────────── */
 {
   id:'genero-retractacion',
-  modulos:['contra','directo'],
+  modulos:['contra','directo','cautelar'],
   caratula:'F. c/ MORALES, Diego s/ lesiones leves y desobediencia',
   delito:'Lesiones leves agravadas por el vínculo y desobediencia a orden judicial (arts. 89, 92 y 239 CP)',
   sintesis:'El 20 de enero, pese a una prohibición de acercamiento vigente, Diego Morales habría concurrido al domicilio de Yamila Torres y la habría lesionado en el rostro y el brazo izquierdo.',
@@ -300,7 +300,7 @@ const CASOS = [
 /* ───────────────────────── 6 ───────────────────────── */
 {
   id:'vial-patquia',
-  modulos:['contra','directo'],
+  modulos:['contra','directo','cautelar'],
   caratula:'F. c/ BRIZUELA, Walter s/ homicidio culposo',
   delito:'Homicidio culposo agravado por la conducción imprudente de vehículo automotor (art. 84 bis CP)',
   sintesis:'El 12 de agosto, en el kilómetro 1.104 de la Ruta Nacional 38, cerca de Patquía, el vehículo conducido por Walter Brizuela colisionó con una motocicleta, provocando la muerte de su conductor.',
@@ -356,7 +356,7 @@ const CASOS = [
 /* ───────────────────────── 7 ───────────────────────── */
 {
   id:'estupefacientes-antartida',
-  modulos:['contra','directo'],
+  modulos:['contra','directo','cautelar'],
   caratula:'F. c/ CARRIZO, Emanuel s/ infracción ley 23.737',
   delito:'Tenencia de estupefacientes con fines de comercialización (art. 5 inc. c, ley 23.737)',
   sintesis:'El 17 de junio se allanó el domicilio de Emanuel Carrizo, en el barrio Antártida, secuestrándose 43 envoltorios de cocaína, una balanza y dinero fraccionado.',
@@ -409,7 +409,7 @@ const CASOS = [
 /* ───────────────────────── 8 ───────────────────────── */
 {
   id:'encubrimiento-moto',
-  modulos:['contra','directo'],
+  modulos:['contra','directo','cautelar'],
   caratula:'F. c/ FUNES, Damián s/ encubrimiento agravado',
   delito:'Encubrimiento agravado por el ánimo de lucro (art. 277 inc. 1 b y 3 b CP)',
   sintesis:'El 9 de abril se secuestró en el taller de Damián Funes una motocicleta con numeración de motor adulterada, denunciada como robada tres semanas antes.',
@@ -463,7 +463,7 @@ const CASOS = [
 /* ───────────────────────── 9 ───────────────────────── */
 {
   id:'estafa-transferencia',
-  modulos:['contra','directo'],
+  modulos:['contra','directo','cautelar'],
   caratula:'F. c/ LEIVA, Rocío s/ estafa',
   delito:'Estafa (art. 172 CP)',
   sintesis:'Entre el 2 y el 6 de febrero, Nélida Cabrera, de 74 años, realizó cuatro transferencias por un total de $940.000 a una cuenta a nombre de Rocío Leiva, tras recibir llamados de una persona que se identificó como empleada de su banco.',
@@ -518,7 +518,7 @@ const CASOS = [
 /* ───────────────────────── 10 ───────────────────────── */
 {
   id:'homicidio-ocasion',
-  modulos:['contra','directo'],
+  modulos:['contra','directo','cautelar'],
   caratula:'F. c/ SORIA, Cristian s/ homicidio en ocasión de robo',
   delito:'Homicidio en ocasión de robo (art. 165 CP)',
   sintesis:'El 28 de noviembre, cerca de la 1:30, en calle Santa Fe al 900 de la ciudad Capital, dos personas habrían interceptado a Julián Ferreyra para sustraerle la mochila; en el forcejeo, Ferreyra recibió una herida de arma blanca que le provocó la muerte.',
@@ -576,7 +576,7 @@ const CASOS = [
 /* ───────────────────────── 11 ───────────────────────── */
 {
   id:'pericia-balistica',
-  modulos:['contra','directo'],
+  modulos:['contra','directo','cautelar'],
   caratula:'F. c/ MERCADO, Iván s/ portación ilegítima de arma de guerra',
   delito:'Portación ilegítima de arma de fuego de guerra (art. 189 bis inc. 2, 4° párr. CP)',
   sintesis:'El 5 de septiembre, en un control vehicular de Ruta 5, se secuestró bajo el asiento del acompañante una pistola calibre 9 mm con numeración suprimida. Iván Mercado viajaba como acompañante.',
@@ -626,7 +626,7 @@ const CASOS = [
 /* ───────────────────────── 12 ───────────────────────── */
 {
   id:'usurpacion-sanagasta',
-  modulos:['contra','directo'],
+  modulos:['contra','directo','cautelar'],
   caratula:'F. c/ GÓMEZ, Marta y otros s/ usurpación',
   delito:'Usurpación por despojo (art. 181 inc. 1 CP)',
   sintesis:'El 11 de octubre, un grupo de personas habría ingresado a un inmueble rural de Sanagasta, propiedad de Héctor Villafañe, instalando construcciones precarias.',
@@ -678,7 +678,7 @@ const CASOS = [
 /* ───────────────────────── 13 ───────────────────────── */
 {
   id:'resistencia-preventor',
-  modulos:['contra','directo'],
+  modulos:['contra','directo','cautelar'],
   caratula:'F. c/ ALBORNOZ, Jonatan s/ resistencia a la autoridad y lesiones',
   delito:'Resistencia a la autoridad en concurso con lesiones leves (arts. 239 y 89 CP)',
   sintesis:'El 23 de febrero, durante un operativo en la Plaza del Sol, Jonatan Albornoz habría resistido su aprehensión y lesionado al agente Cristian Toledo.',
@@ -929,7 +929,7 @@ const CASOS = [
 
 /* ─────────────── 18 a 20 · ALEGATOS ─────────────── */
 {
-  id:'alegato-reconocimiento', modulos:['apertura','clausura'],
+  id:'alegato-reconocimiento', modulos:['apertura','clausura','cautelar'],
   caratula:'F. c/ QUIROGA, Ramón Alberto s/ robo agravado',
   delito:'Robo agravado por el uso de arma de fuego (art. 166 inc. 2 CP)',
   sintesis:'Juicio por el robo del 14 de marzo en barrio Vargas. Toda la acusación descansa en el reconocimiento de la víctima.',
@@ -953,7 +953,7 @@ const CASOS = [
     conducta:''}
 },
 {
-  id:'alegato-indiciario', modulos:['apertura','clausura'],
+  id:'alegato-indiciario', modulos:['apertura','clausura','cautelar'],
   caratula:'F. c/ MOYANO, Elba s/ incendio',
   delito:'Incendio con peligro común para los bienes (art. 186 inc. 1 CP)',
   sintesis:'Juicio por el incendio de un galpón de acopio en Famatina, ocurrido el 30 de julio. No hay testigos presenciales: el caso es íntegramente indiciario.',
@@ -977,7 +977,7 @@ const CASOS = [
     conducta:''}
 },
 {
-  id:'alegato-legitima-defensa', modulos:['apertura','clausura'],
+  id:'alegato-legitima-defensa', modulos:['apertura','clausura','cautelar'],
   caratula:'F. c/ ARAYA, Sergio s/ lesiones graves',
   delito:'Lesiones graves (art. 90 CP) — se invoca legítima defensa (art. 34 inc. 6 CP)',
   sintesis:'Juicio por las lesiones sufridas por Ariel Ferreyra el 6 de junio en la vía pública. El imputado reconoce el hecho y alega legítima defensa.',

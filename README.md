@@ -137,6 +137,24 @@ apple-touch-icon.png
 emblema.png
 ```
 
+## Diagnóstico y aprendizaje
+
+En el menú, **Diagnóstico**, hay dos cosas distintas.
+
+**Cómo vas vos.** A partir de tu historial: promedio, tendencia, tus ejes ordenados del más flojo al
+más firme con su evolución, el defecto que más repetís, y una recomendación de qué practicar ahora
+con la explicación de por qué. La exigencia de la sala se ajusta sola: cuanto mejor litigás, menos
+deja pasar la contraparte y más fino hila el juez.
+
+**Cómo está la aplicación.** Veintitrés verificaciones automáticas: que todos los módulos hayan
+cargado, que los 359 artículos de la ley estén y se recuperen, que se rechacen las citas
+inexistentes, que ningún caso tenga huecos, que el motor detecte una sugestiva sin marcar falsos
+positivos, que el testigo responda y que la fuga del sobre cerrado se bloquee. Más el estado del
+dispositivo: almacenamiento, uso sin conexión, voz de salida y de entrada.
+
+Esto no reentrena ningún modelo: eso no ocurre en un teléfono. Aprende de tus datos y ajusta la
+dificultad y las recomendaciones.
+
 ## Pruebas
 
 El proyecto trae una batería de pruebas que corre fuera del navegador, con un simulacro mínimo del

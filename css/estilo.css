@@ -73,6 +73,9 @@ a{color:var(--azul)}
 .cabecera .marca small{display:block;font-weight:400;font-size:9.5px;letter-spacing:.09em;color:var(--gris-claro);text-transform:uppercase}
 .cabecera .relleno{flex:1}
 .menu{display:flex;gap:14px;align-items:center;flex-shrink:0}
+.hamburguesa{display:none;background:none;border:1px solid var(--borde);border-radius:8px;
+  width:38px;height:38px;place-items:center;flex-shrink:0}
+.hamburguesa svg{width:20px;height:20px;fill:none;stroke:var(--marino);stroke-width:1.9;stroke-linecap:round}
 
 .heroe{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -160,8 +163,22 @@ a{color:var(--azul)}
   .cabecera img{width:30px;height:30px}
   .cabecera .marca{font-size:12.5px}
   .cabecera .marca small{font-size:8px;letter-spacing:.07em}
-  .menu{gap:9px}
-  .menu .plano{font-size:10.5px;text-underline-offset:2px}
+  /* En el teléfono el menú no entra en la barra: pasa a desplegable.
+     Antes quedaba cortado y Ajustes era inalcanzable.              */
+  .hamburguesa{display:grid}
+  .menu{
+    position:absolute;top:100%;right:8px;left:8px;z-index:40;
+    flex-direction:column;align-items:stretch;gap:0;
+    background:var(--blanco);border:1px solid var(--borde);border-radius:12px;
+    box-shadow:var(--sombra-alta);padding:6px;display:none;
+  }
+  .menu.abierto{display:flex}
+  .menu .plano{
+    font-size:15px;text-decoration:none;text-align:left;
+    padding:13px 14px;border-radius:8px;color:var(--marino);
+  }
+  .menu .plano:active{background:var(--celeste-pal)}
+  .menu .plano + .plano{border-top:1px solid var(--borde)}
 
   .heroe{flex:0 1 auto;min-height:0;padding:16px 18px 14px}
   .heroe img{width:clamp(78px,23vw,118px);margin-bottom:10px}
@@ -418,3 +435,20 @@ ul.limpia li{font-family:Spectral,Georgia,serif;font-size:15.5px;line-height:1.5
 .global b{color:var(--marino)}
 .medidor i{background:linear-gradient(to right,var(--laurel),var(--azul))}
 .medidor.alto i{background:var(--punzo)}
+
+
+/* ─────────────── diagnóstico ─────────────── */
+.chk{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-top:1px solid var(--borde);font-size:13.5px}
+.chk .marca{flex-shrink:0;width:17px;height:17px;border-radius:50%;display:grid;place-items:center;
+  font-size:11px;color:var(--blanco);margin-top:2px}
+.chk.si .marca{background:var(--laurel)}
+.chk.no .marca{background:var(--punzo)}
+.chk .det{display:block;color:var(--punzo);font-size:12.5px}
+.chk .area{color:var(--gris-claro);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase}
+.resumenDiag{border-radius:var(--radio);padding:14px 16px;margin-bottom:14px;font-size:14px}
+.resumenDiag.bien{background:#EAF4EE;border:1px solid var(--laurel);color:var(--laurel)}
+.resumenDiag.mal{background:var(--punzo-suave);border:1px solid var(--punzo);color:var(--punzo)}
+.reco{background:var(--celeste-pal);border:1px solid var(--celeste);border-radius:var(--radio);
+  padding:16px 18px;margin:12px 0}
+.reco b{display:block;font-family:Spectral,Georgia,serif;font-size:17px;margin-bottom:5px;color:var(--marino)}
+.reco p{margin:0;font-size:13.5px;color:var(--gris)}
