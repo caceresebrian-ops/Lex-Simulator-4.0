@@ -22,7 +22,7 @@ global.document = {
   createElement:tag=>nodo(tag),
   querySelector(sel){ if(!REG.has(sel)) REG.set(sel, nodo()); return REG.get(sel); },
   querySelectorAll(){ return []; },
-  body:nodo(), addEventListener(){}
+  body:nodo(), head:nodo(), addEventListener(){}
 };
 global.window = { addEventListener(){}, location:{reload(){}}, scrollTo(){},
                   matchMedia:()=>({matches:false}), speechSynthesis:undefined };
@@ -31,4 +31,7 @@ global.navigator = { serviceWorker:undefined };
 global.requestAnimationFrame = f=>setTimeout(f,0);
 global.alert = ()=>{}; global.confirm = ()=>true;
 global.fetch = async ()=>{ throw new Error('sin red en la prueba'); };
+global.URL.createObjectURL = () => 'blob:prueba'; global.URL.revokeObjectURL = () => {};
+global.window.open = () => null;
+global.Blob = class { constructor(p,o){ this.size = 1; this.type = (o||{}).type; } };
 global.__nodo = nodo; global.__REG = REG;

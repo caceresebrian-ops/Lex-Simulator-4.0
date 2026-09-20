@@ -32,6 +32,17 @@ function diagnostico(){
                               ['Ejemplos de estudio','EJEMPLOS']])
     p('Módulos', nom, () => L[clave] !== undefined || ('no cargó'));
 
+  /* módulos complementarios: se enchufan después de la aplicación */
+  const AP = window.LEXAPP || {};
+  for (const [nom, fn] of [
+      ['Grabación de audiencias',   () => typeof L.grabacionesGuardadas === 'function'],
+      ['Objeciones propias',        () => !!(AP.MODULOS && AP.MODULOS.objetar)],
+      ['Preparación del testigo',   () => !!(AP.MODULOS && AP.MODULOS.preparacion)],
+      ['Competencia y docencia',    () => Array.isArray(L.RUBROS_JURADO)],
+      ['Vigencia de la ley',        () => !!L.FICHA_LEY],
+      ['Rol de querellante',        () => !!(AP.ROLES && AP.ROLES.querella)]])
+    p('Complementos', nom, () => fn() || 'no cargó');
+
   /* integridad de la ley */
   p('Ley 10.797', 'Los 359 artículos están', () => {
     const n = (L.LEY_10797 || []).length;

@@ -35,6 +35,8 @@
       <button class="plano" id="irBase">Base de conocimiento</button>
       <button class="plano" id="irEjemplos">Ejemplos</button>
       <button class="plano" id="irFalacias">Falacias</button>
+      <button class="plano" id="irCompetencia">Competencia y docencia</button>
+      <button class="plano" id="irAudiencias">Audiencias reales</button>
       <button class="plano" id="irDiagnostico">Diagnóstico</button>
       <button class="plano" id="irAjustes">Ajustes</button>
     </nav>
@@ -297,6 +299,34 @@
     medio sistema quedara muerto sin que se notara.</p>
   <div class="acciones" style="margin-bottom:14px"><button class="secundario" id="correrDiag">Volver a revisar</button></div>
   <div id="resultadoDiag"></div>
+
+  <h3>Vigencia de la ley</h3>
+  <p class="ayuda">De dónde sale el texto de la ley que usa la app, cuánto está verificado contra el
+    oficial, y qué reformas se registraron.</p>
+  <div id="zonaVigencia"></div>
+</div></section>
+
+<!-- ═══════════ COMPETENCIA Y DOCENCIA ═══════════ -->
+<section class="panel" id="competencia"><div class="hoja">
+  <button class="plano" data-volver="portada">← Volver</button>
+  <h2>Competencia y docencia</h2>
+  <p>Para entrenar para un concurso de litigación o para dar clase.</p>
+  <nav class="pestanasComp" id="compTabs">
+    <button data-tab="jurado">Jurado</button>
+    <button data-tab="equipo">Equipo</button>
+    <button data-tab="casos">Casos oficiales</button>
+    <button data-tab="docente">Docente</button>
+  </nav>
+  <div id="compContenido"></div>
+</div></section>
+
+<!-- ═══════════ AUDIENCIAS REALES ═══════════ -->
+<section class="panel" id="audiencias"><div class="hoja">
+  <button class="plano" data-volver="portada">← Volver</button>
+  <h2>Audiencias reales</h2>
+  <p>Desgrabaciones de audiencias reales, para leer cómo se litigó de verdad al lado de tu propio
+     intento. Tienen que estar anonimizadas.</p>
+  <div id="audContenido"></div>
 </div></section>
 
 <!-- ═══════════ EJEMPLOS ═══════════ -->
@@ -362,6 +392,15 @@
   </div>
 
   <div class="tarjeta">
+    <h3>Práctica</h3>
+    <p class="ayuda">Minutos por audiencia. En competencia se litiga contra reloj, y en una sala
+      real el juez corta.</p>
+    <div id="ajTiempos"></div>
+    <div id="ajOpciones" style="margin-top:14px"></div>
+    <div class="acciones"><button class="principal" id="guardarPractica">Guardar</button></div>
+  </div>
+
+  <div class="tarjeta">
     <h3>Datos guardados</h3>
     <p class="ayuda">El historial de audiencias y la base de conocimiento viven en este navegador.</p>
     <div class="acciones"><button class="secundario" id="borrarTodo">Borrar todos mis datos</button></div>
@@ -418,5 +457,11 @@
 <script src="./js/ingesta.js"></script>
 <script src="./js/aprendizaje.js"></script>
 <script src="./js/app.js"></script>
+<script src="./js/grabacion.js"></script>
+<script src="./js/objeciones.js"></script>
+<script src="./js/preparacion.js"></script>
+<script src="./js/competencia.js"></script>
+<script src="./js/vigencia.js"></script>
+<script src="./js/audiencias.js"></script>
 </body>
 </html>

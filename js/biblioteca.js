@@ -78,8 +78,10 @@ function contexto(numeros){
 function cita(n){
   const a = articulo(n);
   if (!a) return null;
+  const estado = (typeof window !== 'undefined' && window.LEX && window.LEX.estadoArticulo)
+    ? ' · ' + window.LEX.estadoArticulo(a.n) : '';
   return { numero:a.n, rubrica:a.r, texto:a.t,
-           fuente:'Ley 10.797 — Código Procesal Penal de La Rioja' };
+           fuente:'Ley 10.797 — Código Procesal Penal de La Rioja' + estado };
 }
 
 /* ─────────────── verificación de citas ───────────────

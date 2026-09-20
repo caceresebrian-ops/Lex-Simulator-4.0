@@ -9,7 +9,7 @@ const GUION = [
 global.fetch = async (u, o) => { llamadas.push(JSON.parse(o.body).system?.slice(0,60)); 
   return { ok:true, status:200, json: async () => ({ content:[{type:'text', text: GUION[Math.min(llamadas.length-1, GUION.length-1)]}] }) }; };
 global.localStorage.setItem('lex.clave', JSON.stringify('sk-ant-prueba'));
-['conocimiento','casos','biblioteca','motor','agentes','ingesta','app'].forEach(f=>require('/home/claude/lex/js/'+f+'.js'));
+['conocimiento','casos','biblioteca','motor','agentes','ingesta','aprendizaje','app','grabacion','objeciones','preparacion','competencia','vigencia','audiencias'].forEach(f=>require('../js/'+f+'.js'));
 const $ = s => global.document.querySelector(s);
 const espera = ms => new Promise(r=>setTimeout(r,ms));
 (async () => {

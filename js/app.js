@@ -46,8 +46,17 @@ const MODULOS = {
   clausura:{nombre:'Alegato de clausura', pista:'cerrar con la prueba producida', tipo:'alegato', minutos:8,
             reglas:'Alegato final del art. 217: se argumenta y se valora la prueba según la sana crítica, y se cierra con la petición concreta.'}
 };
-const ROLES = { fiscal:'Fiscal', defensa:'Defensa' };
-const otroDe = r => r === 'fiscal' ? 'DEFENSA' : 'FISCAL';
+const ROLES = { fiscal:'Fiscal', querella:'Querella', defensa:'Defensa' };
+/* La querella acusa, igual que la fiscalía: su contraparte es la defensa. */
+const otroDe = r => r === 'defensa' ? 'FISCAL' : 'DEFENSA';
+const esAcusador = r => r === 'fiscal' || r === 'querella';
+
+/* ─────────────── complementos y eventos ───────────────
+   Los módulos nuevos se enchufan acá sin tocar el motor: cada uno
+   registra cómo se abre, cómo procesa un turno y cómo se evalúa.   */
+const PLUGINS = {};
+const OYENTES = {};
+const emitir = (ev, datos) => (OYENTES[ev] || []).forEach(f => { try { f(datos); } catch (e){ console.error(ev, e); } });
 const MODELO_TURNO = 'claude-sonnet-5';
 const MODELO_FONDO = 'claude-opus-5';
 const TOPES = { reglas:2500, criterios:14000, ambiente:14000 };
@@ -204,8 +213,8 @@ function pintarSetup(){
   }
 
   const oc = $('#opCaso'); oc.innerHTML = '';
-  const dispo = causasPropias().filter(c => (c.modulos||[]).includes(S.modulo))
-                .concat(CASOS.filter(c => c.modulos.includes(S.modulo)));
+  const filtro = (PLUGINS[S.modulo] && PLUGINS[S.modulo].casos) || (c => (c.modulos||[]).includes(S.modulo));
+  const dispo = causasPropias().filter(filtro).concat(CASOS.filter(filtro));
   if (hayIA()){
     const b = document.createElement('button');
     b.className = 'op'; b.dataset.k = '';
@@ -254,6 +263,7 @@ $('#abrir').onclick = async () => {
     $('#avisoIA').textContent = 'Sorteando la causa y cerrando el sobre…';
     try {
       S.caso = await generarCaso();
+      if (S.modulo === 'cautelar') S.caso = comoCautelar(S.caso);
       S.generado = true;
       entrarSala();
     } catch (e){
@@ -435,7 +445,7 @@ if (VOZ.soportada){
 /* ═══════════════ SALA ═══════════════ */
 function entrarSala(){
   const m = MODULOS[S.modulo], c = S.caso;
-  S.registro = []; S.turnos = []; S.previas = [];
+  S.registro = []; S.previas = [];
   S.dificultad = dificultadDe(perfilDe(guardado.leer('historial', [])));
   S.estado = { desdeUltimaObjecion: 9, dichos: new Set(), dificultad: S.dificultad };
   S.fundado = '';
@@ -472,8 +482,12 @@ function entrarSala(){
   $('#pregunta').placeholder = m.tipo === 'alegato' ? 'Pronuncie su alegato…' : 'Formule su pregunta…';
   $('#pistaIzq').textContent = 'Enter para enviar · Shift+Enter corta renglón';
   aviso('');
-  arrancarReloj(m.minutos);
+  S.fase = 'principal';
+  S.avisosTiempo = new Set();
+  arrancarReloj(tiempoDelModulo(S.modulo));
   ver('sala');
+  if (PLUGINS[S.modulo] && PLUGINS[S.modulo].abrir) PLUGINS[S.modulo].abrir(S);
+  emitir('abrir', { modulo:S.modulo, rol:S.rol, caso:S.caso });
   setTimeout(() => $('#pregunta').focus(), 80);
 }
 
@@ -517,6 +531,7 @@ function turno(quien, texto, clase){
   d.innerHTML = '<div class="quien">'+esc(quien)+'</div><p class="dicho">'+esc(texto)+'</p>';
   $('#hilo').appendChild(d); alFinal();
   if (clase !== 'propio' && texto !== 'Pensando…') VOZ.decir(quien, texto);
+  emitir('turno', { quien, texto, t: S.t0 ? (Date.now() - S.t0) / 1000 : 0 });
   return d;
 }
 const alFinal = () => { const a = $('#acta'); a.scrollTop = a.scrollHeight; };
@@ -534,15 +549,35 @@ function pensando(quien){
 const demora = ms => new Promise(r => setTimeout(r, ms));
 function aviso(t, malo){ const e = $('#pistaDer'); e.textContent = t||''; e.className = malo ? 'err' : (t ? 'ok' : ''); }
 
+/* Tiempos por audiencia, configurables en Ajustes. En competencia se
+   litiga contra reloj y en una sala real el juez corta.             */
+const TIEMPOS_BASE = { directo:12, contra:10, cautelar:15, apertura:5, clausura:8, objetar:8, preparacion:15 };
+function tiempoDelModulo(mod){
+  const t = guardado.leer('tiempos', {});
+  return Number(t[mod]) || TIEMPOS_BASE[mod] || 10;
+}
+
 function arrancarReloj(obj){
   S.t0 = Date.now(); clearInterval(S.tick);
   S.tick = setInterval(() => {
     const s = Math.floor((Date.now()-S.t0)/1000);
     $('#reloj').textContent = mmss(s);
-    /* la franja punzó de la barra avanza con el tiempo de audiencia */
     const meta = (obj || 12) * 60;
     $('#barra').style.setProperty('--avance', Math.min(100, (s/meta)*100).toFixed(1) + '%');
-    if (obj) $('#reloj').classList.toggle('excedido', s > obj*60);
+    $('#reloj').classList.toggle('excedido', s > meta);
+    /* El juez administra el tiempo, como en una sala */
+    if (!S.avisosTiempo || !guardado.leer('avisarTiempo', true)) return;
+    const hito = (clave, cuando, texto) => {
+      if (s >= cuando && !S.avisosTiempo.has(clave)){
+        S.avisosTiempo.add(clave);
+        turno('JUEZ', texto, 'juez');
+        S.registro.push({ quien:'JUEZ', texto, tiempo:true });
+      }
+    };
+    const rest = Math.max(1, Math.round((meta - s) / 60));
+    hito('80',  Math.round(meta*0.8), `Doctor, le quedan ${rest} minuto${rest>1?'s':''}.`);
+    hito('100', meta, 'Su tiempo ha concluido. Vaya cerrando, por favor.');
+    hito('120', Math.round(meta*1.2), 'Le voy a pedir que concluya ahora.');
   }, 250);
 }
 
@@ -577,10 +612,13 @@ async function formularInterno(){
   }
   S.registro.push(fila);
 
+  if (PLUGINS[S.modulo] && PLUGINS[S.modulo].turno){
+    await PLUGINS[S.modulo].turno(txt, fila);
+    return;
+  }
+
   if (m.tipo === 'alegato'){
-    marca('La parte concluye su alegato.');
-    S.turnos.push({ role:'user', content: txt });
-    setTimeout(levantar, 600);
+    await faseAlegato(txt, fila);
     return;
   }
 
@@ -588,6 +626,85 @@ async function formularInterno(){
   else await turnoOffline(an, fila);
 
   $('#pregunta').focus();
+}
+
+/* ─── alegatos con réplica y dúplica (art. 217) ───
+   La clausura no termina con tu alegato: habla la contraparte, replicás
+   solo para refutar lo que no se discutió antes, y si sos defensa tenés
+   la última palabra.                                                */
+async function faseAlegato(txt, fila){
+  fila.fase = S.fase;
+  if (S.modulo === 'apertura' || !guardado.leer('replica', true)){
+    marca('La parte concluye su exposición.');
+    setTimeout(levantar, 600);
+    return;
+  }
+  const otro = otroDe(S.rol);
+  if (S.fase === 'principal'){
+    marca('Concluye su alegato. Tiene la palabra la ' + otro.toLowerCase() + '.');
+    const ind = pensando(otro); await demora(2200); ind.remove();
+    const alegato = await alegatoContrario();
+    turno(otro, alegato, 'objecion');
+    S.registro.push({ quien:otro, texto:alegato, fase:'contraria' });
+    S.alegatoContra = alegato;
+    S.fase = 'replica';
+    await demora(900);
+    turno('JUEZ', '¿Va a replicar? Recuerde que la réplica se limita a refutar argumentos no discutidos antes.', 'juez');
+    $('#pregunta').placeholder = 'Réplica: refutá lo que dijo la contraparte…';
+    aviso('Réplica. Si no vas a replicar, levantá la audiencia.');
+    return;
+  }
+  if (S.fase === 'replica'){
+    const ind = pensando(otro); await demora(1900); ind.remove();
+    const duplica = await duplicaContraria(txt);
+    turno(otro, duplica, 'objecion');
+    S.registro.push({ quien:otro, texto:duplica, fase:'duplica' });
+    if (S.rol === 'defensa'){
+      S.fase = 'ultima';
+      await demora(800);
+      turno('JUEZ', 'Tiene la última palabra la defensa, conforme el artículo 217.', 'juez');
+      $('#pregunta').placeholder = 'Última palabra…';
+      return;
+    }
+    marca('Concluidos los alegatos.');
+    setTimeout(levantar, 900);
+    return;
+  }
+  marca('Concluidos los alegatos.');
+  setTimeout(levantar, 700);
+}
+
+async function alegatoContrario(){
+  const c = S.caso, soyAcusador = esAcusador(S.rol);
+  if (hayIA()){
+    try {
+      const r = await pedir(`Sos la ${soyAcusador ? 'defensa' : 'fiscalía'} en el alegato de clausura de esta causa de La Rioja.
+${legajoCorto(c)}
+Tu adversario dijo: "${S.registro.filter(x=>x.quien==='LITIGANTE').map(x=>x.texto).join(' ').slice(0,1500)}"
+Alegá en 5 a 7 oraciones, con tu teoría del caso, valoración de la prueba y petición concreta (art. 217).
+Respondé solo con tu alegato.`, { modelo: MODELO_TURNO, tope: 500 });
+      if (verificarCitas(r).valido) return r.trim();
+    } catch {}
+  }
+  const puntos = (c.sobre?.puntos || []).slice(0, 2);
+  return soyAcusador
+    ? `Su señoría, la acusación descansa sobre una prueba que no resiste el análisis. ${puntos[0] ? puntos[0].replace(/\.$/,'') + '.' : ''} ${puntos[1] ? puntos[1].replace(/\.$/,'') + '.' : ''} Valorada en conjunto conforme la sana crítica, esa prueba no alcanza el grado de certeza que exige una condena. El artículo 8 manda resolver la duda a favor del imputado. Solicito la absolución.`
+    : `Su señoría, la prueba producida acredita el hecho y la participación. ${(c.prueba||[]).slice(0,2).map(p=>p.tipo).join(' y ') || 'La prueba de cargo'} ${c.prueba && c.prueba.length > 1 ? 'se corroboran' : 'se sostiene'} entre sí. La defensa pretende instalar una duda que no surge de ninguna constancia. Solicito la condena por ${String(c.delito||'el hecho imputado').split('(')[0].trim().toLowerCase()}.`;
+}
+
+async function duplicaContraria(replica){
+  if (hayIA()){
+    try {
+      const r = await pedir(`Sos la contraparte en la dúplica de un alegato de clausura en La Rioja. Tu adversario replicó: "${replica.slice(0,1200)}". Duplicá en 2 o 3 oraciones, limitándote a refutar lo nuevo. Solo tu dúplica.`,
+        { modelo: MODELO_TURNO, tope: 250 });
+      if (verificarCitas(r).valido) return r.trim();
+    } catch {}
+  }
+  return 'Su señoría, la réplica no introduce nada que no haya sido ya contestado. Me remito a lo expuesto en el alegato.';
+}
+
+function legajoCorto(c){
+  return `Carátula: ${c.caratula}. Calificación: ${c.delito}. Hecho: ${c.sintesis||''}. Prueba: ${(c.prueba||[]).map(p=>p.tipo+' — '+p.detalle).join(' | ')}`;
 }
 
 /* ─── sin conexión ─── */
@@ -746,57 +863,6 @@ function tribunalCautelar(an){
 }
 
 /* ─── con modelo ─── */
-function instrucciones(){
-  const m = MODULOS[S.modulo], c = S.caso, mio = ROLES[S.rol].toUpperCase(), otro = otroDe(S.rol);
-  const extra = kb().reglas;
-  const personajes = m.testigo ? `
-PERSONAJES:
-• TESTIGO (${c.testigo?.nombre}, ${c.testigo?.calidad}). Perfil: ${c.testigo?.perfil}. Habla en primera
-  persona con el vocabulario de esa persona, no con el de un abogado. Contesta SOLO lo que se le
-  pregunta. Ante una abierta se explaya y aprovecha para dañar a quien interroga; ante una sugestiva
-  de un solo punto contesta seco y se calla. Nunca ofrece lo que está en el sobre cerrado: si no se
-  lo preguntan bien, esa información no aparece.
-• ${otro}: objeta cuando corresponde, diciendo "Objeción" y el motivo.
-• JUEZ: resuelve en una línea. NO interroga al testigo jamás (art. 209).`
-  : `
-PERSONAJES:
-• ${otro}: litiga en contra con argumentos concretos sobre los arts. 116, 127, 128 y 129.
-• JUEZ: conduce, exige concreción y pide el plazo si no se lo dieron. NO interroga sobre los hechos.`;
-
-  return `Estás corriendo una simulación de audiencia penal oral para entrenar a un litigante en La Rioja.
-No sos un asistente: sostenés personajes y nunca salís de ese rol. El litigante es la ${mio}.
-
-${CPP}
-
-${LOGICA}
-
-MÓDULO: ${m.nombre}. ${m.reglas}
-${personajes}
-
-LEGAJO PÚBLICO
-${c.caratula} — ${c.delito}
-${c.sintesis}
-${c.hechos}
-Prueba: ${(c.prueba||[]).map(p => p.tipo+' — '+p.detalle).join(' | ')}
-${c.previa ? 'DECLARACIÓN PREVIA:\n'+c.previa : ''}
-${c.imputado ? 'IMPUTADO: '+c.imputado.nombre+' — '+c.imputado.perfil : ''}
-
-SOBRE CERRADO — solo vos lo conocés. Nunca lo reveles fuera de la boca de un personaje, y solo si una
-pregunta bien formulada lo obliga a salir:
-Verdad: ${c.sobre?.verdad}
-Puntos: ${(c.sobre?.puntos||[]).join(' | ')}
-${c.sobre?.conducta ? 'Conducta: '+c.sobre.conducta : ''}
-${extra ? '\nREGLAS ADICIONALES DEL USUARIO:\n'+extra.slice(0,2500) : ''}
-
-CÓMO OBJETAR: solo con fundamento real, y como mucho una cada cuatro o cinco preguntas (art. 210).
-Si la pregunta es correcta, no inventes motivo.
-
-Respondé SOLO este JSON:
-{"intervenciones":[{"quien":"TESTIGO|${otro}|JUEZ","texto":""}],"falta":null,"revelo":false}
-Si la objeción prospera: ${otro} objeta, JUEZ resuelve, el testigo NO responde.
-"revelo" es true si en este turno salió algo del sobre cerrado.`;
-}
-
 /* Cada agente habla por separado, con su propio paquete de conocimiento.
    Antes de emitir, se verifica que no haya inventado un artículo y que no
    haya filtrado el sobre cerrado.                                       */
@@ -918,8 +984,11 @@ async function levantar(){
   ver('devolucion');
   $('#hojaDev').innerHTML = '<h2>Devolución</h2><p class="pensando">Revisando el acta…</p>';
 
+  emitir('levantar', { seg });
   let d;
-  if (hayIA()){
+  if (PLUGINS[S.modulo] && PLUGINS[S.modulo].informe){
+    d = PLUGINS[S.modulo].informe(S, seg);
+  } else if (hayIA()){
     try { d = await devolucionConModelo(seg); }
     catch (e){
       d = S.modulo === 'cautelar' ? informeCautelar(S.caso, S.rol, S.registro, seg)
@@ -935,8 +1004,28 @@ async function levantar(){
   } else {
     d = informeOffline(S.caso, S.modulo, S.registro, seg);
   }
+  if (m.tipo === 'alegato') evaluarReplica(d);
+  S.ultimaDev = d; S.ultimosSeg = seg;
   pintarDevolucion(d, seg);
   archivar(d, seg);
+}
+
+/* La réplica se evalúa aparte: el art. 217 la limita a refutar lo no
+   discutido, así que repetir el propio alegato es un error.          */
+function evaluarReplica(d){
+  const rep = S.registro.find(r => r.quien === 'LITIGANTE' && r.fase === 'replica');
+  if (!rep || !d || !d.ejes) return;
+  const t = window.LEX.sinTildes(rep.texto);
+  const contra = window.LEX.sinTildes(S.alegatoContra || '');
+  const refuta = /\b(la (fiscalia|defensa|querella) (dijo|sostiene|pretende)|se dijo|contrariamente|no es cierto|el argumento de|frente a (eso|ello)|refut)/.test(t);
+  const tomaTema = window.LEX.fichas(contra).filter(w => t.includes(w)).length >= 3;
+  const breve = rep.texto.split(/\s+/).length <= 180;
+  const pt = (refuta ? 4 : 0) + (tomaTema ? 4 : 0) + (breve ? 2 : 0);
+  d.ejes.push({ eje:'Réplica (art. 217)', puntaje: pt,
+    comentario: pt >= 8 ? 'Te hiciste cargo de lo que dijo la contraparte, en forma breve.'
+      : !refuta ? 'La réplica no refutó: repitió tu alegato. El art. 217 la limita a contestar argumentos no discutidos antes.'
+      : !tomaTema ? 'Refutaste en abstracto. Tenías que tomar los argumentos concretos del alegato contrario.'
+      : 'Fue demasiado larga para una réplica.' });
 }
 
 async function devolucionConModelo(seg){
@@ -977,32 +1066,6 @@ Respondé SOLO este JSON:
   return await pedirJson(pide, { modelo: MODELO_FONDO, tope: 3200 });
 }
 
-function informeAlegatoOffline(seg){
-  const t = S.registro.map(r => r.texto).join(' ');
-  const plano = window.LEX.sinTildes(t);
-  const pal = t.split(/\s+/).filter(Boolean).length;
-  const m = MODULOS[S.modulo];
-  const tiene = re => re.test(plano);
-  const ejes = [
-    { eje:'Petición concreta (art. 217)', puntaje: tiene(/\b(solicito|pido|requiero|peticiono|absoluci|condena|pena de)\b/) ? 9 : 3,
-      comentario:'El art. 217 exige que las partes expresen sus peticiones de un modo concreto al finalizar.' },
-    { eje:'Proposiciones fácticas', puntaje: tiene(/\b(la prueba|el testigo|el perito|acredit|demostr|surge de)\b/) ? 8 : 4,
-      comentario:'Se litiga con afirmaciones de hecho respaldadas en prueba, no con conclusiones jurídicas sueltas.' },
-    { eje:'Extensión', puntaje: Math.max(0, Math.min(10, 10 - Math.abs(pal - m.minutos*130)/60)),
-      comentario:`${pal} palabras en ${mmss(seg)}. Para ${m.minutos} minutos hablados, la referencia ronda las ${m.minutos*130}.` }
-  ];
-  if (S.modulo === 'apertura')
-    ejes.push({ eje:'No argumentar todavía', puntaje: tiene(/\b(es evidente|no cabe duda|queda claro que|resulta indudable)\b/) ? 4 : 8,
-      comentario:'La apertura anuncia lo que la prueba va a demostrar; la valoración es materia de la clausura.' });
-  else
-    ejes.push({ eje:'Sana crítica', puntaje: tiene(/\b(sana critica|valoraci|integral|indicio|coherent|corrobor)\b/) ? 8 : 5,
-      comentario:'Los arts. 19 y 218 mandan valoración integral. Mostrá cómo se articula la prueba, no la enumeres.' });
-  const global = Math.round((ejes.reduce((a,e)=>a+e.puntaje,0)/ejes.length)*10)/10;
-  return { global, ejes, correcciones:[], aciertos:[],
-    perdido:(S.caso.sobre?.puntos||[]).filter(p => !plano.includes(window.LEX.sinTildes(p).slice(0,25))),
-    veredicto:'Informe en modo autónomo: se evalúa estructura y cumplimiento del art. 211. Para una devolución que cite tus frases y te reescriba los pasajes flojos, cargá tu clave en Ajustes.' };
-}
-
 function pintarDevolucion(d, seg){
   const c = S.caso, m = MODULOS[S.modulo];
   let h = '<button class="plano" data-volver="portada">← Volver al inicio</button><h2>Devolución</h2>';
@@ -1027,9 +1090,14 @@ function pintarDevolucion(d, seg){
     h += '<h3>Lo que quedó en el sobre</h3><ul class="limpia">'+d.perdido.map(p=>'<li>'+esc(p)+'</li>').join('')+'</ul>';
   h += '<h3>El sobre cerrado</h3><div class="sobre"><p>'+esc(c.sobre?.verdad||'')+'</p>'+
        (c.sobre?.puntos||[]).map(p=>'<p>— '+esc(p)+'</p>').join('')+'</div>';
+  h += '<div id="zonaGrabacion"></div>';
   h += '<div class="acciones"><button class="principal" id="otra">Otra audiencia</button>'+
-       '<button class="secundario" id="leerActa">Leer el acta</button></div>';
+       '<button class="secundario" id="leerActa">Leer el acta</button>'+
+       '<button class="secundario" id="exportarPdf">Exportar en PDF</button>'+
+       '<button class="secundario" id="evaluarJurado">Evaluar como jurado</button></div>';
   $('#hojaDev').innerHTML = h;
+  $('#exportarPdf').onclick = () => exportarPdf(d, seg);
+  $('#evaluarJurado').onclick = () => emitir('jurado', { d, seg });
   $('#hojaDev [data-volver]').onclick = () => ver('portada');
   $('#otra').onclick = () => { pintarSetup(); ver('setup'); };
   $('#leerActa').onclick = () => {
@@ -1037,6 +1105,50 @@ function pintarDevolucion(d, seg){
     $('#levantar').textContent = 'Volver a la devolución';
     $('#levantar').onclick = () => ver('devolucion');
   };
+  emitir('devolucion', { d, seg });
+}
+
+/* ─── Exportación en PDF ───
+   Se arma una página limpia con el acta y la devolución, y se usa la
+   impresión del navegador, que en cualquier dispositivo ofrece
+   "Guardar como PDF". No hace falta ninguna biblioteca externa.      */
+function exportarPdf(d, seg){
+  const c = S.caso, m = MODULOS[S.modulo];
+  const acta = S.registro.filter(r => !r.tiempo).map(r =>
+    '<p><b>' + esc(r.quien === 'LITIGANTE' ? ROLES[S.rol].toUpperCase() : r.quien) + ':</b> ' + esc(r.texto) + '</p>').join('');
+  const ejes = (d.ejes||[]).map(e =>
+    '<tr><td>' + esc(e.eje) + '</td><td class="n">' + esc(typeof e.puntaje==='number'?e.puntaje.toFixed(1):e.puntaje) +
+    '</td><td>' + esc(e.comentario) + '</td></tr>').join('');
+  const corr = (d.correcciones||[]).map(k =>
+    '<div class="c"><p><i>' + esc(k.tuya) + '</i></p><p class="m">' + esc(k.problema) + '</p><p class="b">' + esc(k.mejor) + '</p></div>').join('');
+  const html = `<!DOCTYPE html><html lang="es-AR"><head><meta charset="utf-8">
+<title>Lex Simulator — ${esc(c.caratula||'')}</title><style>
+@page{margin:18mm 16mm}
+body{font-family:Georgia,serif;color:#0F2A4D;font-size:11pt;line-height:1.5}
+.cab{border-bottom:3px solid #C1272D;padding-bottom:8px;margin-bottom:14px}
+.cab h1{font-size:15pt;margin:0}.cab p{margin:3px 0;color:#5A6B7E;font-size:9.5pt}
+h2{font-size:12.5pt;border-bottom:1px solid #DCE4ED;padding-bottom:3px;margin-top:22px}
+.global{font-size:26pt;font-weight:bold;color:#2E7D57}
+table{width:100%;border-collapse:collapse;font-size:9.5pt}td{border-top:1px solid #DCE4ED;padding:5px;vertical-align:top}
+td.n{font-weight:bold;width:40px;text-align:center}
+.c{border-left:3px solid #DCE4ED;padding-left:10px;margin:8px 0;font-size:10pt}
+.m{color:#C1272D;margin:2px 0}.b{border-left:3px solid #2E7D57;padding-left:8px;margin:2px 0}
+.acta p{margin:5px 0;font-size:10pt}.pie{margin-top:26px;font-size:8.5pt;color:#8B9AAB;border-top:1px solid #DCE4ED;padding-top:6px}
+</style></head><body>
+<div class="cab"><h1>${esc(c.caratula||'')}</h1>
+<p>${esc(m.nombre)} · ${esc(ROLES[S.rol])} · ${mmss(seg)} · ${new Date().toLocaleString('es-AR')}</p>
+<p>${esc(c.delito||'')}</p></div>
+<h2>Resultado</h2><p class="global">${esc(d.global ?? '—')}</p><p>${esc(d.veredicto||'')}</p>
+${ejes ? '<h2>Ejes de evaluación</h2><table>' + ejes + '</table>' : ''}
+${corr ? '<h2>Correcciones</h2>' + corr : ''}
+<h2>Acta de la audiencia</h2><div class="acta">${acta}</div>
+<h2>El sobre cerrado</h2><p>${esc(c.sobre?.verdad||'')}</p>
+${(c.sobre?.puntos||[]).map(p=>'<p>— '+esc(p)+'</p>').join('')}
+<p class="pie">Lex Simulator · Ley 10.797, Código Procesal Penal de La Rioja · Simulador de práctica: no sustituye la formación ni el criterio profesional.</p>
+<script>window.onload=()=>setTimeout(()=>window.print(),350)<\/script></body></html>`;
+  const w = window.open('', '_blank');
+  if (!w){ aviso('El navegador bloqueó la ventana. Permití ventanas emergentes para exportar.', true); return; }
+  w.document.write(html); w.document.close();
 }
 
 /* ═══════════════ HISTORIAL ═══════════════ */
@@ -1454,8 +1566,31 @@ $('#guardarVoces') && ($('#guardarVoces').onclick = () => {
   $('#estadoVoces').textContent = 'Voces guardadas para este dispositivo.';
 });
 
+function pintarPractica(){
+  const t = guardado.leer('tiempos', {});
+  $('#ajTiempos').innerHTML = Object.entries(MODULOS).map(([k,m]) =>
+    '<div class="rubro"><div><b>' + esc(m.nombre) + '</b><span>minutos</span></div>' +
+    '<input type="number" min="1" max="60" data-tiempo="' + k + '" value="' + (Number(t[k]) || tiempoDelModulo(k)) + '"></div>').join('');
+  const OPC = [
+    ['avisarTiempo', true,  'El juez avisa cuando se acaba el tiempo'],
+    ['replica',      true,  'Réplica y dúplica en el alegato de clausura'],
+    ['grabarSiempre',false, 'Grabar todas las audiencias automáticamente']
+  ];
+  $('#ajOpciones').innerHTML = OPC.map(([k, def, n]) =>
+    '<label class="dato"><input type="checkbox" data-opc="' + k + '"' + (guardado.leer(k, def) ? ' checked' : '') +
+    '><span class="val" style="font-family:inherit;font-size:14px">' + esc(n) + '</span></label>').join('');
+}
+$('#guardarPractica').onclick = () => {
+  const t = {};
+  $$('[data-tiempo]').forEach(i => { if (+i.value > 0) t[i.dataset.tiempo] = +i.value; });
+  guardado.escribir('tiempos', t);
+  $$('[data-opc]').forEach(c => guardado.escribir(c.dataset.opc, c.checked));
+  aviso('Ajustes de práctica guardados.');
+};
+
 function pintarAjustes(){
   pintarVoces();
+  pintarPractica();
   const c = clave();
   $('#clave').value = c;
   $('#estadoClave').textContent = c
@@ -1638,6 +1773,17 @@ $('#instalar').onclick = async () => {
   if (!promptInstalar) return;
   promptInstalar.prompt(); await promptInstalar.userChoice;
   promptInstalar = null; $('#instalar').classList.add('oculto');
+};
+
+/* ═══════════════ PUENTE PARA LOS MÓDULOS NUEVOS ═══════════════
+   Los complementos no parchean app.js: reciben lo que necesitan por acá. */
+window.LEXAPP = {
+  S, MODULOS, ROLES, otroDe, esAcusador, guardado, esc, mmss,
+  ver, turno, marca, aviso, pensando, demora, hayIA, pedir, pedirJson,
+  pintarSetup, levantar, causasPropias, VOZ,
+  modulo(clave, def){ MODULOS[clave] = def.modulo; if (def.plugin) PLUGINS[clave] = def.plugin; },
+  on(ev, fn){ (OYENTES[ev] = OYENTES[ev] || []).push(fn); },
+  MODELO_TURNO, MODELO_FONDO
 };
 
 ver('portada');

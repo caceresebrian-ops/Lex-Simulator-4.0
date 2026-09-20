@@ -137,6 +137,43 @@ apple-touch-icon.png
 emblema.png
 ```
 
+## Para competencia y docencia
+
+**Grabación.** Un botón en la barra de la sala graba tu voz durante la audiencia. En la devolución la
+escuchás con el acta al lado: tocás un turno y el audio salta a ese momento. Se guarda en el
+dispositivo y se conservan las últimas diez.
+
+**Reloj por tramos.** Minutos configurables por audiencia en Ajustes. El juez avisa cuando quedan
+pocos minutos, cuando se terminó el tiempo, y te pide que concluyas.
+
+**Réplica y dúplica.** En el alegato de clausura habla la contraparte, replicás limitándote a
+refutar lo no discutido, la contraparte duplica y, si sos defensa, tenés la última palabra, como
+manda el art. 217. La réplica se evalúa como eje propio.
+
+**Objetar.** Módulo nuevo en el que interroga la contraparte y objetás vos: escribís "adelante" o
+"objeción, sugestiva". Se evalúa si objetaste lo objetable, si nombraste bien el motivo y si dejaste
+pasar lo admisible.
+
+**Preparar testigo.** Ensayo privado con tu propio testigo para descubrir sus puntos débiles antes
+de la audiencia y adelantarlos en el directo.
+
+**Querellante.** Tercer rol, además de fiscal y defensa.
+
+**Exportar en PDF.** El acta y la devolución, listas para entregar o archivar.
+
+**Competencia y docencia.** Planilla de jurado con los ocho rubros de los concursos de litigación,
+para comparar la evaluación humana con la automática. Reparto de tramos entre los integrantes de un
+equipo. Importación del caso oficial de una competencia y exportación de cualquier caso. Consignas
+docentes que se reparten como archivo, resultados que los alumnos devuelven como archivo, y un
+tablero con la clase entera y su debilidad común. Todo sin servidor: viaja en archivos.
+
+**Audiencias reales.** Banco de desgrabaciones, que se leen al lado de tu último intento del mismo
+tipo. Pasan por el mismo detector de datos personales que las causas.
+
+**Vigencia de la ley.** Qué fuente tiene el texto de la ley, cuánto está verificado contra el
+oficial, y una herramienta para comparar artículo por artículo, corregir errores del OCR y registrar
+reformas. Cada cita legal muestra si el artículo está verificado o reformado.
+
 ## Diagnóstico y aprendizaje
 
 En el menú, **Diagnóstico**, hay dos cosas distintas.

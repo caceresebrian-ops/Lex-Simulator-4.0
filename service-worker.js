@@ -5,7 +5,7 @@
 /* IMPORTANTE: subí este número en CADA actualización de los archivos.
    Si no cambia, los navegadores que ya visitaron el sitio siguen sirviendo
    la copia vieja desde el caché y no ven los cambios nunca.              */
-const VERSION = 'lex-v15';
+const VERSION = 'lex-v17';
 const NUCLEO = [
   './',
   './index.html',
@@ -17,6 +17,12 @@ const NUCLEO = [
   './js/agentes.js',
   './js/ingesta.js',
   './js/aprendizaje.js',
+  './js/grabacion.js',
+  './js/objeciones.js',
+  './js/preparacion.js',
+  './js/competencia.js',
+  './js/vigencia.js',
+  './js/audiencias.js',
   './js/app.js',
   './manifest.json',
   './icon-192.png',

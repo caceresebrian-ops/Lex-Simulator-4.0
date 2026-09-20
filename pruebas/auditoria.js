@@ -1,6 +1,6 @@
 require('./simulacro-dom.js');
-['conocimiento','casos','biblioteca','motor','agentes','ingesta','aprendizaje','app'].forEach(f =>
-  require('/home/claude/lex/js/'+f+'.js'));
+['conocimiento','casos','biblioteca','motor','agentes','ingesta','aprendizaje','app','grabacion','objeciones','preparacion','competencia','vigencia','audiencias'].forEach(f =>
+  require('../js/'+f+'.js'));
 const $ = s => global.document.querySelector(s);
 const espera = ms => new Promise(r => setTimeout(r, ms));
 const fallas = [];
@@ -53,7 +53,7 @@ const PLANTEOS = {
 
   console.log('\n═══ 4. INGESTA DE CAUSA REAL ═══');
   try {
-    $('#txtCausa').value = require('fs').readFileSync('/tmp/ipp.txt','utf8');
+    $('#txtCausa').value = require('fs').readFileSync('./ipp-ejemplo.txt','utf8');
     $('#revisarCausa').onclick();
     const n = ($('#listaDatos').innerHTML.match(/class="dato/g)||[]).length;
     ok('detecta datos personales', n>0, n+' hallazgos');
