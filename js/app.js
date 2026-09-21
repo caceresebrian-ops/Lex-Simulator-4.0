@@ -97,19 +97,32 @@ $('#irCausa').onclick    = () => { pintarCausa(); ver('causa'); };
 
 /* Menú desplegable: en el teléfono la barra no alcanza para seis secciones */
 const menu = $('#menu'), hb = $('#abrirMenu');
-if (hb){
+if (hb && menu){
+  /* Un velo detrás del menú: tocar afuera lo cierra, y se entiende que
+     hay una capa abierta encima de la portada.                        */
+  const velo = document.createElement('div');
+  velo.className = 'veloMenu';
+  document.body.appendChild(velo);
+
+  const cerrar = () => {
+    menu.classList.remove('abierto'); velo.classList.remove('abierto');
+    hb.setAttribute('aria-expanded', 'false');
+  };
+  const abrir = () => {
+    /* el menú se ubica justo debajo de la cabecera, donde sea que esté */
+    const cab = document.querySelector('.cabecera');
+    const abajo = cab ? cab.getBoundingClientRect().bottom : 60;
+    menu.style.setProperty('--menuTop', Math.round(abajo + 6) + 'px');
+    menu.classList.add('abierto'); velo.classList.add('abierto');
+    hb.setAttribute('aria-expanded', 'true');
+  };
   hb.onclick = e => {
     e.stopPropagation();
-    const abierto = menu.classList.contains('abierto');
-    menu.classList.toggle('abierto', !abierto);
-    hb.setAttribute('aria-expanded', String(!abierto));
+    menu.classList.contains('abierto') ? cerrar() : abrir();
   };
-  document.addEventListener('click', () => {
-    menu.classList.remove('abierto'); hb.setAttribute('aria-expanded','false');
-  });
-  menu.addEventListener('click', () => {
-    menu.classList.remove('abierto'); hb.setAttribute('aria-expanded','false');
-  });
+  velo.onclick = cerrar;
+  /* elegir una sección también cierra el menú */
+  menu.addEventListener('click', cerrar);
 }
 $('#irFalacias').onclick = () => { pintarFalacias(); ver('falacias'); };
 $('#irDiagnostico').onclick = () => { pintarDiagnostico(); ver('diagnostico'); };

@@ -11,7 +11,7 @@ function nodo(tag){
     appendChild(c){c._padre=this; this.children.push(c); return c}, remove(){ if(this._padre){const i=this._padre.children.indexOf(this); if(i>=0)this._padre.children.splice(i,1);} }, 
     setAttribute(){}, getAttribute(){return null}, addEventListener(){},
     querySelector(sel){ const h=String(this._html||''); const m=h.match(/<p class="dicho">([\s\S]*?)<\/p>/); const n2=nodo('p'); if(m){n2._html=m[1]; n2._text=m[1].replace(/<[^>]+>/g,'');} n2.querySelectorAll=()=>[]; return n2; }, querySelectorAll(){return []},
-    scrollIntoView(){}, focus(){}, click(){}, onclick:null, oninput:null, onchange:null,
+    scrollIntoView(){}, focus(){}, click(){}, getBoundingClientRect(){return {top:0,bottom:62,left:0,right:360,width:360,height:62}}, onclick:null, oninput:null, onchange:null,
     scrollTop:0, scrollHeight:0, clientWidth:300, offsetLeft:0, offsetWidth:100,
     get lastElementChild(){return this.children[this.children.length-1]||null}
   };

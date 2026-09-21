@@ -10,7 +10,7 @@
   --azul-medio:#2E77C4;
   --celeste:#7FB3E3;
   --celeste-pal:#E8F1FA;
-  --fondo:#F4F7FA;
+  --fondo:#ECEEF1;
   --blanco:#FFFFFF;
   --borde:#DCE4ED;
   --gris:#5A6B7E;
@@ -83,7 +83,7 @@ a{color:var(--azul)}
   position:relative;overflow:hidden;
   background:
     linear-gradient(104deg, transparent 0 calc(50% - 3px), var(--punzo) calc(50% - 3px) calc(50% + 3px), transparent calc(50% + 3px)),
-    linear-gradient(170deg, var(--blanco) 0%, var(--celeste-pal) 100%);
+    linear-gradient(170deg, #F7F8F9 0%, #E4E7EB 100%);
 }
 /* laurel: las dos ramas verdes, como marco lateral tenue */
 .heroe::before{
@@ -166,13 +166,18 @@ a{color:var(--azul)}
   /* En el teléfono el menú no entra en la barra: pasa a desplegable.
      Antes quedaba cortado y Ajustes era inalcanzable.              */
   .hamburguesa{display:grid}
+  /* Capa fija sobre la pantalla. Antes era absoluta dentro de la cabecera,
+     y la cabecera recorta todo lo que sobresale (para que no desborde la
+     diagonal de la bandera): el menú se abría pero quedaba invisible.   */
   .menu{
-    position:absolute;top:100%;right:8px;left:8px;z-index:40;
+    position:fixed;top:var(--menuTop,64px);right:10px;left:10px;z-index:90;
     flex-direction:column;align-items:stretch;gap:0;
     background:var(--blanco);border:1px solid var(--borde);border-radius:12px;
     box-shadow:var(--sombra-alta);padding:6px;display:none;
   }
   .menu.abierto{display:flex}
+  .veloMenu{position:fixed;inset:0;z-index:89;background:rgba(15,42,77,.28);display:none}
+  .veloMenu.abierto{display:block}
   .menu .plano{
     font-size:15px;text-decoration:none;text-align:left;
     padding:13px 14px;border-radius:8px;color:var(--marino);
